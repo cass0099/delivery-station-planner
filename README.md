@@ -1,14 +1,3 @@
----
-title: Delivery Station Planner
-emoji: 📦
-colorFrom: red
-colorTo: gray
-sdk: docker
-app_port: 7860
-pinned: false
-short_description: Simulate next-day parcel delivery and size a station network
----
-
 # Delivery Station Planner
 
 This project uses a basic simulation to find the lowest-cost network of delivery stations for next-day DoorDash Parcel delivery in Minneapolis–St. Paul. A delivery station receives overnight trucks, sorts packages into routes, and is where Dashers pick up their routes in the morning. The question is how many stations the metro area should run and how large each one should be.
@@ -55,4 +44,4 @@ python -m engine.live --sensitivity 0.02 0.03 0.05
 streamlit run app/streamlit_app.py
 ```
 
-The hosted app uses `requirements-app.txt` and the `Dockerfile`, and it loads only the small prepared files in `data/prepared` and the saved results in `scenarios`.
+The hosted app runs on Streamlit Community Cloud. It installs only the libraries in `app/requirements.txt` and loads only the small prepared files in `data/prepared` and the saved results in `scenarios`. A `Dockerfile` is also included for hosts that run containers.

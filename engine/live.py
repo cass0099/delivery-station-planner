@@ -59,7 +59,37 @@ def available_cpus() -> int:
             n = min(n, max(1, int(int(quota) / int(period))))
     except (OSError, ValueError):
         pass
-    return max(1, n)
+    return max(1, min(n, workers_memory_allows()))
+
+
+WORKER_MB = 260          # one simulation worker after loading the market (measured ~210 MB), plus headroom
+APP_RESERVE_MB = 500     # the Streamlit app itself and its cached data
+
+
+def available_memory_mb() -> float | None:
+    """Memory this process may still use: the container's limit if there is one, else what the system has free."""
+    try:
+        limit = open("/sys/fs/cgroup/memory.max").read().strip()
+        if limit != "max":
+            used = int(open("/sys/fs/cgroup/memory.current").read().strip())
+            return (int(limit) - used) / 2**20
+    except (OSError, ValueError):
+        pass
+    try:
+        for line in open("/proc/meminfo"):
+            if line.startswith("MemAvailable:"):
+                return int(line.split()[1]) / 1024
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def workers_memory_allows() -> int:
+    """How many simulation workers fit in memory, so a small host (e.g. Streamlit Community Cloud) never runs out."""
+    mb = available_memory_mb()
+    if mb is None:
+        return 64
+    return max(1, int((mb - APP_RESERVE_MB) // WORKER_MB))
 
 
 # ---------------------------------------------------------------- workers
