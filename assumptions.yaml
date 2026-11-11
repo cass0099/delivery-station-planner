@@ -1,0 +1,429 @@
+# Every synthetic number, target and random seed lives here.
+# Engine code reads this file; nothing in engine/ hard-codes these values.
+# Reference numbers carry a source (checked 2026-11-11). Values marked "assumption" have no
+# public source and are stated choices; change them here.
+
+random_seed: 20261111
+
+markets:
+  msp:
+    name: Minneapolis–St. Paul
+    # Seven-county Twin Cities region (Metropolitan Council definition).
+    state_fips: "27"
+    counties:
+      "003": Anoka
+      "019": Carver
+      "037": Dakota
+      "053": Hennepin
+      "123": Ramsey
+      "139": Scott
+      "163": Washington
+    # Metric CRS for areas and distances (NAD83 / UTM zone 15N).
+    projected_crs: EPSG:26915
+
+data_sources:
+  acs_year: 2023        # ACS 5-year estimates (2019–2023)
+  tiger_year: 2023      # Census cartographic boundary files for tracts
+
+roads:
+  # Phase 1 pulls the main road network only. It is enough for hub-to-
+  # neighborhood drive times in the fast estimate. The full residential
+  # network is pulled later for real-road routing in the final check.
+  highway_types: [motorway, motorway_link, trunk, trunk_link, primary, primary_link,
+                  secondary, secondary_link, tertiary, tertiary_link]
+
+stores:
+  # OpenStreetMap shop types treated as possible local pickup points.
+  shop_types: [supermarket, convenience, department_store, general, variety_store,
+               hardware, doityourself, electronics, clothes, shoes, books, pet,
+               chemist, sports, toys, furniture, houseware, gift, beauty, cosmetics]
+
+hub_candidates:
+  # Real sites: OpenStreetMap land use. Costs come later and are synthetic.
+  landuse_types: [industrial]
+  min_site_area_m2: 20000      # ~2 ha: room for a small sort building, docks and van/car staging
+  coverage_radius_km: 12       # a site "reaches" households within this straight-line distance
+  min_spacing_km: 5            # no two shortlisted sites closer than this
+  max_candidates: 25
+  # Industrial land that could never be a parcel hub: utilities, waste, heavy industry.
+  # A site is dropped if any of these OSM tags match, or its name contains a keyword.
+  exclude_tags:
+    industrial: [scrap_yard, water, oil, refinery, petroleum_terminal, gas_storage, port,
+                 asphalt_plant, recycling, metal_processing, sawmill]
+    man_made: [wastewater_plant, water_works, pumping_station, works]
+    power: any
+    amenity: [recycling]
+  exclude_name_keywords: [power plant, generating, substation, steam plant, heating plant,
+                          refinery, gas plant, biomass, quarry, gravel, wastewater, water treatment,
+                          compost, landfill, transfer station, yard waste, salvage, recycling,
+                          scrap, asphalt, concrete]
+
+demand:
+  # Market packages per day = households x packages_per_household_per_day x network_share
+  packages_per_household_per_day: 0.46
+  # Derived: 22.4 billion US parcels in 2024 (Pitney Bowes Parcel Shipping Index 2025)
+  #          / ~132 million US households (Census CPS ASEC 2024) / 365 days = 0.46.
+  network_share: 0.03          # share of the market's parcels our network delivers (business assumption)
+
+  # Day-of-week pattern. Must average 1.0 so the weekly total is unchanged.
+  # Shape assumption: weekend orders land on Monday; Sunday is light.
+  day_of_week_multipliers:
+    Mon: 1.20
+    Tue: 1.10
+    Wed: 1.05
+    Thu: 1.05
+    Fri: 1.00
+    Sat: 0.95
+    Sun: 0.65
+
+  # Holiday peak scales every day of a peak week (used as a named scenario from phase 3).
+  holiday_peak_multiplier: 1.8
+
+  # Package sizes. Drivers use personal cars, so route capacity is set by volume.
+  package_sizes:
+    small:  {share: 0.60, volume_m3: 0.006}   # ~ shoebox
+    medium: {share: 0.30, volume_m3: 0.025}
+    large:  {share: 0.10, volume_m3: 0.070}
+
+# ---------------------------------------------------------------- phase 2: local engine
+
+# Hand-picked design list (phase 3 scores every one; no search algorithm yet).
+# k hubs at the top-k shortlisted sites (data/prepared/<market>/hub_candidates.gpkg), all the
+# same size, plus "big first hub" variants where site #1 is one size up.
+design_grid:
+  hub_counts: [1, 2, 3, 4]
+  sizes: [small, medium, large]
+  big_first_hub_variants: true
+
+# Next-day service. Times are "D-1 HH:MM" (evening before) or "D HH:MM" (delivery day).
+schedule:
+  linehaul_waves:              # trucks reach the hub overnight; share of the hub's packages on each wave
+    - {arrive: "D-1 20:00", share: 0.25}
+    - {arrive: "D-1 23:00", share: 0.35}
+    - {arrive: "D 02:00", share: 0.25}
+    - {arrive: "D 05:00", share: 0.15}
+  sort_cutoff: "D 07:00"       # packages not sorted by now miss today's routes (late)
+  route_start: "D 08:00"       # drivers arrive, load and leave
+  promise_end: "D 20:00"       # delivered after this counts as late
+
+hubs:
+  sizes:
+    # sort_packages_per_labor_hour: economies of scale (assumption). Bigger stations justify more automation
+    # (powered conveyors, scan tunnels, induction), so each labor hour sorts more packages.
+    # fitout_per_sqft by size: the automation behind higher productivity costs more to install (assumption).
+    small:  {sort_rate_per_hour: 1500, square_feet: 40000,  fixed_staff_hours_per_day: 30, loading_lanes: 20, sort_packages_per_labor_hour: 150, fitout_per_sqft: 25.00}
+    medium: {sort_rate_per_hour: 3000, square_feet: 80000,  fixed_staff_hours_per_day: 50, loading_lanes: 40, sort_packages_per_labor_hour: 190, fitout_per_sqft: 35.00}
+    large:  {sort_rate_per_hour: 6000, square_feet: 150000, fixed_staff_hours_per_day: 80, loading_lanes: 70, sort_packages_per_labor_hour: 240, fitout_per_sqft: 50.00}
+  lease_per_sqft_per_year: 9.35       # Twin Cities industrial average rent: $9.1–10.0 in 2025–26 (Colliers Q2-25 $9.58,
+                                      # Transwestern Q3-25 $9.96, CBRE Q1-26 $9.34 asking, CBRE Q2-26 $9.12 NNN)
+  # Costs beyond rent (assumptions). Broker averages mix gross and NNN quotes; property tax and building
+  # insurance are not added separately, so rent may be understated by a few dollars per sq ft if NNN.
+  fitout_per_sqft: 25.00              # fallback when a size does not set its own
+  # Property taxes, building insurance and common-area charges on top of the quoted rent (broker averages are
+  # largely before these). Typical Twin Cities industrial range is roughly $2.50-$4.00 per sq ft a year (assumption).
+  nnn_per_sqft_per_year: 3.00
+  operating_per_sqft_per_year: 3.00   # utilities, repairs and maintenance, security
+  site_opening_cost: 250000           # one-time per site: permits, hiring and training, launch
+  amortization_years: 7               # fit-out and opening costs spread over a typical lease term
+  # Loader labor per route (paid at sort wage): a fixed part plus time per package. A 46-package route ~10 min.
+  loader_minutes_per_route: 3
+  loader_seconds_per_package: 9
+  fixed_staff_wage_per_hour: 32.00    # supervisors, dispatch, yard
+  sort_wage_per_hour: 22.00           # hand laborers & material movers, Minneapolis metro: $21.94 mean (BLS OEWS May 2023)
+  sort_packages_per_labor_hour: 150   # fallback when a size does not set its own (assumption)
+  # Peak strain: a hub is staffed for this share of its overnight sort capacity. Volume above it is
+  # sorted by overtime/temp labor: higher wage, lower productivity, and a slower sort for that volume.
+  # Loaders go on overtime in the same proportion as the hub's sort volume.
+  staffed_share_of_capacity: 0.80
+  overtime_wage_multiplier: 1.5
+  overtime_productivity: 0.85
+
+overhead_per_package: 0.35    # tech, support, claims, insurance (assumption)
+
+routing:
+  # Fast estimate: in-area distance ~ k * sqrt(stops x area served), plus the drive from hub to area.
+  circuity_k: 0.75                  # ~0.57 for straight lines (Daganzo) x ~1.3 road circuity
+  # Real routes inside a neighborhood cover more distance than the formula, because they follow faster main roads:
+  # same time, more km. Calibrated by engine.route_check (OR-Tools on real streets, two hubs, one day: 1.36 and
+  # 1.64, pooled 1.56). Applies to kilometres only (mileage pay and car costs), not to route time.
+  local_distance_factor: 1.56
+  stem_congestion_factor: 1.30      # free-flow road-network times x this (routes leave in the morning rush)
+  dense_households_per_km2: 1500    # at or above: "dense" profile (apartments, short hops)
+  # Packages per stop come from density: deliveries land on stop points (a house, or an apartment
+  # building's entrance or mailroom) at random. stops = points x (1 - exp(-deliveries / points)), so
+  # busier days put more deliveries on the same stop. Each delivery averages items_per_delivery packages.
+  items_per_delivery: 1.15          # multi-box orders (assumption)
+  profiles:
+    dense:    {households_per_stop_point: 20, service_minutes_per_stop: 3.0, local_speed_kmh: 22}
+    suburban: {households_per_stop_point: 1,  service_minutes_per_stop: 2.0, local_speed_kmh: 35}
+  max_route_hours: 10.0             # cap only; in practice car space limits routes well before this
+  max_packages_per_route: 60        # handling limit even if the car has room
+  car_cargo_m3: 0.85                # usable trunk + back seat of a typical sedan or small SUV
+  # Loading a route at the hub (the Dasher waits for it; each loading lane loads one route at a time): a fixed
+  # part plus time per package. A 46-package sedan route takes ~15 min; a 178-package van route ~44 min.
+  hub_load_minutes: 5
+  hub_load_seconds_per_package: 13
+  snap_speed_kmh: 25                # from a site/neighborhood point to the nearest main road
+
+drivers:
+  # Calibrated so typical gross pay lands ~$24/hour, inside public gig parcel ranges (see reference_checks).
+  pay_base_per_route: 16.00
+  pay_per_stop: 1.00
+  pay_per_km: 0.20                  # in-route and hub-to-area km
+  # Unpaid commute to the hub (Dashers arrive at a staggered pickup slot). By default it depends on the network:
+  # Dashers are assumed to live where households live and to work at their nearest hub, so each hub's commute is
+  # the household-weighted drive from its own service area, at morning-rush speed. Fewer hubs -> longer commutes.
+  commute_from_service_area: true
+  commute_minutes: 20               # used only when commute_from_service_area is false
+  commute_km: 15                    # used only when commute_from_service_area is false
+  vehicle_cost_per_km: 0.450        # IRS 2026 business standard mileage rate $0.725/mile (IRS Notice 2026-10)
+  # Bigger vehicles cost more to run. The IRS rate applies to a sedan; per-km cost rises in a straight line with
+  # cargo space to the van rate (assumption: roughly double the fuel of a sedan, plus higher maintenance).
+  vehicle_cost_per_km_van: 0.750     # ~$1.21/mile
+  vehicle_reference_cuft: {sedan: 30, van: 250}
+  # Share of Dashers whose vehicle has at least this much cargo space, in cubic feet (assumption). Fewer Dashers
+  # can take big-vehicle routes, so each offer is accepted less often. Straight-line between points.
+  vehicle_availability: [[30, 1.0], [70, 0.45], [150, 0.12], [250, 0.03], [350, 0.01]]
+  # Chance a route gets claimed rises with its net pay per hour (logistic curve).
+  claim_midpoint_net_per_hour: 13.00   # 50% claimed at this net rate (~Flex median $20.89 gross less ~$7/h car cost)
+  claim_curve_width: 3.00              # $/hour; smaller = drivers more sensitive to pay
+  # Surge pricing clears the market: unclaimed routes are re-offered at +surge_step of base pay,
+  # again and again, up to surge_max. Driver supply is not a constraint except on extreme-weather days.
+  surge_step: 0.15
+  surge_max: 2.00
+  # Pay floor per route: if a route's base pay works out to less than the Dasher pay floor (objective) per hour
+  # after car costs, counting the unpaid commute, its base pay is raised to the floor. The raise is a cost of the
+  # network, so station layouts with long drives pay for it instead of being ruled out.
+  raise_base_to_floor: true
+  no_show_rate: 0.03                   # claimed but driver never arrives
+  no_show_rescue_delay_hours: 1.5      # no-show routes are re-offered (one surge step up) and leave this much later
+
+# ---------------------------------------------------------------- phase 3: uncertainty and search
+
+# Random weeks. Each week draws its own values; every design sees the same weeks.
+uncertainty:
+  weeks_search: 200          # random weeks used to score every design
+  weeks_final: 300           # fresh weeks for the final check of the top designs
+  final_top_n: 3
+  volume_week_sigma: 0.08    # week-level volume vs forecast (lognormal sd)
+  volume_day_sigma: 0.05     # extra day-to-day noise
+  truck_late_prob: 0.10      # chance a given linehaul wave into a given hub is late
+  truck_late_mean_hours: 1.5 # exponential delay when late
+  late_handoff_share_max: 0.06   # share of a wave's packages that miss their truck (uniform 0–max per day)
+  no_show_rate_range: [0.01, 0.06]   # weekly draw
+  # Extreme weather (blizzard, ice): fewer drivers, slower roads, surge capped. The only days routes go unclaimed.
+  extreme_weather_prob: 0.025       # about 9 days a year: a Minnesota winter (assumption)
+  extreme_supply_factor: 0.60       # claim chance per offer x this
+  extreme_time_factor: 1.50
+  extreme_surge_max: 1.30
+  slow_day_prob: 0.08        # bad weather or major traffic day
+  slow_day_time_factor: 1.35 # route time multiplier on a slow day
+  drive_time_sigma: 0.05     # everyday route-time noise (lognormal sd)
+  sort_rate_sigma: 0.07      # hub sort speed vs plan, per hub per day (normal sd, clipped 0.7–1.15)
+
+# What "best" means: lowest typical-week cost per package, subject to service and driver pay.
+objective:
+  # Service = both: a typical (median) week at or above the goal, and a floor met in nearly every week.
+  on_time_typical_target: 0.98   # goal: median week on-time rate
+  on_time_target: 0.96           # floor: a week "meets service" at or above this on-time rate
+  on_time_week_share: 0.95       # ... and must do so in at least this share of weeks (one bad week in 20)
+  # Weeks with a declared extreme-weather day are left out of the floor (like carriers' weather
+  # exclusions on service guarantees) and reported on their own line. Typical week and cost still use all weeks.
+  exclude_extreme_weather_weeks: true
+  # Peak weeks: carriers plan for, and customers accept, lower peak performance (ShipMatrix, Dec 2024: UPS 96.5%,
+  # FedEx 91.8%). These replace the targets above in holiday peak weeks (assumption).
+  peak_targets: {on_time_typical_target: 0.97, on_time_target: 0.94, on_time_week_share: 0.90}
+  driver_net_per_hour_floor: 15.00   # typical-week driver pay per hour, net of car costs (public median ~$14)
+  # If no design meets every target: designs within this many points of the best share of weeks
+  # meeting service count as tied on service, and the cheapest of them is recommended.
+  infeasible_service_tolerance: 0.03
+  # Year-round pick: networks within this share of the cheapest year cost count as tied on cost,
+  # and the one with the best worst-scenario share of weeks meeting the floor wins (resilience first).
+  year_round_cost_tie: 0.01
+  screen_min_on_time: 0.90       # average-day screen: drop designs below this
+  screen_max_cost_vs_best: 1.30  # ... or costing more than this x the cheapest
+
+# One network for the whole year: the design must meet the targets in every scenario; among those,
+# lowest typical cost weighted by how many weeks a year each scenario represents (assumption).
+weeks_per_year:
+  normal: 44
+  holiday_peak: 6
+  hub_outage: 2
+
+# Peak flex: in peak weeks each open station adds temporary labor and longer shifts (assumption).
+peak_flex:
+  enabled: true
+  sort_capacity_boost: 0.35          # sort rate this much higher in peak weeks; the extra is paid at the overtime rate
+  setup_cost_per_station_week: 10000 # agency fees, rented equipment and supervision per open station per peak week
+
+# Partner-carrier overflow: packages a station cannot sort by the cut-off (peak volume, a station outage) go to a
+# partner carrier instead of waiting a day (assumption; typical negotiated ground rates, not a quote).
+partner:
+  enabled: false                     # off by default; switch on in step 5 to test it
+  cost_per_package: 6.00
+  max_share_of_day: 0.15             # at most this share of the day's packages can go to the partner
+  on_time_rate: 0.95                 # share of partner-delivered packages that arrive on time
+
+# Named scenarios. The search runs for each.
+scenarios:
+  normal:
+    description: A normal week
+    volume_multiplier: 1.0
+  holiday_peak:
+    description: Holiday peak week (volume x1.8)
+    volume_multiplier: 1.8
+    peak: true                 # peak flex options apply in this kind of week
+  hub_outage:
+    description: The busiest hub is down all Wednesday (trucks reroute to the nearest open hub)
+    volume_multiplier: 1.0
+    outage_day: Wed
+
+# Public reference ranges. Each phase checks its outputs against these.
+reference_checks:
+  msp_households:
+    description: Households in the seven-county region
+    low: 1150000
+    high: 1350000
+    source: "Metropolitan Council 2024 estimates, 1,303,817 households (model uses ACS 2019–23 5-year, ~3% lower)"
+  mean_households_per_tract:
+    description: Average households per Census tract
+    low: 800
+    high: 2500
+    source: "Census Bureau tract design target of 1,200–8,000 people (optimum 4,000), divided by ~2.4 people per household"
+  packages_per_household_per_day:
+    description: US parcels per household per day, all carriers
+    low: 0.35
+    high: 0.60
+    source: "Pitney Bowes Parcel Shipping Index (21.7B parcels 2023, 22.4B 2024) / ~132M households / 365"
+  cost_per_package:
+    description: Last-mile cost per residential package (hub, sort, driver, overhead; no linehaul)
+    low: 2.00
+    high: 8.00
+    source: "Weak public data; definitions vary. Analyst estimates for Amazon run ~$4.75 (2024, secondary source) to ~$7.50 (Cowen, older, broader scope); 2017 urban labor alone ~$2.10 (Statista). Model excludes linehaul and upstream sort, so it should sit low in the range"
+  driver_gross_per_hour:
+    description: Gig delivery driver gross earnings per hour, before car costs
+    low: 18
+    high: 26
+    source: "Amazon Flex advertises $18–25/hour; Gridwise 2025 data on 11,600 Flex drivers, median $20.89/hour, top 10% $25.96+"
+  on_time_rate:
+    description: Share of packages delivered on time (normal week)
+    low: 0.95
+    high: 0.995
+    source: "ShipMatrix: UPS 98.7%, FedEx 98.3% (Dec 2023); peak Dec 2024 fell to UPS 96.5%, FedEx 91.8%, USPS 90.4%"
+
+# ---------------------------------------------------------------- app: what a visitor can change
+# Each control points at a value above by its dotted path. Ranges are what the app allows, not forecasts.
+# kind: slider (default), toggle, clock (time of day, "D HH:MM"), range (two-ended slider), scale (multiplies
+# every value matching a * path). format: pct, pct1, pct_above (a multiplier shown as % above 1), per_year
+# (a daily probability shown as days per year), cuft (cubic metres shown as cubic feet), money, money0, num1,
+# num2, int, x, hours. display_step sets
+# the slider step in display units when the model-unit step would be awkward.
+app_controls:
+  run:
+    quick:                           # seconds: a rough answer for exploring
+      weeks: 40                      # simulated weeks per layout and kind of week
+      top_designs_per_scenario: 3    # cheapest layouts kept from each kind of week's screen
+    full:                            # minutes: the method behind the published results
+      search_weeks: 200              # every layout that passes the screen, per kind of week
+      recheck_weeks: 500             # fresh weeks for the closest layouts, in every kind of week (~1.5-point precision)
+      recheck_top_designs: 3         # best layouts from each kind of week's search go to the recheck
+  steps:
+    - key: volume
+      name: Volume
+      title: Set the volume assumptions
+      question: How many packages will the network carry?
+      note: Volume sets the size of the problem. More packages make routes fuller, which lowers the cost of each delivery, but the stations also have to sort more packages overnight. The busiest nights determine how much station capacity the network needs.
+      uses: On each simulated day, every Census tract receives a random number of packages around this average. Mondays are busier than other days, and the holiday peak raises the volume on every day of the week.
+      controls:
+        - {path: demand.network_share, label: Share of metro parcels, min: 0.01, max: 0.10, step: 0.005, format: pct1, unit: of all metro parcels}
+        - {path: demand.packages_per_household_per_day, label: Parcels per household per day, min: 0.30, max: 0.70, step: 0.01, format: num2, unit: parcels per household per day}
+        - {path: scenarios.holiday_peak.volume_multiplier, label: Holiday peak volume above normal, min: 1.2, max: 2.5, step: 0.05, format: pct_above, unit: more packages than a normal week}
+    - key: hubs
+      name: Station costs
+      title: Set the station cost assumptions
+      question: What does a station cost, and how fast can it sort?
+      note: Every station adds rent, staff and equipment costs. A station's sort speed determines how many packages are ready when Dashers arrive in the morning. Packages that miss the sort cut-off are delivered a day late.
+      uses: Each open station sorts packages overnight at its sort speed. Rent, fit-out and fixed staff are charged every day, whether the station is busy or not. Sort labor is charged for each package, and the rate rises to overtime once a station passes its staffed level.
+      controls:
+        - {path: hubs.sizes.small.sort_rate_per_hour, label: Small station sort speed, packages per hour, min: 500, max: 3000, step: 100, format: int, unit: packages per hour}
+        - {path: hubs.sizes.medium.sort_rate_per_hour, label: Medium station sort speed, packages per hour, min: 1000, max: 6000, step: 250, format: int, unit: packages per hour}
+        - {path: hubs.sizes.large.sort_rate_per_hour, label: Large station sort speed, packages per hour, min: 2000, max: 12000, step: 500, format: int, unit: packages per hour}
+        - {path: hubs.lease_per_sqft_per_year, label: Rent per sq ft per year, min: 6.0, max: 16.0, step: 0.25, format: money, unit: per sq ft per year}
+        - {path: hubs.sizes.small.fitout_per_sqft, label: Small station fit-out per sq ft, min: 5, max: 120, step: 1, format: money0, unit: per sq ft}
+        - {path: hubs.sizes.medium.fitout_per_sqft, label: Medium station fit-out per sq ft, min: 5, max: 120, step: 1, format: money0, unit: per sq ft}
+        - {path: hubs.sizes.large.fitout_per_sqft, label: Large station fit-out per sq ft, min: 5, max: 120, step: 1, format: money0, unit: per sq ft}
+        - {path: hubs.nnn_per_sqft_per_year, label: Taxes and building charges per sq ft per year, min: 0.0, max: 8.0, step: 0.25, format: money, unit: per sq ft per year}
+        - {path: hubs.site_opening_cost, label: One-time cost to open a site, min: 0, max: 1000000, step: 25000, format: money0, unit: per site}
+        - {path: hubs.sort_wage_per_hour, label: Sort and loading wage per hour, min: 15.0, max: 35.0, step: 0.5, format: money, unit: per hour}
+        - {path: hubs.sizes.small.sort_packages_per_labor_hour, label: Small station sort productivity, min: 60, max: 400, step: 5, format: int, unit: packages per labor hour}
+        - {path: hubs.sizes.medium.sort_packages_per_labor_hour, label: Medium station sort productivity, min: 60, max: 400, step: 5, format: int, unit: packages per labor hour}
+        - {path: hubs.sizes.large.sort_packages_per_labor_hour, label: Large station sort productivity, min: 60, max: 400, step: 5, format: int, unit: packages per labor hour}
+    - key: drivers
+      name: Dasher pay
+      title: Set the Dasher pay assumptions
+      question: How much does a route pay?
+      note: Dashers choose routes based on what they earn per hour after car costs. If a route pays too little, nobody accepts it until its base pay is raised, and that raises the cost of delivery.
+      uses: At the cut-off, the sorted packages are grouped into routes that stay within these limits. Each route is offered to Dashers, and the chance that a Dasher accepts it rises with its pay per hour. If nobody accepts a route, it is offered again with its base pay raised, up to the limit set below.
+      controls:
+        - {path: drivers.pay_base_per_route, label: Base pay per route, min: 0, max: 40, step: 1, format: money0, unit: per route}
+        - {path: drivers.pay_per_stop, label: Pay per stop, min: 0.0, max: 3.0, step: 0.1, format: money, unit: per stop}
+        - {path: drivers.pay_per_km, label: Pay per mile driven, min: 0.0, max: 0.6214, display_step: 0.05, format: money_per_mile, unit: per mile}
+        - {path: drivers.claim_midpoint_net_per_hour, label: Hourly pay at which half of Dashers accept, min: 8, max: 25, step: 0.5, format: money, unit: per hour after car costs}
+        - {path: drivers.claim_curve_width, label: How much acceptance changes with pay, min: 1.0, max: 8.0, step: 0.5, format: money, unit: an hour}
+        - {path: drivers.surge_max, label: Most a route's pay can rise above base, min: 1.0, max: 3.0, step: 0.05, format: pct_above, unit: above base pay}
+        - {path: drivers.raise_base_to_floor, kind: toggle, label: Raise base pay on any route that pays below the Dasher pay floor}
+        - {path: routing.max_route_hours, label: Longest route, min: 2.0, max: 10.0, step: 0.25, format: hours}
+        - {path: routing.max_packages_per_route, label: Most packages per route, min: 30, max: 300, step: 5, format: int, unit: packages per route}
+        - {path: routing.car_cargo_m3, label: Cargo space per Dasher vehicle, min: 0.2832, max: 9.911, display_step: 5, format: cuft}
+        - {path: drivers.vehicle_availability.1.1, label: Dashers with at least SUV space (70 cu ft), min: 0.0, max: 1.0, step: 0.01, format: pct, unit: of Dashers}
+        - {path: drivers.vehicle_availability.2.1, label: Dashers with at least minivan space (150 cu ft), min: 0.0, max: 1.0, step: 0.01, format: pct, unit: of Dashers}
+        - {path: drivers.vehicle_availability.3.1, label: Dashers with a cargo van (250 cu ft), min: 0.0, max: 1.0, step: 0.01, format: pct, unit: of Dashers}
+    - key: service
+      name: Service targets
+      title: Set the service targets
+      question: What level of service must the network deliver?
+      note: These targets act as guardrails. The model rules out any network that misses one of them, no matter how cheap that network is.
+      uses: A package counts toward OTD if it is delivered by 8 p.m. on the day it was due. The model scores every simulated week against these targets and rules out any station layout that misses them in any kind of week.
+      controls:
+        - {path: schedule.sort_cutoff, kind: clock, label: Sort cut-off, options: ["D 05:00", "D 06:00", "D 07:00", "D 08:00", "D 09:00"]}
+        - {path: objective.on_time_typical_target, label: OTD target in a typical week, min: 0.90, max: 0.995, step: 0.005, format: pct1, unit: OTD}
+        - {path: objective.on_time_target, label: OTD floor in any single week, min: 0.85, max: 0.99, step: 0.01, format: pct, unit: OTD}
+        - {path: objective.on_time_week_share, label: Weeks that must meet the OTD floor, min: 0.50, max: 1.00, step: 0.05, format: pct, unit: of weeks}
+        - {path: objective.peak_targets.on_time_typical_target, label: OTD target in a typical peak week, min: 0.85, max: 0.995, step: 0.005, format: pct1}
+        - {path: objective.peak_targets.on_time_target, label: OTD floor in any single peak week, min: 0.80, max: 0.99, step: 0.01, format: pct}
+        - {path: objective.peak_targets.on_time_week_share, label: Peak weeks that must meet the peak OTD floor, min: 0.50, max: 1.00, step: 0.05, format: pct}
+        - {path: objective.driver_net_per_hour_floor, label: Dasher pay floor per hour after car costs, min: 0, max: 25, step: 1, format: money0, unit: per hour after car costs}
+        - {path: objective.exclude_extreme_weather_weeks, kind: toggle, label: Exclude severe-weather weeks from the OTD floor}
+    - key: disruptions
+      name: Disruptions
+      title: Set the disruption and backup assumptions
+      question: How often do things go wrong, and how does the network cope?
+      note: Bad weeks are the reason delivery networks keep spare capacity. Instead of building more stations, a network can also add temporary sort capacity at peak or hand overflow to a partner carrier. Every station layout faces the same random weeks, so the comparison is fair.
+      uses: Each simulated week has its own late trucks, Dasher no-shows, slow traffic days and storms, drawn at these rates. The number of peak weeks and outage weeks per year determines how much those weeks count toward the yearly cost.
+      controls:
+        - {path: uncertainty.truck_late_prob, label: Chance a truck arrives late, min: 0.0, max: 0.40, step: 0.01, format: pct, unit: of truck arrivals}
+        - {path: uncertainty.volume_week_sigma, label: Week-to-week volume swing, min: 0.0, max: 0.25, step: 0.01, format: pct, unit: up or down}
+        - {path: uncertainty.no_show_rate_range, kind: range, label: Dasher no-show rate range, min: 0.0, max: 0.20, step: 0.01, format: pct, unit: of accepted routes}
+        - {path: uncertainty.slow_day_prob, label: Slow-traffic days per year, min: 0.0, max: 0.30, display_step: 1, format: per_year, unit: per year}
+        - {path: uncertainty.extreme_weather_prob, label: Severe-weather days per year, min: 0.0, max: 0.06, display_step: 0.5, format: per_year, unit: per year}
+        - {path: weeks_per_year.holiday_peak, label: Peak weeks per year, min: 0, max: 10, step: 1, format: int, unit: weeks per year}
+        - {path: weeks_per_year.hub_outage, label: Station outage weeks per year, min: 0, max: 8, step: 1, format: int, unit: weeks per year}
+        - {path: peak_flex.enabled, kind: toggle, label: Add temporary sort capacity in peak weeks}
+        - {path: peak_flex.sort_capacity_boost, label: Extra sort capacity in peak weeks, min: 0.0, max: 1.0, step: 0.05, format: pct, unit: above normal, requires: peak_flex.enabled}
+        - {path: peak_flex.setup_cost_per_station_week, label: Peak setup cost per station per week, min: 0, max: 50000, step: 1000, format: money0, requires: peak_flex.enabled}
+        - {path: partner.enabled, kind: toggle, label: Send overflow to a partner carrier}
+        - {path: partner.cost_per_package, label: Partner carrier cost per package, min: 2.0, max: 15.0, step: 0.25, format: money, requires: partner.enabled}
+        - {path: partner.max_share_of_day, label: Most of a day's packages the partner can take, min: 0.0, max: 0.5, step: 0.01, format: pct, unit: of the day's packages, requires: partner.enabled}
+        - {path: partner.on_time_rate, label: Partner carrier on-time rate, min: 0.70, max: 1.0, step: 0.01, format: pct, requires: partner.enabled}
+
+# ---------------------------------------------------------------- route check: fast estimate vs real roads
+# One hub's area on one day: packages are placed on real streets, routed with OR-Tools on the full drive network,
+# and compared with the fast square-root estimate the simulation uses. Run: python -m engine.route_check
+route_check:
+  design: "4x small"
+  hubs: [0, 1]                 # which hubs of the design to check (0 = the top-ranked site)
+  tracts_per_hub: 30           # the hub's nearest service-area tracts by drive time (keeps the street download small)
+  day: Mon
+  seed: 20261111
+  solver_seconds: 90           # OR-Tools time limit per hub
+  vehicle_slack: 1.6           # vehicles offered to the solver = fast-estimate routes x this

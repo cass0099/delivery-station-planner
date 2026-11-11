@@ -1,0 +1,9 @@
+.git
+.devcontainer
+data/raw
+cache
+shots
+tests
+**/__pycache__
+**/*.html
+*.png

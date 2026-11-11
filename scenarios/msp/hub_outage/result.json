@@ -1,0 +1,39 @@
+{
+  "market": "msp",
+  "scenario": "hub_outage",
+  "description": "The busiest hub is down all Wednesday (trucks reroute to the nearest open hub)",
+  "recommended": "3x small",
+  "recommended_hubs": "#1 small + #2 small + #3 small",
+  "recommended_feasible": true,
+  "runners_up": [
+    "4x small",
+    "3x small, big #1"
+  ],
+  "designs_screened": 18,
+  "designs_scored": 9,
+  "weeks_search": 200,
+  "weeks_final": 300,
+  "seconds": {
+    "screen": 0.1,
+    "search": 13.8,
+    "final": 13.7,
+    "total": 27.6
+  },
+  "workers": 9,
+  "objective": {
+    "on_time_typical_target": 0.98,
+    "on_time_target": 0.96,
+    "on_time_week_share": 0.95,
+    "exclude_extreme_weather_weeks": true,
+    "peak_targets": {
+      "on_time_typical_target": 0.97,
+      "on_time_target": 0.94,
+      "on_time_week_share": 0.9
+    },
+    "driver_net_per_hour_floor": 15.0,
+    "infeasible_service_tolerance": 0.03,
+    "year_round_cost_tie": 0.01,
+    "screen_min_on_time": 0.9,
+    "screen_max_cost_vs_best": 1.3
+  }
+}

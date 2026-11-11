@@ -1,0 +1,56 @@
+{
+  "name": "parcel-network",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+
+  // Needed only so the firewall script can set network rules at startup.
+  "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
+
+  "remoteUser": "vscode",
+
+  // Only the project folder is shared from the Mac (VS Code does that by default).
+  // These two are container-only storage that survives rebuilds:
+  //   - Claude Code login and settings (separate from the Mac's ~/.claude)
+  //   - downloaded map and census data
+  "mounts": [
+    "source=parcel-claude-config,target=/home/vscode/.claude,type=volume",
+    "source=parcel-data-cache,target=/home/vscode/cache,type=volume"
+  ],
+
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
+    "DISABLE_AUTOUPDATER": "1",
+    "PARCEL_CACHE_DIR": "/home/vscode/cache"
+  },
+
+  "remoteEnv": {
+    // Don't pass the Mac's SSH keys into the container.
+    "SSH_AUTH_SOCK": "",
+    // Passed through from the Mac only if set there. Never written to the repo.
+    "CENSUS_API_KEY": "${localEnv:CENSUS_API_KEY}"
+  },
+
+  "forwardPorts": [8501],
+  "portsAttributes": {
+    "8501": { "label": "Streamlit" }
+  },
+
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+  "waitFor": "postStartCommand",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "anthropic.claude-code"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python"
+      }
+    }
+  }
+}

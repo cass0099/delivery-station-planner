@@ -1,0 +1,39 @@
+{
+  "market": "msp",
+  "scenario": "normal",
+  "description": "A normal week",
+  "recommended": "3x small",
+  "recommended_hubs": "#1 small + #2 small + #3 small",
+  "recommended_feasible": true,
+  "runners_up": [
+    "2x small, big #1",
+    "1x medium"
+  ],
+  "designs_screened": 18,
+  "designs_scored": 14,
+  "weeks_search": 200,
+  "weeks_final": 300,
+  "seconds": {
+    "screen": 0.2,
+    "search": 21.7,
+    "final": 12.3,
+    "total": 34.2
+  },
+  "workers": 9,
+  "objective": {
+    "on_time_typical_target": 0.98,
+    "on_time_target": 0.96,
+    "on_time_week_share": 0.95,
+    "exclude_extreme_weather_weeks": true,
+    "peak_targets": {
+      "on_time_typical_target": 0.97,
+      "on_time_target": 0.94,
+      "on_time_week_share": 0.9
+    },
+    "driver_net_per_hour_floor": 15.0,
+    "infeasible_service_tolerance": 0.03,
+    "year_round_cost_tie": 0.01,
+    "screen_min_on_time": 0.9,
+    "screen_max_cost_vs_best": 1.3
+  }
+}

@@ -1,0 +1,22 @@
+# Downloaded public data (scripts re-download it)
+data/raw/
+cache/
+
+# Secrets
+.env
+.env.*
+*.key
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Mac
+.DS_Store
+
+# Large prepared outputs (regenerate with the engine scripts)
+data/prepared/**/*.html
+shots/

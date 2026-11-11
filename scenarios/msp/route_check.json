@@ -1,0 +1,52 @@
+[
+  {
+    "hub": 0,
+    "site_rank": 1,
+    "tracts": 30,
+    "packages": 814,
+    "street_nodes": 3233,
+    "fast": {
+      "routes": 19,
+      "km": 149.66874477290355,
+      "hours": 39.31710923921835,
+      "stops": 626.1463332609137,
+      "packages": 814
+    },
+    "real_roads": {
+      "routes": 19,
+      "km": 181.5077649531005,
+      "hours": 39.22375018912166,
+      "stops": 623,
+      "packages": 814
+    },
+    "km_ratio": 1.2127299205221982,
+    "hours_ratio": 0.9976254853954634,
+    "routes_ratio": 1.0,
+    "seconds": 96.8
+  },
+  {
+    "hub": 1,
+    "site_rank": 2,
+    "tracts": 30,
+    "packages": 874,
+    "street_nodes": 8453,
+    "fast": {
+      "routes": 19,
+      "km": 355.1897228787241,
+      "hours": 39.78285283182025,
+      "stops": 750.5507827023853,
+      "packages": 874
+    },
+    "real_roads": {
+      "routes": 19,
+      "km": 502.237774197306,
+      "hours": 42.46392123182261,
+      "stops": 753,
+      "packages": 874
+    },
+    "km_ratio": 1.4139986093257262,
+    "hours_ratio": 1.0673925626032006,
+    "routes_ratio": 1.0,
+    "seconds": 264.2
+  }
+]
