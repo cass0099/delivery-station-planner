@@ -1,0 +1,38 @@
+[
+  {
+    "share": 0.02,
+    "packages_per_day": 11585.826799999999,
+    "design": "2x small",
+    "hubs": "#1 small + #2 small",
+    "year_cost": 2.956451833313751,
+    "meets_all": true,
+    "runner_up": "3x small",
+    "runner_up_hubs": "#1 small + #2 small + #3 small",
+    "runner_up_cost": 3.122397953978181,
+    "hash": "b64fd12ff67725ee"
+  },
+  {
+    "share": 0.03,
+    "packages_per_day": 17378.7402,
+    "design": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "year_cost": 2.7495772133000003,
+    "meets_all": true,
+    "runner_up": "4x small",
+    "runner_up_hubs": "#1 small + #2 small + #3 small + #4 small",
+    "runner_up_cost": 2.8762877596000003,
+    "hash": "b64fd12ff67725ee"
+  },
+  {
+    "share": 0.05,
+    "packages_per_day": 28964.567,
+    "design": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "year_cost": 2.4990601263112757,
+    "meets_all": true,
+    "runner_up": "4x small, big #1",
+    "runner_up_hubs": "#1 medium + #2 small + #3 small + #4 small",
+    "runner_up_cost": 2.585594754092068,
+    "hash": "b64fd12ff67725ee"
+  }
+]
