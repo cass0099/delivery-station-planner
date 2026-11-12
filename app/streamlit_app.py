@@ -282,6 +282,12 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
     padding: 8px 0 !important; margin: 0 -16px; padding-left: 16px !important; padding-right: 16px !important;
     scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-padding: 0 16px; }}
   .st-key-nav::-webkit-scrollbar {{ display: none; }}
+  /* Nothing in the menu may shrink: each group and item keeps its full width, and the row scrolls instead. */
+  .st-key-nav > *, .st-key-nav_about, .st-key-nav_assume, .st-key-nav_run,
+  .st-key-nav [data-testid="stElementContainer"], .st-key-nav .stButton, .st-key-nav button {{
+    flex: 0 0 auto !important; width: max-content !important; min-width: max-content !important;
+    max-width: none !important; }}
+  .st-key-nav button, .st-key-nav button p {{ white-space: nowrap !important; }}
   .st-key-nav button {{ font-size: 13px !important; padding: 6px 10px !important; }}
   .st-key-nav_assume {{ padding: 3px 4px 3px 12px !important; }}
   .nav-group {{ font-size: 12px; padding-right: 8px; }}
@@ -295,7 +301,7 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
   .chart-note {{ font-size: 13.5px; }}
   [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] label {{ white-space: normal; overflow: visible; }}
   /* Buttons wrap instead of running off the screen; Back and Next stack, Next on top. */
-  .stButton > button, .stButton > button p {{ white-space: normal !important; text-align: center; }}
+  .stButton > button, .stButton > button p {{ white-space: normal; text-align: center; }}
   .st-key-pager {{ flex-direction: column-reverse !important; align-items: stretch !important; }}
   .st-key-pager [data-testid="stElementContainer"], .st-key-pager .stButton,
   .st-key-pager .stButton > button {{ width: 100% !important; }}
