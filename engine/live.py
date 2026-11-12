@@ -240,6 +240,31 @@ def _merge(into: dict, new: dict) -> None:
         into.setdefault(k, []).extend(v)
 
 
+def _quick_tier_scan(pool, a: dict, market: str, scenarios: list[str], ctl: dict, done: dict,
+                     progress: Progress | None) -> tuple[int, int, list[str]]:
+    """Full runs only: when the standard list fails, find the group of larger networks worth a full search with a
+    quick pass (the quick run's weeks and candidates) over every group, instead of fully searching each in turn.
+    Returns the group to search fully (the first where a layout meets every target, or else the group of the layout
+    closest to them), the last group checked, and every layout checked."""
+    q = ctl["quick"]
+    rows: dict = {}
+    tier_of: dict = {}
+    year = pd.DataFrame()
+    for t in range(1, n_tiers(a, market)):
+        screens = screen_all(a, market, t)["screens"]
+        new = candidates(screens, q["top_designs_per_scenario"])
+        tier_of.update({d: t for d in new})
+        total = done["weeks"] + len(new) * len(scenarios) * q["weeks"]
+        _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", q["weeks"]), done, total,
+                               "No layout met every target, so the run is checking larger networks quickly", progress))
+        frames = {sc: summarize(pd.DataFrame(rows[("final", sc)]), a, sc) for sc in scenarios}
+        year = year_round_table(frames, a)
+        if len(year) and bool(year["meets_all"].iloc[0]):
+            return t, t, list(tier_of)
+    last = n_tiers(a, market) - 1
+    return (tier_of.get(year.index[0], last) if len(year) else last), last, list(tier_of)
+
+
 def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None = None,
         progress: Progress | None = None, screen_info: dict | None = None) -> dict:
     """Simulate the standard list of layouts. If none meets every OTD target in every kind of week, add the next
@@ -254,7 +279,7 @@ def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None =
     tiers = n_tiers(a, market)
     done = {"weeks": 0, "packages": 0}
     rows: dict = {}
-    screens, designs, tier = None, [], 0
+    screens, designs, tier, scanned_to, scanned = None, [], 0, 0, []
     with ProcessPoolExecutor(workers, initializer=_init, initargs=(market, a)) as pool:
         while True:
             screens = merge_screens(screens, tier_screens)
@@ -292,7 +317,10 @@ def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None =
             year = year_round_table(frames, a)
             if (len(year) and bool(year["meets_all"].iloc[0])) or tier + 1 >= tiers:
                 break
-            tier += 1
+            if mode == "full" and tier == 0:
+                tier, scanned_to, scanned = _quick_tier_scan(pool, a, market, scenarios, ctl, done, progress)
+            else:
+                tier += 1
             if progress:
                 progress(1.0, "No layout met every target. Screening larger networks", dict(done, total=done["weeks"]))
             tier_screens = screen_all(a, market, tier)["screens"]
@@ -302,8 +330,8 @@ def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None =
             "designs": designs, "scenarios": scenarios, "seconds": round(time.perf_counter() - t0, 1),
             "hash": settings_hash(a), "estimate": quick_estimate(a, screen_info["screens"], market),
             "weeks_simulated": done["weeks"], "packages_simulated": done["packages"],
-            "tiers_tried": tier + 1, "tiers_available": tiers, "diagnosis": diagnose(frames, year, a),
-            "max_stations": max(len(get_design(d, a).hubs) for d in designs), **weeks_note}
+            "tiers_tried": max(tier, scanned_to) + 1, "tiers_available": tiers, "diagnosis": diagnose(frames, year, a),
+            "max_stations": max(len(get_design(d, a).hubs) for d in designs + scanned), **weeks_note}
 
 
 # ---------------------------------------------------------------- saved default runs

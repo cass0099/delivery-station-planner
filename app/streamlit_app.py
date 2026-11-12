@@ -39,8 +39,14 @@ def _reload_if_engine_changed() -> None:
         import types
         holder = sys.modules["_engine_stamp"] = types.ModuleType("_engine_stamp")
     if getattr(holder, "stamp", stamp) != stamp:
-        for name in [n for n in sys.modules if n == "engine" or n.startswith("engine.")]:
-            del sys.modules[name]
+        # Reload in place, in import order, so every module object (and anything holding it, such as a run already
+        # in progress in another session) sees the new code rather than a copy that no longer matches sys.modules.
+        import importlib
+        order = ["config", "randomness", "demand", "routing", "simulation", "checks", "search", "live"]
+        loaded = [n for n in sys.modules if n.startswith("engine.")]
+        for name in [f"engine.{m}" for m in order if f"engine.{m}" in loaded] + \
+                [n for n in loaded if n.split(".", 1)[1] not in order]:
+            importlib.reload(sys.modules[name])
         st.cache_data.clear()
         st.cache_resource.clear()
     holder.stamp = stamp
@@ -2070,7 +2076,9 @@ elif page == RESULTS - 1:
         with tab:
             st.html(f'<div class="tab-body"><div class="note" style="max-width:75ch">{text}</div>'
                     f'<div class="note" style="max-width:75ch">This run simulates about {weeks:,} weeks, counting each '
-                    f'station layout separately, and should take {seconds_label(secs)} on this server.</div></div>')
+                    f'station layout separately, and should take {seconds_label(secs)} on this server. If no layout of up to '
+                    f'{WORDS.get(max(a["design_grid"]["hub_counts"]))} stations meets every target, the run also tries '
+                    'larger networks and takes longer.</div></div>')
             with st.container(horizontal=True, vertical_alignment="center", key=f"runrow_{mode}"):
                 if done is not None:
                     st.button(f"See the {title.lower()} result", type="primary", key=f"see_{mode}",
