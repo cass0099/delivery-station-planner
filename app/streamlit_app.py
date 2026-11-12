@@ -55,7 +55,8 @@ def _reload_if_engine_changed() -> None:
 _reload_if_engine_changed()
 from engine.demand import DAYS
 from engine.search import objective_for
-from engine.live import estimate_seconds, load_baseline, planned_weeks, quick_estimate, run as live_run, screen_all, settings_hash
+from engine.live import (RunStopped, estimate_seconds, load_baseline, planned_weeks, quick_estimate, run as live_run,
+                         screen_all, settings_hash)
 from engine.simulation import CUFT_PER_M3 as _CUFT, clock, get_design, vehicle_availability, vehicle_cost_per_km
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1136,6 +1137,10 @@ def diagnosis_text(dg: dict | None, a: dict) -> str:
                           "Faster sorting, a later cut-off or more peak flex would help."),
         "dashers": (f"In the closest network, {dg['unclaimed']:.1%} of routes go unclaimed in a typical week. More "
                     "Dashers or higher base pay would help."),
+        "vehicles": (f"In the closest network, {dg['unclaimed']:.1%} of routes go unclaimed in a typical week. Routes are "
+                     f"planned for vehicles with {dg.get('cargo_cuft', 0):,.0f} cubic feet of cargo space, and only "
+                     f"{dg.get('vehicle_share', 0):.0%} of Dashers have one. Planning routes for smaller vehicles or "
+                     "assuming more Dashers with large vehicles would help."),
         "routes": (f"In the closest network, {late:.1%} of packages are late in a typical week, mostly because routes "
                    "finish after the 8 p.m. delivery deadline. Shorter routes or more Dashers would help."),
     }[dg["cause"]]
@@ -1697,23 +1702,35 @@ def start_job(a: dict, mode: str) -> tuple:
     need_default = saved_run(A0, mode) is None and settings_hash(a) != settings_hash(A0)
     job = {"state": "queued", "mode": mode, "frac": 0.0, "text": "Waiting for another run on this server to finish",
            "stats": {"weeks": 0, "packages": 0, "total": planned_weeks(screen_user, mode, CTL["run"])},
-           "started": time.time(), "result": None, "error": None, "a": a}
+           "started": time.time(), "result": None, "error": None, "a": a, "stop": False}
     store[key] = job
+    limit = CTL["run"].get("max_minutes", 30) * 60
+
+    def should_stop() -> bool:
+        if time.time() - job["started"] > limit:
+            job["why"] = "limit"
+        return job["stop"] or job.get("why") == "limit"
 
     def work():
         with lock:
+            if job["stop"]:                # stopped while it was still waiting for another run
+                job.update(state="stopped", why="visitor")
+                return
             job.update(state="running", started=time.time(), text="Checking every station layout on an average day")
             try:
                 def report(prefix=""):
-                    return lambda f, text, stats: job.update(frac=f, text=prefix + text, stats=stats)
-                r = live_run(a, mode, MARKET, progress=report(), screen_info=screen_user)
+                    return lambda f, text, stats: job.update(
+                        frac=f, text=prefix + text, stats={k: v for k, v in stats.items() if k != "stop"})
+                r = live_run(a, mode, MARKET, progress=report(), screen_info=screen_user, should_stop=should_stop)
                 store[(settings_hash(a), mode)] = r
                 if need_default:
                     job.update(frac=0.0, text="Running the default settings for comparison")
                     store[(settings_hash(A0), mode)] = live_run(
                         A0, mode, MARKET, progress=report("Default settings for comparison. "),
-                        screen_info=screen_default)
+                        screen_info=screen_default, should_stop=should_stop)
                 job.update(state="done", result=r, frac=1.0)
+            except RunStopped:
+                job.update(state="stopped", why=job.get("why") or "visitor")
             except Exception as err:      # shown to the visitor; the server keeps running
                 job.update(state="failed", error=repr(err))
     threading.Thread(target=work, daemon=True).start()
@@ -1744,12 +1761,32 @@ def progress_panel(key: tuple) -> None:
     if job["state"] in ("queued", "running"):
         st.progress(min(job["frac"], 1.0), text=job["text"])
         if job["state"] == "running":
+            elapsed = time.time() - job["started"]
+            left = ""
+            if stats["weeks"] > 0 and elapsed > 8 and stats["total"] > stats["weeks"]:
+                rest = (stats["total"] - stats["weeks"]) * elapsed / stats["weeks"]
+                left = f" At the current pace, this part of the run has {seconds_label(rest)} left."
+            limit = CTL["run"].get("max_minutes", 30)
             st.html(f'<div class="note" style="max-width:none">So far the model has simulated '
                     f'{stats["weeks"]:,} of about {stats["total"]:,} weeks, counting each station layout separately, '
                     'and covered '
                     f'{big_number(stats["packages"])} packages. Time elapsed: '
-                    f'{elapsed_label(time.time() - job["started"])}. You can leave this page and come back, and the '
-                    'run will keep going.</div>')
+                    f'{elapsed_label(elapsed)}.{left} You can leave this page and come back, and the '
+                    f'run will keep going. A run stops on its own after {limit} minutes, so that other visitors can '
+                    'use the server.</div>')
+        if not job["stop"]:
+            st.button("Stop this run", key="stop_run", type="secondary", on_click=lambda: job.update(stop=True))
+        else:
+            st.html('<div class="note">Stopping the run…</div>')
+    elif job["state"] == "stopped":
+        st.session_state.pop("active_job", None)
+        run_store().pop(key, None)
+        st.session_state["run_notice"] = (
+            f"The run went past the {CTL['run'].get('max_minutes', 30)}-minute limit and was stopped. These settings "
+            "make the simulation very slow. Try the quick run, or move the most extreme settings back toward their "
+            "defaults." if job.get("why") == "limit" else
+            "The run was stopped. You can change the settings or start it again.")
+        st.rerun(scope="app")
     elif job["state"] == "done":
         st.session_state.pop("active_job", None)
         show_result(job["a"], job["mode"], job["result"])
@@ -2078,20 +2115,31 @@ elif page == RESULTS - 1:
                     f'<div class="note" style="max-width:75ch">This run simulates about {weeks:,} weeks, counting each '
                     f'station layout separately, and should take {seconds_label(secs)} on this server. If no layout of up to '
                     f'{WORDS.get(max(a["design_grid"]["hub_counts"]))} stations meets every target, the run also tries '
-                    'larger networks and takes longer.</div></div>')
+                    'larger networks, which can make it take up to three times as long.</div>'
+                    + (f'<div class="note" style="max-width:75ch"><b>With these settings, this run would take longer '
+                       f'than the {CTL["run"].get("max_minutes", 30)}-minute limit on this server, so it is turned '
+                       'off.</b> Extreme settings, such as very high volume with many late trucks and no-shows, make each '
+                       'simulated week much slower. Try the quick run, or move the most extreme settings back toward '
+                       'their defaults.</div>' if secs > CTL["run"].get("max_minutes", 30) * 60 and done is None else '')
+                    + '</div>')
             with st.container(horizontal=True, vertical_alignment="center", key=f"runrow_{mode}"):
                 if done is not None:
                     st.button(f"See the {title.lower()} result", type="primary", key=f"see_{mode}",
                               on_click=show_result, args=(a, mode, done))
                     if st.button(f"Run the {title.lower()} again from scratch", type="tertiary", key=f"again_{mode}"):
                         run_store().pop((settings_hash(a), mode), None)
+                        st.session_state.pop("run_notice", None)
                         st.session_state.active_job = start_job(a, mode)
                         st.rerun()
                 else:
+                    too_long = secs > CTL["run"].get("max_minutes", 30) * 60
                     if st.button(f"Start the {title.lower()} ({seconds_label(secs)})", type="primary",
-                                 key=f"start_{mode}"):
+                                 key=f"start_{mode}", disabled=too_long):
+                        st.session_state.pop("run_notice", None)
                         st.session_state.active_job = start_job(a, mode)
                         st.rerun()
+    if st.session_state.get("run_notice") and not st.session_state.get("active_job"):
+        st.info(st.session_state["run_notice"])
     if st.session_state.get("active_job"):
         st.write("")
         progress_panel(st.session_state.active_job)

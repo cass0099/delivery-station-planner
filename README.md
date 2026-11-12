@@ -32,6 +32,12 @@ The fast route formula was checked against routes planned with OR-Tools on real 
 
 This is a basic model. It covers one metro area, and the national layer of shippers, long-distance trucking and partner carriers is not built yet. Demand is scaled from household counts rather than real orders. Station sites come from a fixed shortlist rather than being chosen freely, and route lengths use a calibrated formula rather than planned routes.
 
+## Testing
+
+Besides the unit tests in `tests/`, three scripts in `tools/` test the model and the app as a visitor would use them. `tools/stress_test.py` sets every control to both ends of its range, then tries combined extremes and random combinations. For each case it runs the model, checks that every number is valid and that the pick is the cheapest layout meeting every target, and opens the app's pages with the result. `tools/widget_test.py` moves every slider in the app to both ends and checks the stored value in real units. `tools/app_flow_test.py` clicks through the app, runs a live simulation, stops a long one and resets the settings.
+
+A run that would take longer than 30 minutes on the server is turned off before it starts, and any run can be stopped, so one visitor cannot hold the server.
+
 ## Running it locally
 
 ```

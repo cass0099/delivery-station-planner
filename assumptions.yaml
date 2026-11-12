@@ -330,6 +330,7 @@ app_controls:
       search_weeks: 200              # every layout that passes the screen, per kind of week
       recheck_weeks: 500             # fresh weeks for the closest layouts, in every kind of week (~1.5-point precision)
       recheck_top_designs: 3         # best layouts from each kind of week's search go to the recheck
+    max_minutes: 30                  # a run that goes past this is stopped, so one visitor can't hold the server
   steps:
     - key: volume
       name: Volume

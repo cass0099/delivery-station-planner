@@ -26,7 +26,8 @@ import pandas as pd
 
 from engine.config import REPO_ROOT, load_assumptions
 from engine.randomness import average_day, draw_weeks
-from engine.simulation import busiest_hub, design_grid, get_design, load_market, simulate_day, simulate_week
+from engine.simulation import (CUFT_PER_M3, busiest_hub, design_grid, get_design, load_market, simulate_day,
+                               simulate_week, vehicle_availability)
 
 _M = None
 _A = None
@@ -265,10 +266,12 @@ def diagnose(frames: dict[str, pd.DataFrame], year: pd.DataFrame, a: dict) -> di
     if sort_miss >= 0.5 * late:
         cause = "sort_capacity" if r["peak_sort_utilization_p90"] >= 0.95 else "late_trucks"
     elif r["unclaimed_p50"] > 0.01:
-        cause = "dashers"
+        cause = "vehicles" if vehicle_availability(a["drivers"], a["routing"]) < 0.5 else "dashers"
     else:
         cause = "routes"
-    return {**worst, "design": str(d), "cause": cause, "late_share": float(late), "sort_miss_share": sort_miss,
+    return {**worst, "design": str(d), "cause": cause,
+            "vehicle_share": vehicle_availability(a["drivers"], a["routing"]),
+            "cargo_cuft": a["routing"]["car_cargo_m3"] * CUFT_PER_M3, "late_share": float(late), "sort_miss_share": sort_miss,
             "sort_utilization_p90": float(r["peak_sort_utilization_p90"]), "unclaimed": float(r["unclaimed_p50"]),
             "on_time_p50": float(r["on_time_p50"])}
 

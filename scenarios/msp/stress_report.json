@@ -1,0 +1,2530 @@
+[
+  {
+    "case": "demand.network_share = 0.01",
+    "changes": {
+      "demand.network_share": 0.01
+    },
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 3.814,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 2.9,
+    "predicted": 4.6,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 5.5
+  },
+  {
+    "case": "demand.network_share = 0.1",
+    "changes": {
+      "demand.network_share": 0.1
+    },
+    "pick": "4x medium",
+    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium",
+    "meets_all": true,
+    "year_cost": 2.379,
+    "tiers": "1/4",
+    "estimate": "4x medium",
+    "seconds": 24.9,
+    "predicted": 17.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 28.9
+  },
+  {
+    "case": "demand.packages_per_household_per_day = 0.3",
+    "changes": {
+      "demand.packages_per_household_per_day": 0.3
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.187,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 7.4,
+    "predicted": 6.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 9.6
+  },
+  {
+    "case": "demand.packages_per_household_per_day = 0.7",
+    "changes": {
+      "demand.packages_per_household_per_day": 0.7
+    },
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 2.578,
+    "tiers": "1/4",
+    "estimate": "4x small",
+    "seconds": 11.9,
+    "predicted": 9.5,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "scenarios.holiday_peak.volume_multiplier = 1.2",
+    "changes": {
+      "scenarios.holiday_peak.volume_multiplier": 1.2
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.815,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 8.9,
+    "predicted": 6.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 11.3
+  },
+  {
+    "case": "scenarios.holiday_peak.volume_multiplier = 2.5",
+    "changes": {
+      "scenarios.holiday_peak.volume_multiplier": 2.5
+    },
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 2.885,
+    "tiers": "1/4",
+    "estimate": "4x small",
+    "seconds": 12.7,
+    "predicted": 9.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.4
+  },
+  {
+    "case": "hubs.sizes.small.sort_rate_per_hour = 500",
+    "changes": {
+      "hubs.sizes.small.sort_rate_per_hour": 500
+    },
+    "pick": "2x medium",
+    "hubs": "#1 medium + #2 medium",
+    "meets_all": true,
+    "year_cost": 2.993,
+    "tiers": "1/4",
+    "estimate": "2x medium",
+    "seconds": 12.2,
+    "predicted": 8.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.6
+  },
+  {
+    "case": "hubs.sizes.small.sort_rate_per_hour = 3000",
+    "changes": {
+      "hubs.sizes.small.sort_rate_per_hour": 3000
+    },
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 2.68,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 10.0,
+    "predicted": 6.7,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 12.3
+  },
+  {
+    "case": "hubs.sizes.medium.sort_rate_per_hour = 1000",
+    "changes": {
+      "hubs.sizes.medium.sort_rate_per_hour": 1000
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 10.2,
+    "predicted": 6.6,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 12.6
+  },
+  {
+    "case": "hubs.sizes.medium.sort_rate_per_hour = 6000",
+    "changes": {
+      "hubs.sizes.medium.sort_rate_per_hour": 6000
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.0,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.4
+  },
+  {
+    "case": "hubs.sizes.large.sort_rate_per_hour = 2000",
+    "changes": {
+      "hubs.sizes.large.sort_rate_per_hour": 2000
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 8.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.4
+  },
+  {
+    "case": "hubs.sizes.large.sort_rate_per_hour = 12000",
+    "changes": {
+      "hubs.sizes.large.sort_rate_per_hour": 12000
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "hubs.lease_per_sqft_per_year = 6.0",
+    "changes": {
+      "hubs.lease_per_sqft_per_year": 6.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.719,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.8,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.1
+  },
+  {
+    "case": "hubs.lease_per_sqft_per_year = 16.0",
+    "changes": {
+      "hubs.lease_per_sqft_per_year": 16.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.903,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.1,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.5
+  },
+  {
+    "case": "hubs.sizes.small.fitout_per_sqft = 5",
+    "changes": {
+      "hubs.sizes.small.fitout_per_sqft": 5
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.728,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.8,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.2
+  },
+  {
+    "case": "hubs.sizes.small.fitout_per_sqft = 120",
+    "changes": {
+      "hubs.sizes.small.fitout_per_sqft": 120
+    },
+    "pick": "2x medium",
+    "hubs": "#1 medium + #2 medium",
+    "meets_all": true,
+    "year_cost": 2.993,
+    "tiers": "1/4",
+    "estimate": "2x medium",
+    "seconds": 14.4,
+    "predicted": 8.7,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 16.8
+  },
+  {
+    "case": "hubs.sizes.medium.fitout_per_sqft = 5",
+    "changes": {
+      "hubs.sizes.medium.fitout_per_sqft": 5
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.6,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.0
+  },
+  {
+    "case": "hubs.sizes.medium.fitout_per_sqft = 120",
+    "changes": {
+      "hubs.sizes.medium.fitout_per_sqft": 120
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.8,
+    "predicted": 7.4,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "hubs.sizes.large.fitout_per_sqft = 5",
+    "changes": {
+      "hubs.sizes.large.fitout_per_sqft": 5
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.1,
+    "predicted": 7.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.5
+  },
+  {
+    "case": "hubs.sizes.large.fitout_per_sqft = 120",
+    "changes": {
+      "hubs.sizes.large.fitout_per_sqft": 120
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.6,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.0
+  },
+  {
+    "case": "hubs.nnn_per_sqft_per_year = 0.0",
+    "changes": {
+      "hubs.nnn_per_sqft_per_year": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.725,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.7,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.1
+  },
+  {
+    "case": "hubs.nnn_per_sqft_per_year = 8.0",
+    "changes": {
+      "hubs.nnn_per_sqft_per_year": 8.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.873,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.7,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.1
+  },
+  {
+    "case": "hubs.site_opening_cost = 0",
+    "changes": {
+      "hubs.site_opening_cost": 0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.764,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.8,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.2
+  },
+  {
+    "case": "hubs.site_opening_cost = 1000000",
+    "changes": {
+      "hubs.site_opening_cost": 1000000
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.83,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.7,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.1
+  },
+  {
+    "case": "hubs.sort_wage_per_hour = 15.0",
+    "changes": {
+      "hubs.sort_wage_per_hour": 15.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.708,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.6,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.0
+  },
+  {
+    "case": "hubs.sort_wage_per_hour = 35.0",
+    "changes": {
+      "hubs.sort_wage_per_hour": 35.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.915,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.2,
+    "predicted": 8.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.6
+  },
+  {
+    "case": "hubs.sizes.small.sort_packages_per_labor_hour = 60",
+    "changes": {
+      "hubs.sizes.small.sort_packages_per_labor_hour": 60
+    },
+    "pick": "2x medium",
+    "hubs": "#1 medium + #2 medium",
+    "meets_all": true,
+    "year_cost": 2.993,
+    "tiers": "1/4",
+    "estimate": "2x medium",
+    "seconds": 13.2,
+    "predicted": 7.9,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.5
+  },
+  {
+    "case": "hubs.sizes.small.sort_packages_per_labor_hour = 400",
+    "changes": {
+      "hubs.sizes.small.sort_packages_per_labor_hour": 400
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.688,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.8,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.2
+  },
+  {
+    "case": "hubs.sizes.medium.sort_packages_per_labor_hour = 60",
+    "changes": {
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 60
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.6,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.0
+  },
+  {
+    "case": "hubs.sizes.medium.sort_packages_per_labor_hour = 400",
+    "changes": {
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 400
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.2,
+    "predicted": 7.9,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.6
+  },
+  {
+    "case": "hubs.sizes.large.sort_packages_per_labor_hour = 60",
+    "changes": {
+      "hubs.sizes.large.sort_packages_per_labor_hour": 60
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.7,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.1
+  },
+  {
+    "case": "hubs.sizes.large.sort_packages_per_labor_hour = 400",
+    "changes": {
+      "hubs.sizes.large.sort_packages_per_labor_hour": 400
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 7.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "drivers.pay_base_per_route = 0",
+    "changes": {
+      "drivers.pay_base_per_route": 0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.756,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.8,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.2
+  },
+  {
+    "case": "drivers.pay_base_per_route = 40",
+    "changes": {
+      "drivers.pay_base_per_route": 40
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.106,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.2,
+    "predicted": 7.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.6
+  },
+  {
+    "case": "drivers.pay_per_stop = 0.0",
+    "changes": {
+      "drivers.pay_per_stop": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.756,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 7.4,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "drivers.pay_per_stop = 3.0",
+    "changes": {
+      "drivers.pay_per_stop": 3.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 4.247,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.1,
+    "predicted": 7.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.5
+  },
+  {
+    "case": "drivers.pay_per_km = 0.0",
+    "changes": {
+      "drivers.pay_per_km": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.762,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 7.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "drivers.pay_per_km = 0.6214",
+    "changes": {
+      "drivers.pay_per_km": 0.6214
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.967,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.2,
+    "predicted": 8.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.6
+  },
+  {
+    "case": "drivers.claim_midpoint_net_per_hour = 8",
+    "changes": {
+      "drivers.claim_midpoint_net_per_hour": 8
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.717,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "drivers.claim_midpoint_net_per_hour = 25",
+    "changes": {
+      "drivers.claim_midpoint_net_per_hour": 25
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.256,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.6,
+    "predicted": 7.6,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.1
+  },
+  {
+    "case": "drivers.claim_curve_width = 1.0",
+    "changes": {
+      "drivers.claim_curve_width": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.72,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.0,
+    "predicted": 7.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.4
+  },
+  {
+    "case": "drivers.claim_curve_width = 8.0",
+    "changes": {
+      "drivers.claim_curve_width": 8.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.831,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.1,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.5
+  },
+  {
+    "case": "drivers.surge_max = 1.0",
+    "changes": {
+      "drivers.surge_max": 1.0
+    },
+    "pick": "12x medium",
+    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium + #5 medium + #6 medium + #7 medium + #8 medium + #9 medium + #10 medium + #11 medium + #12 medium",
+    "meets_all": false,
+    "year_cost": 6.322,
+    "tiers": "4/4",
+    "estimate": "12x small",
+    "seconds": 21.4,
+    "predicted": 5.6,
+    "diagnosis": "dashers",
+    "problems": [],
+    "wall_seconds": 26.6
+  },
+  {
+    "case": "drivers.surge_max = 3.0",
+    "changes": {
+      "drivers.surge_max": 3.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "drivers.raise_base_to_floor = False",
+    "changes": {
+      "drivers.raise_base_to_floor": false
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.679,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.3,
+    "predicted": 7.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.7
+  },
+  {
+    "case": "routing.max_route_hours = 2.0",
+    "changes": {
+      "routing.max_route_hours": 2.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.064,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 14.7,
+    "predicted": 8.9,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 17.3
+  },
+  {
+    "case": "routing.max_route_hours = 10.0",
+    "changes": {
+      "routing.max_route_hours": 10.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.1,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.0
+  },
+  {
+    "case": "routing.max_packages_per_route = 30",
+    "changes": {
+      "routing.max_packages_per_route": 30
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.113,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.1,
+    "predicted": 8.9,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.6
+  },
+  {
+    "case": "routing.max_packages_per_route = 300",
+    "changes": {
+      "routing.max_packages_per_route": 300
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.4
+  },
+  {
+    "case": "routing.car_cargo_m3 = 0.2832",
+    "changes": {
+      "routing.car_cargo_m3": 0.2832
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 4.069,
+    "tiers": "1/4",
+    "estimate": "4x small",
+    "seconds": 12.6,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 16.0
+  },
+  {
+    "case": "routing.car_cargo_m3 = 9.911",
+    "changes": {
+      "routing.car_cargo_m3": 9.911
+    },
+    "pick": "5x medium",
+    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium + #5 medium",
+    "meets_all": false,
+    "year_cost": 11.732,
+    "tiers": "4/4",
+    "estimate": "5x medium",
+    "seconds": 52.8,
+    "predicted": 18.6,
+    "diagnosis": "vehicles",
+    "problems": [],
+    "wall_seconds": 58.2
+  },
+  {
+    "case": "drivers.vehicle_availability.1.1 = 0.0",
+    "changes": {
+      "drivers.vehicle_availability.1.1": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "drivers.vehicle_availability.1.1 = 1.0",
+    "changes": {
+      "drivers.vehicle_availability.1.1": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.2,
+    "predicted": 7.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.6
+  },
+  {
+    "case": "drivers.vehicle_availability.2.1 = 0.0",
+    "changes": {
+      "drivers.vehicle_availability.2.1": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.0,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.4
+  },
+  {
+    "case": "drivers.vehicle_availability.2.1 = 1.0",
+    "changes": {
+      "drivers.vehicle_availability.2.1": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.1,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.5
+  },
+  {
+    "case": "drivers.vehicle_availability.3.1 = 0.0",
+    "changes": {
+      "drivers.vehicle_availability.3.1": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.2,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.6
+  },
+  {
+    "case": "drivers.vehicle_availability.3.1 = 1.0",
+    "changes": {
+      "drivers.vehicle_availability.3.1": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.5,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.9
+  },
+  {
+    "case": "schedule.sort_cutoff = D 05:00",
+    "changes": {
+      "schedule.sort_cutoff": "D 05:00"
+    },
+    "pick": "5x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small + #4 small + #5 small",
+    "meets_all": false,
+    "year_cost": 3.237,
+    "tiers": "4/4",
+    "estimate": "3x small",
+    "seconds": 17.8,
+    "predicted": 8.1,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 22.8
+  },
+  {
+    "case": "schedule.sort_cutoff = D 09:00",
+    "changes": {
+      "schedule.sort_cutoff": "D 09:00"
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.778,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.4,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "objective.on_time_typical_target = 0.9",
+    "changes": {
+      "objective.on_time_typical_target": 0.9
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.2,
+    "predicted": 7.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "objective.on_time_typical_target = 0.995",
+    "changes": {
+      "objective.on_time_typical_target": 0.995
+    },
+    "pick": "3x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small",
+    "meets_all": false,
+    "year_cost": 2.934,
+    "tiers": "4/4",
+    "estimate": "3x small",
+    "seconds": 17.8,
+    "predicted": 7.2,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 23.0
+  },
+  {
+    "case": "objective.on_time_target = 0.85",
+    "changes": {
+      "objective.on_time_target": 0.85
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.2,
+    "predicted": 7.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.6
+  },
+  {
+    "case": "objective.on_time_target = 0.99",
+    "changes": {
+      "objective.on_time_target": 0.99
+    },
+    "pick": "3x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small",
+    "meets_all": false,
+    "year_cost": 2.934,
+    "tiers": "4/4",
+    "estimate": "3x small",
+    "seconds": 17.8,
+    "predicted": 7.2,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 20.2
+  },
+  {
+    "case": "objective.on_time_week_share = 0.5",
+    "changes": {
+      "objective.on_time_week_share": 0.5
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "objective.on_time_week_share = 1.0",
+    "changes": {
+      "objective.on_time_week_share": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.2,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.5
+  },
+  {
+    "case": "objective.peak_targets.on_time_typical_target = 0.85",
+    "changes": {
+      "objective.peak_targets.on_time_typical_target": 0.85
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "objective.peak_targets.on_time_typical_target = 0.995",
+    "changes": {
+      "objective.peak_targets.on_time_typical_target": 0.995
+    },
+    "pick": "3x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small",
+    "meets_all": false,
+    "year_cost": 2.934,
+    "tiers": "4/4",
+    "estimate": "3x small",
+    "seconds": 18.0,
+    "predicted": 7.2,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 20.4
+  },
+  {
+    "case": "objective.peak_targets.on_time_target = 0.8",
+    "changes": {
+      "objective.peak_targets.on_time_target": 0.8
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "objective.peak_targets.on_time_target = 0.99",
+    "changes": {
+      "objective.peak_targets.on_time_target": 0.99
+    },
+    "pick": "3x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small",
+    "meets_all": false,
+    "year_cost": 2.934,
+    "tiers": "4/4",
+    "estimate": "3x small",
+    "seconds": 18.1,
+    "predicted": 7.1,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 20.5
+  },
+  {
+    "case": "objective.peak_targets.on_time_week_share = 0.5",
+    "changes": {
+      "objective.peak_targets.on_time_week_share": 0.5
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.2,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "objective.peak_targets.on_time_week_share = 1.0",
+    "changes": {
+      "objective.peak_targets.on_time_week_share": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.6
+  },
+  {
+    "case": "objective.driver_net_per_hour_floor = 0",
+    "changes": {
+      "objective.driver_net_per_hour_floor": 0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.679,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.9,
+    "predicted": 9.5,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 16.4
+  },
+  {
+    "case": "objective.driver_net_per_hour_floor = 25",
+    "changes": {
+      "objective.driver_net_per_hour_floor": 25
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.287,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 10.8,
+    "predicted": 6.7,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 13.2
+  },
+  {
+    "case": "objective.exclude_extreme_weather_weeks = False",
+    "changes": {
+      "objective.exclude_extreme_weather_weeks": false
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.4,
+    "predicted": 8.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.9
+  },
+  {
+    "case": "uncertainty.truck_late_prob = 0.0",
+    "changes": {
+      "uncertainty.truck_late_prob": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.78,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "uncertainty.truck_late_prob = 0.4",
+    "changes": {
+      "uncertainty.truck_late_prob": 0.4
+    },
+    "pick": "6x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small",
+    "meets_all": false,
+    "year_cost": 3.213,
+    "tiers": "4/4",
+    "estimate": "3x small",
+    "seconds": 17.9,
+    "predicted": 7.0,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 20.3
+  },
+  {
+    "case": "uncertainty.volume_week_sigma = 0.0",
+    "changes": {
+      "uncertainty.volume_week_sigma": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.749,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.4,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "uncertainty.volume_week_sigma = 0.25",
+    "changes": {
+      "uncertainty.volume_week_sigma": 0.25
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.82,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.1,
+    "predicted": 6.9,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.5
+  },
+  {
+    "case": "uncertainty.no_show_rate_range = [0.0, 0.0]",
+    "changes": {
+      "uncertainty.no_show_rate_range": [
+        0.0,
+        0.0
+      ]
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.772,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "uncertainty.no_show_rate_range = [0.2, 0.2]",
+    "changes": {
+      "uncertainty.no_show_rate_range": [
+        0.2,
+        0.2
+      ]
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.82,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.6,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.0
+  },
+  {
+    "case": "uncertainty.no_show_rate_range = [0.0, 0.2]",
+    "changes": {
+      "uncertainty.no_show_rate_range": [
+        0.0,
+        0.2
+      ]
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.784,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 8.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "uncertainty.slow_day_prob = 0.0",
+    "changes": {
+      "uncertainty.slow_day_prob": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.761,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.3,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.7
+  },
+  {
+    "case": "uncertainty.slow_day_prob = 0.3",
+    "changes": {
+      "uncertainty.slow_day_prob": 0.3
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.79,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.5,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.9
+  },
+  {
+    "case": "uncertainty.extreme_weather_prob = 0.0",
+    "changes": {
+      "uncertainty.extreme_weather_prob": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.757,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.4,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "uncertainty.extreme_weather_prob = 0.06",
+    "changes": {
+      "uncertainty.extreme_weather_prob": 0.06
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.782,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.5,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "weeks_per_year.holiday_peak = 0",
+    "changes": {
+      "weeks_per_year.holiday_peak": 0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.806,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 8.8,
+    "predicted": 5.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 10.7
+  },
+  {
+    "case": "weeks_per_year.holiday_peak = 10",
+    "changes": {
+      "weeks_per_year.holiday_peak": 10
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.766,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.5,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.9
+  },
+  {
+    "case": "weeks_per_year.hub_outage = 0",
+    "changes": {
+      "weeks_per_year.hub_outage": 0
+    },
+    "pick": "1x medium",
+    "hubs": "#1 medium",
+    "meets_all": true,
+    "year_cost": 2.717,
+    "tiers": "1/4",
+    "estimate": "1x medium",
+    "seconds": 8.1,
+    "predicted": 4.9,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 10.2
+  },
+  {
+    "case": "weeks_per_year.hub_outage = 8",
+    "changes": {
+      "weeks_per_year.hub_outage": 8
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.785,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.4,
+    "predicted": 7.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.0
+  },
+  {
+    "case": "peak_flex.enabled = False",
+    "changes": {
+      "peak_flex.enabled": false
+    },
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 2.888,
+    "tiers": "1/4",
+    "estimate": "4x small",
+    "seconds": 13.0,
+    "predicted": 8.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.3
+  },
+  {
+    "case": "peak_flex.sort_capacity_boost = 0.0",
+    "changes": {
+      "peak_flex.sort_capacity_boost": 0.0
+    },
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 2.909,
+    "tiers": "1/4",
+    "estimate": "4x small",
+    "seconds": 13.7,
+    "predicted": 8.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 16.2
+  },
+  {
+    "case": "peak_flex.sort_capacity_boost = 1.0",
+    "changes": {
+      "peak_flex.sort_capacity_boost": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.4,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "peak_flex.setup_cost_per_station_week = 0",
+    "changes": {
+      "peak_flex.setup_cost_per_station_week": 0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.764,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.6,
+    "predicted": 7.4,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.0
+  },
+  {
+    "case": "peak_flex.setup_cost_per_station_week = 50000",
+    "changes": {
+      "peak_flex.setup_cost_per_station_week": 50000
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.845,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.9,
+    "predicted": 8.0,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 16.3
+  },
+  {
+    "case": "partner.enabled = True",
+    "changes": {
+      "partner.enabled": true
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.821,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.5,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "partner.cost_per_package = 2.0",
+    "changes": {
+      "partner.enabled": true,
+      "partner.cost_per_package": 2.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.783,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.5,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.9
+  },
+  {
+    "case": "partner.cost_per_package = 15.0",
+    "changes": {
+      "partner.enabled": true,
+      "partner.cost_per_package": 15.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.917,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.2,
+    "predicted": 6.4,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 13.7
+  },
+  {
+    "case": "partner.max_share_of_day = 0.0",
+    "changes": {
+      "partner.enabled": true,
+      "partner.max_share_of_day": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.6,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.0
+  },
+  {
+    "case": "partner.max_share_of_day = 0.5",
+    "changes": {
+      "partner.enabled": true,
+      "partner.max_share_of_day": 0.5
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.821,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.6,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.0
+  },
+  {
+    "case": "partner.on_time_rate = 0.7",
+    "changes": {
+      "partner.enabled": true,
+      "partner.on_time_rate": 0.7
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.821,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.7,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.0
+  },
+  {
+    "case": "partner.on_time_rate = 1.0",
+    "changes": {
+      "partner.enabled": true,
+      "partner.on_time_rate": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.821,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.6,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.0
+  },
+  {
+    "case": "every control at its minimum",
+    "changes": {
+      "demand.network_share": 0.01,
+      "demand.packages_per_household_per_day": 0.3,
+      "scenarios.holiday_peak.volume_multiplier": 1.2,
+      "hubs.sizes.small.sort_rate_per_hour": 500,
+      "hubs.sizes.medium.sort_rate_per_hour": 1000,
+      "hubs.sizes.large.sort_rate_per_hour": 2000,
+      "hubs.lease_per_sqft_per_year": 6.0,
+      "hubs.sizes.small.fitout_per_sqft": 5,
+      "hubs.sizes.medium.fitout_per_sqft": 5,
+      "hubs.sizes.large.fitout_per_sqft": 5,
+      "hubs.nnn_per_sqft_per_year": 0.0,
+      "hubs.site_opening_cost": 0,
+      "hubs.sort_wage_per_hour": 15.0,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 60,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 60,
+      "hubs.sizes.large.sort_packages_per_labor_hour": 60,
+      "drivers.pay_base_per_route": 0,
+      "drivers.pay_per_stop": 0.0,
+      "drivers.pay_per_km": 0.0,
+      "drivers.claim_midpoint_net_per_hour": 8,
+      "drivers.claim_curve_width": 1.0,
+      "drivers.surge_max": 1.0,
+      "routing.max_route_hours": 2.0,
+      "routing.max_packages_per_route": 30,
+      "routing.car_cargo_m3": 0.2832,
+      "drivers.vehicle_availability.1.1": 0.0,
+      "drivers.vehicle_availability.2.1": 0.0,
+      "drivers.vehicle_availability.3.1": 0.0,
+      "schedule.sort_cutoff": "D 05:00",
+      "objective.on_time_typical_target": 0.9,
+      "objective.on_time_target": 0.85,
+      "objective.on_time_week_share": 0.5,
+      "objective.peak_targets.on_time_typical_target": 0.85,
+      "objective.peak_targets.on_time_target": 0.8,
+      "objective.peak_targets.on_time_week_share": 0.5,
+      "objective.driver_net_per_hour_floor": 0,
+      "uncertainty.truck_late_prob": 0.0,
+      "uncertainty.volume_week_sigma": 0.0,
+      "uncertainty.no_show_rate_range": [
+        0.0,
+        0.0
+      ],
+      "uncertainty.slow_day_prob": 0.0,
+      "uncertainty.extreme_weather_prob": 0.0,
+      "weeks_per_year.holiday_peak": 0,
+      "weeks_per_year.hub_outage": 0,
+      "peak_flex.sort_capacity_boost": 0.0,
+      "peak_flex.setup_cost_per_station_week": 0,
+      "partner.cost_per_package": 2.0,
+      "partner.max_share_of_day": 0.0,
+      "partner.on_time_rate": 0.7
+    },
+    "pick": "1x small",
+    "hubs": "#1 small",
+    "meets_all": false,
+    "year_cost": 1212.541,
+    "tiers": "4/4",
+    "estimate": "1x small",
+    "seconds": 7.5,
+    "predicted": 3.9,
+    "diagnosis": "dashers",
+    "problems": [],
+    "wall_seconds": 9.9
+  },
+  {
+    "case": "every control at its maximum",
+    "changes": {
+      "demand.network_share": 0.1,
+      "demand.packages_per_household_per_day": 0.7,
+      "scenarios.holiday_peak.volume_multiplier": 2.5,
+      "hubs.sizes.small.sort_rate_per_hour": 3000,
+      "hubs.sizes.medium.sort_rate_per_hour": 6000,
+      "hubs.sizes.large.sort_rate_per_hour": 12000,
+      "hubs.lease_per_sqft_per_year": 16.0,
+      "hubs.sizes.small.fitout_per_sqft": 120,
+      "hubs.sizes.medium.fitout_per_sqft": 120,
+      "hubs.sizes.large.fitout_per_sqft": 120,
+      "hubs.nnn_per_sqft_per_year": 8.0,
+      "hubs.site_opening_cost": 1000000,
+      "hubs.sort_wage_per_hour": 35.0,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 400,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 400,
+      "hubs.sizes.large.sort_packages_per_labor_hour": 400,
+      "drivers.pay_base_per_route": 40,
+      "drivers.pay_per_stop": 3.0,
+      "drivers.pay_per_km": 0.6214,
+      "drivers.claim_midpoint_net_per_hour": 25,
+      "drivers.claim_curve_width": 8.0,
+      "drivers.surge_max": 3.0,
+      "routing.max_route_hours": 10.0,
+      "routing.max_packages_per_route": 300,
+      "routing.car_cargo_m3": 9.911,
+      "drivers.vehicle_availability.1.1": 1.0,
+      "drivers.vehicle_availability.2.1": 1.0,
+      "drivers.vehicle_availability.3.1": 1.0,
+      "schedule.sort_cutoff": "D 09:00",
+      "objective.on_time_typical_target": 0.995,
+      "objective.on_time_target": 0.99,
+      "objective.on_time_week_share": 1.0,
+      "objective.peak_targets.on_time_typical_target": 0.995,
+      "objective.peak_targets.on_time_target": 0.99,
+      "objective.peak_targets.on_time_week_share": 1.0,
+      "objective.driver_net_per_hour_floor": 25,
+      "uncertainty.truck_late_prob": 0.4,
+      "uncertainty.volume_week_sigma": 0.25,
+      "uncertainty.no_show_rate_range": [
+        0.2,
+        0.2
+      ],
+      "uncertainty.slow_day_prob": 0.3,
+      "uncertainty.extreme_weather_prob": 0.06,
+      "weeks_per_year.holiday_peak": 10,
+      "weeks_per_year.hub_outage": 8,
+      "peak_flex.sort_capacity_boost": 1.0,
+      "peak_flex.setup_cost_per_station_week": 50000,
+      "partner.cost_per_package": 15.0,
+      "partner.max_share_of_day": 0.5,
+      "partner.on_time_rate": 1.0
+    },
+    "pick": "15x large",
+    "hubs": "#1 large + #2 large + #3 large + #4 large + #5 large + #6 large + #7 large + #8 large + #9 large + #10 large + #11 large + #12 large + #13 large + #14 large + #15 large",
+    "meets_all": false,
+    "year_cost": 16.244,
+    "tiers": "4/4",
+    "estimate": "15x large",
+    "seconds": 90.4,
+    "predicted": 19.9,
+    "diagnosis": "vehicles",
+    "problems": [],
+    "wall_seconds": 102.9
+  },
+  {
+    "case": "hardest: most volume, tightest targets, most disruption",
+    "changes": {
+      "demand.network_share": 0.1,
+      "demand.packages_per_household_per_day": 0.7,
+      "scenarios.holiday_peak.volume_multiplier": 2.5,
+      "objective.on_time_typical_target": 0.995,
+      "objective.on_time_target": 0.99,
+      "objective.on_time_week_share": 1.0,
+      "objective.peak_targets.on_time_typical_target": 0.995,
+      "objective.peak_targets.on_time_target": 0.99,
+      "objective.peak_targets.on_time_week_share": 1.0,
+      "uncertainty.truck_late_prob": 0.4,
+      "uncertainty.no_show_rate_range": [
+        0.2,
+        0.2
+      ],
+      "uncertainty.slow_day_prob": 0.3,
+      "uncertainty.extreme_weather_prob": 0.06,
+      "weeks_per_year.holiday_peak": 10,
+      "weeks_per_year.hub_outage": 8
+    },
+    "pick": "6x large",
+    "hubs": "#1 large + #2 large + #3 large + #4 large + #5 large + #6 large",
+    "meets_all": false,
+    "year_cost": 2.64,
+    "tiers": "4/4",
+    "estimate": "5x large",
+    "seconds": 103.5,
+    "predicted": 22.5,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 112.6
+  },
+  {
+    "case": "easiest: least volume, loosest targets, no disruption",
+    "changes": {
+      "demand.network_share": 0.01,
+      "objective.on_time_typical_target": 0.9,
+      "objective.on_time_target": 0.85,
+      "objective.on_time_week_share": 0.5,
+      "uncertainty.truck_late_prob": 0.0,
+      "uncertainty.no_show_rate_range": [
+        0.0,
+        0.0
+      ],
+      "uncertainty.slow_day_prob": 0.0,
+      "uncertainty.extreme_weather_prob": 0.0,
+      "uncertainty.volume_week_sigma": 0.0
+    },
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 3.722,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 7.7,
+    "predicted": 4.7,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 9.6
+  },
+  {
+    "case": "only normal weeks count",
+    "changes": {
+      "weeks_per_year.holiday_peak": 0,
+      "weeks_per_year.hub_outage": 0
+    },
+    "pick": "1x medium",
+    "hubs": "#1 medium",
+    "meets_all": true,
+    "year_cost": 2.746,
+    "tiers": "1/4",
+    "estimate": "1x medium",
+    "seconds": 5.1,
+    "predicted": 3.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 6.8
+  },
+  {
+    "case": "Dashers paid nothing",
+    "changes": {
+      "drivers.pay_base_per_route": 0,
+      "drivers.pay_per_stop": 0.0,
+      "drivers.pay_per_km": 0.0,
+      "drivers.raise_base_to_floor": false
+    },
+    "pick": "15x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small + #9 small + #10 small + #11 small + #12 small + #13 small + #14 small + #15 small",
+    "meets_all": false,
+    "year_cost": 64.487,
+    "tiers": "4/4",
+    "estimate": "15x small",
+    "seconds": 60.6,
+    "predicted": 11.3,
+    "diagnosis": "dashers",
+    "problems": [],
+    "wall_seconds": 67.0
+  },
+  {
+    "case": "tiny cars, short routes",
+    "changes": {
+      "routing.car_cargo_m3": 0.2832,
+      "routing.max_route_hours": 2.0,
+      "routing.max_packages_per_route": 30
+    },
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 4.093,
+    "tiers": "1/4",
+    "estimate": "4x small",
+    "seconds": 13.3,
+    "predicted": 7.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 16.7
+  },
+  {
+    "case": "no vans or SUVs",
+    "changes": {
+      "drivers.vehicle_availability.1.1": 0.0,
+      "drivers.vehicle_availability.2.1": 0.0,
+      "drivers.vehicle_availability.3.1": 0.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.7,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.2
+  },
+  {
+    "case": "random #1",
+    "changes": {
+      "hubs.sizes.large.fitout_per_sqft": 12,
+      "routing.car_cargo_m3": 5.1687,
+      "uncertainty.slow_day_prob": 0.0112,
+      "hubs.sizes.small.sort_rate_per_hour": 1584,
+      "hubs.sizes.medium.sort_rate_per_hour": 1349,
+      "objective.peak_targets.on_time_target": 0.8172,
+      "hubs.lease_per_sqft_per_year": 10.2452,
+      "routing.max_route_hours": 8.6148,
+      "objective.exclude_extreme_weather_weeks": true
+    },
+    "pick": "12x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small + #9 small + #10 small + #11 small + #12 small",
+    "meets_all": false,
+    "year_cost": 5.204,
+    "tiers": "4/4",
+    "estimate": "12x small",
+    "seconds": 30.6,
+    "predicted": 8.7,
+    "diagnosis": "vehicles",
+    "problems": [],
+    "wall_seconds": 35.6
+  },
+  {
+    "case": "random #2",
+    "changes": {
+      "uncertainty.no_show_rate_range": [
+        0.01,
+        0.044
+      ],
+      "partner.on_time_rate": 0.867,
+      "objective.exclude_extreme_weather_weeks": true,
+      "hubs.sizes.small.sort_rate_per_hour": 1548,
+      "objective.driver_net_per_hour_floor": 14,
+      "partner.cost_per_package": 9.4219,
+      "routing.car_cargo_m3": 5.6772
+    },
+    "pick": "12x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small + #9 small + #10 small + #11 small + #12 small",
+    "meets_all": false,
+    "year_cost": 5.267,
+    "tiers": "4/4",
+    "estimate": "12x small",
+    "seconds": 30.5,
+    "predicted": 8.1,
+    "diagnosis": "vehicles",
+    "problems": [],
+    "wall_seconds": 35.7
+  },
+  {
+    "case": "random #3",
+    "changes": {
+      "hubs.site_opening_cost": 496414,
+      "hubs.lease_per_sqft_per_year": 11.3172,
+      "objective.exclude_extreme_weather_weeks": false,
+      "objective.driver_net_per_hour_floor": 12,
+      "uncertainty.no_show_rate_range": [
+        0.072,
+        0.185
+      ],
+      "hubs.sort_wage_per_hour": 19.9685,
+      "routing.max_route_hours": 3.4381,
+      "partner.max_share_of_day": 0.3899,
+      "objective.peak_targets.on_time_week_share": 0.5409,
+      "hubs.sizes.medium.sort_rate_per_hour": 2501,
+      "partner.enabled": true,
+      "hubs.sizes.small.sort_rate_per_hour": 1359,
+      "uncertainty.volume_week_sigma": 0.1122,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 267
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.784,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.3,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.7
+  },
+  {
+    "case": "random #4",
+    "changes": {
+      "hubs.sizes.small.fitout_per_sqft": 44,
+      "objective.on_time_week_share": 0.9666,
+      "drivers.vehicle_availability.1.1": 0.4217,
+      "hubs.nnn_per_sqft_per_year": 7.6962,
+      "partner.enabled": true
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.959,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.8,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.2
+  },
+  {
+    "case": "random #5",
+    "changes": {
+      "objective.driver_net_per_hour_floor": 24,
+      "partner.max_share_of_day": 0.237,
+      "drivers.claim_curve_width": 5.6491,
+      "drivers.surge_max": 1.1213,
+      "weeks_per_year.hub_outage": 6,
+      "drivers.raise_base_to_floor": false,
+      "uncertainty.truck_late_prob": 0.3972,
+      "objective.on_time_target": 0.9651,
+      "objective.exclude_extreme_weather_weeks": true,
+      "schedule.sort_cutoff": "D 08:00",
+      "hubs.sizes.medium.sort_rate_per_hour": 5435,
+      "hubs.sizes.large.sort_rate_per_hour": 5470
+    },
+    "pick": "15x medium",
+    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium + #5 medium + #6 medium + #7 medium + #8 medium + #9 medium + #10 medium + #11 medium + #12 medium + #13 medium + #14 medium + #15 medium",
+    "meets_all": false,
+    "year_cost": 7.343,
+    "tiers": "4/4",
+    "estimate": "15x large",
+    "seconds": 22.0,
+    "predicted": 5.4,
+    "diagnosis": "dashers",
+    "problems": [],
+    "wall_seconds": 27.2
+  },
+  {
+    "case": "random #6",
+    "changes": {
+      "drivers.raise_base_to_floor": true,
+      "hubs.nnn_per_sqft_per_year": 6.9714,
+      "uncertainty.volume_week_sigma": 0.0201,
+      "hubs.sizes.small.fitout_per_sqft": 57,
+      "objective.on_time_target": 0.9269,
+      "hubs.sizes.small.sort_rate_per_hour": 2708,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 339,
+      "drivers.pay_per_km": 0.5369,
+      "hubs.sizes.medium.fitout_per_sqft": 37,
+      "hubs.sizes.large.sort_packages_per_labor_hour": 201,
+      "routing.car_cargo_m3": 3.7374
+    },
+    "pick": "12x medium",
+    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium + #5 medium + #6 medium + #7 medium + #8 medium + #9 medium + #10 medium + #11 medium + #12 medium",
+    "meets_all": false,
+    "year_cost": 7.497,
+    "tiers": "4/4",
+    "estimate": "8x small, big #1",
+    "seconds": 29.1,
+    "predicted": 12.3,
+    "diagnosis": "vehicles",
+    "problems": [],
+    "wall_seconds": 34.2
+  },
+  {
+    "case": "random #7",
+    "changes": {
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 343,
+      "hubs.sizes.large.fitout_per_sqft": 26,
+      "hubs.sizes.large.sort_rate_per_hour": 4819,
+      "hubs.site_opening_cost": 145676,
+      "partner.max_share_of_day": 0.2673,
+      "partner.on_time_rate": 0.8829,
+      "uncertainty.extreme_weather_prob": 0.0191,
+      "peak_flex.sort_capacity_boost": 0.1255,
+      "demand.network_share": 0.0873,
+      "objective.on_time_target": 0.983
+    },
+    "pick": "8x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small",
+    "meets_all": false,
+    "year_cost": 2.476,
+    "tiers": "4/4",
+    "estimate": "4x medium",
+    "seconds": 62.8,
+    "predicted": 17.0,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 66.5
+  },
+  {
+    "case": "random #8",
+    "changes": {
+      "weeks_per_year.holiday_peak": 2,
+      "peak_flex.setup_cost_per_station_week": 49233,
+      "hubs.sizes.small.sort_rate_per_hour": 1602,
+      "schedule.sort_cutoff": "D 05:00",
+      "partner.on_time_rate": 0.802,
+      "objective.peak_targets.on_time_week_share": 0.5263,
+      "routing.car_cargo_m3": 0.2854,
+      "peak_flex.enabled": true,
+      "weeks_per_year.hub_outage": 1,
+      "partner.max_share_of_day": 0.1818,
+      "hubs.lease_per_sqft_per_year": 6.255,
+      "objective.on_time_typical_target": 0.9831,
+      "uncertainty.extreme_weather_prob": 0.0368,
+      "partner.cost_per_package": 3.9312
+    },
+    "pick": "5x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small + #4 small + #5 small",
+    "meets_all": false,
+    "year_cost": 4.265,
+    "tiers": "4/4",
+    "estimate": "4x small",
+    "seconds": 32.0,
+    "predicted": 12.2,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 39.6
+  },
+  {
+    "case": "random #9",
+    "changes": {
+      "drivers.raise_base_to_floor": true,
+      "uncertainty.truck_late_prob": 0.1247,
+      "routing.max_route_hours": 3.1529,
+      "objective.on_time_typical_target": 0.9712,
+      "hubs.sizes.small.fitout_per_sqft": 90,
+      "peak_flex.setup_cost_per_station_week": 23931,
+      "objective.on_time_target": 0.9469,
+      "schedule.sort_cutoff": "D 09:00"
+    },
+    "pick": "2x small, big #1",
+    "hubs": "#1 medium + #2 small",
+    "meets_all": true,
+    "year_cost": 2.928,
+    "tiers": "1/4",
+    "estimate": "2x small, big #1",
+    "seconds": 15.7,
+    "predicted": 8.6,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 18.1
+  },
+  {
+    "case": "random #10",
+    "changes": {
+      "hubs.sizes.small.sort_packages_per_labor_hour": 295,
+      "objective.peak_targets.on_time_typical_target": 0.9826,
+      "routing.max_route_hours": 8.0651,
+      "hubs.sizes.large.fitout_per_sqft": 39
+    },
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 2.837,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.9,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.3
+  },
+  {
+    "case": "random #11",
+    "changes": {
+      "hubs.sizes.large.sort_rate_per_hour": 10061,
+      "weeks_per_year.hub_outage": 7,
+      "drivers.pay_base_per_route": 30,
+      "objective.peak_targets.on_time_typical_target": 0.8829,
+      "routing.max_route_hours": 6.1411,
+      "hubs.nnn_per_sqft_per_year": 2.8445,
+      "drivers.raise_base_to_floor": true,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 69,
+      "objective.peak_targets.on_time_target": 0.8531,
+      "weeks_per_year.holiday_peak": 3,
+      "objective.on_time_week_share": 0.8463,
+      "drivers.surge_max": 2.913,
+      "partner.max_share_of_day": 0.2236,
+      "hubs.sort_wage_per_hour": 33.7404
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.07,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.3,
+    "predicted": 6.5,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 13.7
+  },
+  {
+    "case": "random #12",
+    "changes": {
+      "routing.max_route_hours": 5.8612,
+      "hubs.sizes.large.sort_rate_per_hour": 11852,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 267,
+      "hubs.lease_per_sqft_per_year": 6.0191,
+      "partner.cost_per_package": 13.8196,
+      "objective.on_time_typical_target": 0.9327,
+      "hubs.sort_wage_per_hour": 27.8627,
+      "drivers.surge_max": 2.6693,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 101
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.87,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.8,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.2
+  },
+  {
+    "case": "random #13",
+    "changes": {
+      "partner.max_share_of_day": 0.4004,
+      "peak_flex.enabled": false,
+      "partner.enabled": true,
+      "hubs.sort_wage_per_hour": 23.0277,
+      "objective.on_time_typical_target": 0.9899,
+      "hubs.site_opening_cost": 724799,
+      "drivers.vehicle_availability.2.1": 0.17,
+      "uncertainty.no_show_rate_range": [
+        0.025,
+        0.03
+      ],
+      "drivers.surge_max": 2.8097,
+      "hubs.sizes.large.sort_rate_per_hour": 10065
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.859,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.9,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.2
+  },
+  {
+    "case": "random #14",
+    "changes": {
+      "uncertainty.volume_week_sigma": 0.1372,
+      "uncertainty.truck_late_prob": 0.0524,
+      "objective.on_time_typical_target": 0.9014,
+      "uncertainty.extreme_weather_prob": 0.0583,
+      "drivers.raise_base_to_floor": false,
+      "hubs.sizes.large.fitout_per_sqft": 66
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.699,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 12.9,
+    "predicted": 7.4,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.4
+  },
+  {
+    "case": "random #15",
+    "changes": {
+      "drivers.vehicle_availability.2.1": 0.293,
+      "hubs.sort_wage_per_hour": 19.8108,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 259,
+      "demand.packages_per_household_per_day": 0.4037,
+      "drivers.pay_base_per_route": 17,
+      "partner.cost_per_package": 3.704
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.817,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.9,
+    "predicted": 6.8,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.3
+  },
+  {
+    "case": "random #16",
+    "changes": {
+      "drivers.raise_base_to_floor": false,
+      "schedule.sort_cutoff": "D 06:00",
+      "uncertainty.extreme_weather_prob": 0.0103,
+      "objective.exclude_extreme_weather_weeks": true,
+      "objective.peak_targets.on_time_typical_target": 0.9552,
+      "drivers.vehicle_availability.1.1": 0.5565,
+      "objective.on_time_week_share": 0.663,
+      "hubs.sizes.medium.fitout_per_sqft": 65,
+      "objective.peak_targets.on_time_target": 0.9055,
+      "hubs.sizes.large.fitout_per_sqft": 95,
+      "peak_flex.setup_cost_per_station_week": 5305,
+      "peak_flex.enabled": false,
+      "demand.packages_per_household_per_day": 0.3994,
+      "drivers.vehicle_availability.3.1": 0.2769,
+      "hubs.site_opening_cost": 772261
+    },
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 2.995,
+    "tiers": "1/4",
+    "estimate": "4x small",
+    "seconds": 12.5,
+    "predicted": 7.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.8
+  },
+  {
+    "case": "random #17",
+    "changes": {
+      "drivers.vehicle_availability.3.1": 0.6927,
+      "objective.peak_targets.on_time_week_share": 0.7262,
+      "demand.packages_per_household_per_day": 0.5133,
+      "partner.enabled": true,
+      "hubs.sizes.medium.sort_rate_per_hour": 5708,
+      "partner.on_time_rate": 0.9098,
+      "drivers.claim_curve_width": 7.1357,
+      "uncertainty.volume_week_sigma": 0.2355,
+      "objective.on_time_week_share": 0.6298,
+      "uncertainty.truck_late_prob": 0.2238,
+      "weeks_per_year.holiday_peak": 9,
+      "hubs.sort_wage_per_hour": 31.8
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.981,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.9,
+    "predicted": 7.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 16.3
+  },
+  {
+    "case": "random #18",
+    "changes": {
+      "drivers.vehicle_availability.1.1": 0.6712,
+      "hubs.sizes.small.fitout_per_sqft": 54,
+      "routing.car_cargo_m3": 2.3309,
+      "drivers.vehicle_availability.3.1": 0.3028,
+      "drivers.claim_curve_width": 1.8564,
+      "hubs.sizes.medium.sort_rate_per_hour": 4885
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.906,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 11.7,
+    "predicted": 6.6,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 14.1
+  },
+  {
+    "case": "random #19",
+    "changes": {
+      "uncertainty.slow_day_prob": 0.2982,
+      "uncertainty.extreme_weather_prob": 0.0242,
+      "routing.max_route_hours": 5.3702,
+      "hubs.sizes.large.fitout_per_sqft": 46,
+      "drivers.pay_base_per_route": 4,
+      "hubs.sizes.medium.fitout_per_sqft": 47,
+      "schedule.sort_cutoff": "D 07:00",
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 248,
+      "hubs.lease_per_sqft_per_year": 10.4046,
+      "routing.car_cargo_m3": 0.4573,
+      "objective.on_time_target": 0.8964,
+      "hubs.nnn_per_sqft_per_year": 4.9914,
+      "weeks_per_year.hub_outage": 4,
+      "uncertainty.no_show_rate_range": [
+        0.013,
+        0.197
+      ],
+      "drivers.vehicle_availability.2.1": 0.7884
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 3.4,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 16.9,
+    "predicted": 9.4,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 19.8
+  },
+  {
+    "case": "random #20",
+    "changes": {
+      "hubs.sizes.large.sort_rate_per_hour": 3816,
+      "drivers.pay_base_per_route": 30,
+      "drivers.pay_per_stop": 2.4593,
+      "scenarios.holiday_peak.volume_multiplier": 2.3045,
+      "partner.cost_per_package": 10.7877
+    },
+    "pick": "2x medium",
+    "hubs": "#1 medium + #2 medium",
+    "meets_all": true,
+    "year_cost": 4.21,
+    "tiers": "1/4",
+    "estimate": "2x medium",
+    "seconds": 16.7,
+    "predicted": 9.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 19.3
+  }
+]

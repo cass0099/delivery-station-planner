@@ -21,12 +21,14 @@ import copy
 import hashlib
 import json
 import math
+import multiprocessing
 import os
 import time
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from io import StringIO
 from typing import Callable
 
+import numpy as np
 import pandas as pd
 
 from engine.config import REPO_ROOT, load_assumptions
@@ -39,9 +41,17 @@ _M = _A = None
 # quick runs 4.8–5.6 on 1–2 cores; full runs about 10.5 (they include the slow, overloaded layouts the quick run skips).
 WEEK_PER_SCREEN_DAY = {"quick": 6.0, "full": 11.0}
 STARTUP_SECONDS = 3.0
+# Real runs take longer than (planned weeks x one timed week / workers): many layouts run at once on shared cores,
+# and the layouts simulated are on average heavier than the one timed. Measured on default and extreme settings:
+# quick runs 1.2-1.8x, full runs about 2.4x.
+WEEK_OVERHEAD = {"quick": 1.5, "full": 2.5}
 CHUNK_WEEKS = 20              # weeks per unit of work: small enough for smooth progress updates
 
 Progress = Callable[[float, str, dict], None]
+
+
+class RunStopped(Exception):
+    """Raised inside a run when its stop check says so (the visitor pressed Stop, or the time limit passed)."""
 
 
 def settings_hash(a: dict) -> str:
@@ -62,7 +72,7 @@ def available_cpus() -> int:
     return max(1, min(n, workers_memory_allows()))
 
 
-WORKER_MB = 260          # one simulation worker after loading the market (measured ~210 MB), plus headroom
+WORKER_MB = 340          # one simulation worker: its own copy of the market (~210 MB) plus Streamlit imports (forkserver)
 APP_RESERVE_MB = 500     # the Streamlit app itself and its cached data
 
 
@@ -115,16 +125,21 @@ def _chunks(designs: list[str], scenarios: list[str], stream: str, n_weeks: int)
 
 
 def _simulate(pool, jobs: list[tuple], done: dict, total: int, label: str, progress: Progress | None) -> dict:
-    """Run jobs; returns {(stream, scenario): [rows]}. `done` carries counters across phases."""
+    """Run jobs; returns {(stream, scenario): [rows]}. `done` carries counters across phases. Checks the run's stop
+    test (done["stop"]) at least once a second."""
     out: dict = {}
-    futures = [pool.submit(_job, j) for j in jobs]
-    for f in as_completed(futures):
-        name, sc, stream, rows = f.result()
-        out.setdefault((stream, sc), []).extend(rows)
-        done["weeks"] += len(rows)
-        done["packages"] += sum(r["packages_due"] for r in rows)
-        if progress:
-            progress(done["weeks"] / total, label, dict(done, total=total))
+    pending = {pool.submit(_job, j) for j in jobs}
+    while pending:
+        ready, pending = wait(pending, timeout=1.0, return_when=FIRST_COMPLETED)
+        if done.get("stop") and done["stop"]():
+            raise RunStopped()
+        for f in ready:
+            name, sc, stream, rows = f.result()
+            out.setdefault((stream, sc), []).extend(rows)
+            done["weeks"] += len(rows)
+            done["packages"] += sum(r["packages_due"] for r in rows)
+            if progress:
+                progress(done["weeks"] / total, label, dict(done, total=total))
     return out
 
 
@@ -134,14 +149,34 @@ def scenarios_in_play(a: dict) -> list[str]:
     return [s for s in a["scenarios"] if a["weeks_per_year"].get(s, 0) > 0] or ["normal"]
 
 
-def screen_all(a: dict, market: str = "msp", tier: int = 0) -> dict:
-    """Average-day screen of one group of layouts (0 = the standard list) in every scenario in play. Takes well
-    under a second per scenario; its duration also calibrates the run-time estimate on whatever machine runs it."""
+def screen_all(a: dict, market: str = "msp", tier: int | str = 0) -> dict:
+    """Average-day screen of one group of layouts (0 = the standard list, "larger" = every larger network at once) in
+    every scenario in play. Takes about a second; its duration also calibrates the run-time estimate on whatever
+    machine runs it."""
     m = load_market(market)
-    designs = design_tiers(a, len(m.site_rank))[tier]
+    tiers = design_tiers(a, len(m.site_rank))
+    designs = [d for t in tiers[1:] for d in t] if tier == "larger" else tiers[tier]
     t0 = time.perf_counter()
     screens = {sc: screen(m, a, sc, designs) for sc in scenarios_in_play(a)}
-    return {"screens": screens, "seconds": time.perf_counter() - t0, "tier": tier}
+    out = {"screens": screens, "seconds": time.perf_counter() - t0, "tier": tier}
+    if tier == 0:
+        out["week_seconds"] = time_one_week(m, a, screens)
+    return out
+
+
+def time_one_week(m, a: dict, screens: dict) -> float:
+    """Seconds to simulate one real week with these settings on this machine: the cheapest layout that passed the
+    screen, one week in each kind of week, averaged. Extreme settings (late trucks, no-shows, huge volume) make weeks
+    much slower than the average-day screen suggests, so run times are estimated from this."""
+    took = []
+    weeks = draw_weeks(1, len(m.site_rank), len(a["schedule"]["linehaul_waves"]), a, "search")
+    for sc, s in screens.items():
+        kept = s[s["kept"]] if s["kept"].any() else s
+        d = get_design(kept.nsmallest(1, "screen_cost")["design"].iloc[0], a)
+        t = time.perf_counter()
+        simulate_week(m, d, weeks[0], a, a["scenarios"][sc])
+        took.append(time.perf_counter() - t)
+    return float(np.mean(took))
 
 
 def n_tiers(a: dict, market: str = "msp") -> int:
@@ -156,6 +191,19 @@ def candidates(screens: dict, top_n: int) -> list[str]:
         k = s[s["kept"]]
         hit = k[k["meets_target"]] if "meets_target" in k else k.iloc[:0]
         for d in list(k.nsmallest(top_n, "screen_cost")["design"]) + list(hit.nsmallest(top_n, "screen_cost")["design"]):
+            if d not in keep:
+                keep.append(d)
+    return keep
+
+
+def larger_candidates(screens: dict, top_n: int) -> list[str]:
+    """Among the larger networks, per kind of week: the cheapest few that meet the OTD target on the average day, and
+    the few with the best average-day OTD (so the closest are simulated even if none meets the target)."""
+    keep = []
+    for s in screens.values():
+        hit = s[s["meets_target"]].nsmallest(top_n, "screen_cost")["design"]
+        best = s.sort_values(["screen_on_time", "screen_cost"], ascending=[False, True]).head(top_n)["design"]
+        for d in list(hit) + list(best):
             if d not in keep:
                 keep.append(d)
     return keep
@@ -205,11 +253,14 @@ def planned_weeks(screen_info: dict, mode: str, ctl: dict) -> int:
 
 
 def estimate_seconds(screen_info: dict, mode: str, ctl: dict, workers: int | None = None) -> float:
-    """Expected run time. A simulated week costs about WEEK_PER_SCREEN_DAY x one screened design-day on the
-    same machine; the screen just measured that."""
+    """Expected run time, if no larger networks are needed: the planned weeks times the measured time of one real
+    week on this machine, shared across the workers. Falls back to the average-day screen's timing."""
     screens = screen_info["screens"]
-    per_day = screen_info["seconds"] / max(sum(len(s) for s in screens.values()), 1)
     workers = workers or available_cpus()
+    if screen_info.get("week_seconds"):
+        return planned_weeks(screen_info, mode, ctl) * screen_info["week_seconds"] * WEEK_OVERHEAD[mode] / workers \
+            + STARTUP_SECONDS
+    per_day = screen_info["seconds"] / max(sum(len(s) for s in screens.values()), 1)
     return planned_weeks(screen_info, mode, ctl) * WEEK_PER_SCREEN_DAY[mode] * per_day / workers + STARTUP_SECONDS
 
 
@@ -240,98 +291,103 @@ def _merge(into: dict, new: dict) -> None:
         into.setdefault(k, []).extend(v)
 
 
-def _quick_tier_scan(pool, a: dict, market: str, scenarios: list[str], ctl: dict, done: dict,
-                     progress: Progress | None) -> tuple[int, int, list[str]]:
-    """Full runs only: when the standard list fails, find the group of larger networks worth a full search with a
-    quick pass (the quick run's weeks and candidates) over every group, instead of fully searching each in turn.
-    Returns the group to search fully (the first where a layout meets every target, or else the group of the layout
-    closest to them), the last group checked, and every layout checked."""
-    q = ctl["quick"]
-    rows: dict = {}
-    tier_of: dict = {}
-    year = pd.DataFrame()
-    for t in range(1, n_tiers(a, market)):
-        screens = screen_all(a, market, t)["screens"]
-        new = candidates(screens, q["top_designs_per_scenario"])
-        tier_of.update({d: t for d in new})
-        total = done["weeks"] + len(new) * len(scenarios) * q["weeks"]
-        _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", q["weeks"]), done, total,
-                               "No layout met every target, so the run is checking larger networks quickly", progress))
-        frames = {sc: summarize(pd.DataFrame(rows[("final", sc)]), a, sc) for sc in scenarios}
-        year = year_round_table(frames, a)
-        if len(year) and bool(year["meets_all"].iloc[0]):
-            return t, t, list(tier_of)
-    last = n_tiers(a, market) - 1
-    return (tier_of.get(year.index[0], last) if len(year) else last), last, list(tier_of)
+def _batch(pool, a: dict, mode: str, ctl: dict, scenarios: list[str], designs_by_sc: dict, rows: dict, done: dict,
+           progress: Progress | None, lead: str) -> list[str]:
+    """Simulate one batch of layouts. Quick: every layout on the quick run's weeks. Full: search every layout on the
+    search weeks, then recheck the closest few per kind of week on fresh weeks. Returns the layouts simulated on the
+    final weeks."""
+    if mode == "quick":
+        q = ctl["quick"]
+        new = list(dict.fromkeys(d for v in designs_by_sc.values() for d in v))
+        _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", q["weeks"]), done,
+                               done["weeks"] + len(new) * len(scenarios) * q["weeks"],
+                               f"{lead}Simulating {len(new)} layouts", progress))
+        return new
+    f = ctl["full"]
+    jobs = [j for sc in scenarios for j in _chunks(designs_by_sc[sc], [sc], "search", f["search_weeks"])]
+    n_search = sum(len(v) for v in designs_by_sc.values()) * f["search_weeks"]
+    guess = min(f["recheck_top_designs"] * len(scenarios), len(set().union(*designs_by_sc.values()))) \
+        * len(scenarios) * f["recheck_weeks"]
+    _merge(rows, _simulate(pool, jobs, done, done["weeks"] + n_search + guess,
+                           f"{lead}Searching: every layout that passed the screen, {f['search_weeks']} weeks each",
+                           progress))
+    search = {sc: summarize(pd.DataFrame(rows[("search", sc)]), a, sc) for sc in scenarios}
+    new = []
+    for sc in scenarios:
+        for d in [x for x in search[sc].index if x in designs_by_sc[sc]][: f["recheck_top_designs"]]:
+            if d not in new:
+                new.append(d)
+    n_recheck = len(new) * len(scenarios) * f["recheck_weeks"]
+    _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", f["recheck_weeks"]), done,
+                           done["weeks"] + n_recheck,
+                           f"{lead}Rechecking the {len(new)} closest layouts on {f['recheck_weeks']:,} fresh weeks",
+                           progress))
+    return new
 
 
 def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None = None,
-        progress: Progress | None = None, screen_info: dict | None = None) -> dict:
-    """Simulate the standard list of layouts. If none meets every OTD target in every kind of week, add the next
-    group of larger networks (design_grid.larger_networks) and simulate those on the same random weeks, until a
-    layout meets every target or the groups run out."""
+        progress: Progress | None = None, screen_info: dict | None = None,
+        should_stop: Callable[[], bool] | None = None) -> dict:
+    """Simulate the standard list of layouts. If none meets every OTD target in every kind of week, screen every
+    larger network (design_grid.larger_networks) on an average day and simulate the most promising few in one more
+    batch on the same random weeks. One extra batch keeps a hard case to roughly twice the usual time."""
     t0 = time.perf_counter()
     ctl = a["app_controls"]["run"]
     screen_info = screen_info or screen_all(a, market)
-    tier_screens = screen_info["screens"]
-    scenarios = list(tier_screens)
+    screens = screen_info["screens"]
+    scenarios = list(screens)
     workers = workers or available_cpus()
     tiers = n_tiers(a, market)
-    done = {"weeks": 0, "packages": 0}
+    done = {"weeks": 0, "packages": 0, "stop": should_stop}
     rows: dict = {}
-    screens, designs, tier, scanned_to, scanned = None, [], 0, 0, []
-    with ProcessPoolExecutor(workers, initializer=_init, initargs=(market, a)) as pool:
-        while True:
-            screens = merge_screens(screens, tier_screens)
-            info = {"screens": tier_screens}
-            total = done["weeks"] + planned_weeks(info, mode, ctl)
-            more = "" if tier == 0 else ("No layout met every target, so the run is now trying larger networks. ")
-            if mode == "quick":
-                q = ctl["quick"]
-                new = candidates(tier_screens, q["top_designs_per_scenario"])
-                _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", q["weeks"]), done, total,
-                                       f"{more}Simulating {len(new)} layouts", progress))
-                weeks_note = {"weeks": q["weeks"]}
-            else:
-                f = ctl["full"]
-                kept = {sc: s.loc[s["kept"], "design"].tolist() for sc, s in tier_screens.items()}
-                search_jobs = [j for sc in scenarios for j in _chunks(kept[sc], [sc], "search", f["search_weeks"])]
-                _merge(rows, _simulate(pool, search_jobs, done, total,
-                                       f"{more}Searching: every layout that passed the screen, "
-                                       f"{f['search_weeks']} weeks each", progress))
-                search = {sc: summarize(pd.DataFrame(rows[("search", sc)]), a, sc) for sc in scenarios}
-                new = []
-                tier_names = set(tier_screens[scenarios[0]]["design"])
-                for sc in scenarios:
-                    for d in [x for x in search[sc].index if x in tier_names][: f["recheck_top_designs"]]:
-                        if d not in new:
-                            new.append(d)
-                n_recheck = len(new) * len(scenarios) * f["recheck_weeks"]
-                _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", f["recheck_weeks"]), done,
-                                       done["weeks"] + n_recheck,
-                                       f"{more}Rechecking the {len(new)} closest layouts on "
-                                       f"{f['recheck_weeks']:,} fresh weeks", progress))
-                weeks_note = {"search_weeks": f["search_weeks"], "recheck_weeks": f["recheck_weeks"]}
-            designs += [d for d in new if d not in designs]
-            frames = _frames(rows, a, scenarios, mode)
-            year = year_round_table(frames, a)
-            if (len(year) and bool(year["meets_all"].iloc[0])) or tier + 1 >= tiers:
-                break
-            if mode == "full" and tier == 0:
-                tier, scanned_to, scanned = _quick_tier_scan(pool, a, market, scenarios, ctl, done, progress)
-            else:
-                tier += 1
+    top = ctl["quick"]["top_designs_per_scenario"]
+    # forkserver: workers start from a clean process, not a copy of this multi-threaded one (the web server, other
+    # runs), which avoids rare fork deadlocks. It is the default on Python 3.14, which the hosted app uses.
+    pool = ProcessPoolExecutor(workers, mp_context=multiprocessing.get_context("forkserver"),
+                               initializer=_init, initargs=(market, a))
+    try:
+        if mode == "quick":
+            first = {sc: candidates(screens, top) for sc in scenarios}
+        else:
+            first = {sc: s.loc[s["kept"], "design"].tolist() for sc, s in screens.items()}
+        designs = _batch(pool, a, mode, ctl, scenarios, first, rows, done, progress, "")
+        frames = _frames(rows, a, scenarios, mode)
+        year = year_round_table(frames, a)
+        larger_tried = False
+        if not (len(year) and bool(year["meets_all"].iloc[0])) and tiers > 1:
             if progress:
                 progress(1.0, "No layout met every target. Screening larger networks", dict(done, total=done["weeks"]))
-            tier_screens = screen_all(a, market, tier)["screens"]
-    if mode == "full":
-        weeks_note["rechecked"] = designs
+            big = screen_all(a, market, "larger")["screens"]
+            screens = merge_screens(screens, big)
+            pick = larger_candidates(big, top)
+            designs += [d for d in _batch(pool, a, mode, ctl, scenarios, {sc: pick for sc in scenarios}, rows, done,
+                                          progress, "No layout met every target, so the run is now trying larger "
+                                                    "networks. ") if d not in designs]
+            frames = _frames(rows, a, scenarios, mode)
+            year = year_round_table(frames, a)
+            larger_tried = True
+    except BaseException:
+        # Stopped or failed: drop the queued chunks and end the workers now, so the server is free at once.
+        procs = list(getattr(pool, "_processes", {}).values())
+        pool.shutdown(wait=False, cancel_futures=True)
+        for p in procs:
+            if p.is_alive():
+                p.terminate()
+        raise
+    else:
+        pool.shutdown(wait=True)
+    done.pop("stop", None)
+    weeks_note = ({"weeks": ctl["quick"]["weeks"]} if mode == "quick" else
+                  {"search_weeks": ctl["full"]["search_weeks"], "recheck_weeks": ctl["full"]["recheck_weeks"],
+                   "rechecked": designs})
+    screened = [d for s in [next(iter(screens.values()))] for d in s["design"]]
     return {"mode": mode, "frames": frames, "year": year, "screens": screens,
             "designs": designs, "scenarios": scenarios, "seconds": round(time.perf_counter() - t0, 1),
             "hash": settings_hash(a), "estimate": quick_estimate(a, screen_info["screens"], market),
             "weeks_simulated": done["weeks"], "packages_simulated": done["packages"],
-            "tiers_tried": max(tier, scanned_to) + 1, "tiers_available": tiers, "diagnosis": diagnose(frames, year, a),
-            "max_stations": max(len(get_design(d, a).hubs) for d in designs + scanned), **weeks_note}
+            "tiers_tried": tiers if larger_tried else 1, "tiers_available": tiers,
+            "diagnosis": diagnose(frames, year, a),
+            "max_stations": max(len(get_design(d, a).hubs) for d in screened), **weeks_note}
 
 
 # ---------------------------------------------------------------- saved default runs
