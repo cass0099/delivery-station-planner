@@ -1983,7 +1983,7 @@ if page == 0:
             '<div class="intro">'
             '<div class="q" style="font-size:34px">Using a basic simulation to find the lowest-cost delivery station network '
             'for DoorDash Parcel in Minneapolis–St. Paul</div>'
-            '<p>In a parcel network like DoorDash Parcel, packages are sorted overnight at local delivery stations. '
+            '<p style="font-style:italic">In a parcel network like DoorDash Parcel, packages are sorted overnight at local delivery stations. '
             'A delivery station receives overnight trucks, sorts packages into routes, and is where Dashers pick up '
             'their routes in the morning. This project asks how many delivery stations the network in '
             'Minneapolis–St. Paul should run and how large each one should be. The rest of the app calls them '
