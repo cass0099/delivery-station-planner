@@ -193,6 +193,8 @@ table.score tr.out td.name, table.score tr.out td.cost span {{ color: {MUTED}; }
 [data-testid="stSliderTickBar"] {{ display: none; }}
 [data-testid="stSegmentedControl"] button {{ border-radius: 999px !important; font-weight: 600; }}
 .stProgress > div > div > div > div {{ background: {RED_BRIGHT} !important; }}
+[data-testid="stSpinner"] {{ font-size: 15px; color: {BODY}; padding: 10px 0; }}
+[data-testid="stSpinner"] i {{ border-top-color: {RED_BRIGHT} !important; }}
 
 /* ---------- type ---------- */
 .q {{ font-size: 32px; line-height: 1.15; font-weight: 800; color: {INK}; letter-spacing: -0.02em; margin: 0 0 12px; }}
@@ -1600,6 +1602,15 @@ def get_screen(a: dict) -> dict:
     return store[key]
 
 
+def get_estimate(a: dict, si: dict) -> dict:
+    """Instant estimate for these settings; cached, since it may screen larger networks too."""
+    key = ("estimate", settings_hash(a))
+    store = run_store()
+    if key not in store:
+        store[key] = quick_estimate(a, si["screens"], MARKET)
+    return store[key]
+
+
 def saved_run(a: dict, mode: str) -> dict | None:
     """A finished run for these settings: from this server's memory, or the saved default runs."""
     key = (settings_hash(a), mode)
@@ -1929,7 +1940,6 @@ elif page < FIRST_STEP + len(STEPS):
 elif page == RESULTS - 1:
     ch = changed()
     rc = CTL["run"]
-    si = get_screen(a)
     st.html('<div class="q">Run the simulation</div>'
             '<div class="note" style="max-width:80ch">Choose how to run the model with the assumptions you set. The '
             'instant estimate is a rough first answer. The quick run and the full run are live simulations that follow '
@@ -1945,6 +1955,16 @@ elif page == RESULTS - 1:
         st.html('<div class="note" style="max-width:none">You have not changed any assumptions, so the run will use '
                 'the default settings. You can go back to any step to change them.</div>')
     st.write("")
+    # New settings need a fresh average-day screen of every layout before the run times can be shown. The page above is
+    # already on screen; the spinner shows while the screen runs (a few seconds on the hosted server).
+    if ("screen", settings_hash(a)) in run_store():
+        si = get_screen(a)
+        est = get_estimate(a, si)
+    else:
+        with st.spinner("Checking every station layout on an average day with your settings. This takes a few "
+                        "seconds."):
+            si = get_screen(a)
+            est = get_estimate(a, si)
 
     q, f = rc["quick"], rc["full"]
     copy_ = {
@@ -1963,7 +1983,6 @@ elif page == RESULTS - 1:
     }
     tab_est, tab_quick, tab_full = st.tabs(["Instant estimate", "Quick run", "Full run"])
     with tab_est:
-        est = quick_estimate(a, si["screens"])
         lead = ('On an average day without disruptions, the cheapest station layout that meets the OTD targets is '
                 if est.get("passes_all", True) else
                 'On an average day without disruptions, no station layout the model tried meets the OTD targets. The '
