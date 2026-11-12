@@ -21,6 +21,7 @@ import geopandas as gpd
 import pandas as pd
 import streamlit as st
 import yaml
+from branca.element import MacroElement, Template
 from streamlit_folium import st_folium
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -52,8 +53,17 @@ TILES, TILE_LABELS = ESRI.format("World_Light_Gray_Base"), ESRI.format("World_Li
 TILES_ATTR = "Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors"
 
 
+class _PhoneStill(MacroElement):
+    """On touch screens, one finger scrolls the page instead of dragging the map; the zoom buttons still work."""
+    _template = Template("""{% macro script(this, kwargs) %}
+    if (L.Browser.mobile) { {{ this._parent.get_name() }}.dragging.disable();
+      if ({{ this._parent.get_name() }}.tap) { {{ this._parent.get_name() }}.tap.disable(); } }
+    {% endmacro %}""")
+
+
 def add_basemap(m: folium.Map) -> None:
     folium.TileLayer(TILES, attr=TILES_ATTR, max_zoom=16).add_to(m)
+    m.add_child(_PhoneStill())
 
 
 def add_labels(m: folium.Map) -> None:
@@ -257,6 +267,65 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
 .method h3:first-child {{ margin-top: 0; }}
 .method p {{ font-size: 15.5px; line-height: 1.65; color: {BODY}; margin: 0 0 12px; max-width: 70ch; }}
 .method .src {{ font-size: 13.5px; color: {MUTED}; }}
+
+/* ---------- phones (desktop layout above is unchanged) ---------- */
+@media (max-width: 640px) {{
+  .block-container {{ padding: 14px 16px 64px !important; }}
+  .masthead {{ gap: 10px; padding-bottom: 10px; }}
+  .masthead svg {{ width: 28px; height: 28px; }}
+  .app-name {{ font-size: 17px; }}
+  .app-sub {{ font-size: 13px; line-height: 1.4; }}
+  /* Menu: one swipeable row instead of three wrapped lines; the current page scrolls into view. */
+  .st-key-nav {{ flex-wrap: nowrap !important; overflow-x: auto; overflow-y: hidden; gap: 6px !important;
+    padding: 8px 0 !important; margin: 0 -16px; padding-left: 16px !important; padding-right: 16px !important;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-padding: 0 16px; }}
+  .st-key-nav::-webkit-scrollbar {{ display: none; }}
+  .st-key-nav button {{ font-size: 13px !important; padding: 6px 10px !important; }}
+  .st-key-nav_assume {{ padding: 3px 4px 3px 12px !important; }}
+  .nav-group {{ font-size: 12px; padding-right: 8px; }}
+  hr.nav {{ margin: 4px 0 20px; }}
+  /* Type */
+  .q {{ font-size: 24px; line-height: 1.2; }}
+  .result {{ font-size: 25px; line-height: 1.18; }}
+  .result-sub, .note {{ font-size: 15px; }}
+  .intro p {{ font-size: 15.5px; }}
+  .section {{ font-size: 18px; }}
+  .chart-note {{ font-size: 13.5px; }}
+  [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] label {{ white-space: normal; overflow: visible; }}
+  /* Buttons wrap instead of running off the screen; Back and Next stack, Next on top. */
+  .stButton > button, .stButton > button p {{ white-space: normal !important; text-align: center; }}
+  .st-key-pager {{ flex-direction: column-reverse !important; align-items: stretch !important; }}
+  .st-key-pager [data-testid="stElementContainer"], .st-key-pager .stButton,
+  .st-key-pager .stButton > button {{ width: 100% !important; }}
+  .st-key-pager .stButton > button[kind="tertiary"] {{ padding: 8px 0; }}
+  [class*="st-key-runrow_"] {{ flex-wrap: wrap !important; gap: 12px !important; }}
+  [data-testid="stTabs"] [data-baseweb="tab-list"] {{ gap: 16px; }}
+  [data-testid="stTabs"] [data-baseweb="tab"] p {{ font-size: 15px !important; }}
+  /* Planner table: question above its answer. */
+  table.jd tr:first-child {{ display: none; }}
+  table.jd, table.jd tbody, table.jd tr, table.jd td {{ display: block; width: auto !important; }}
+  table.jd tr {{ padding: 12px 0; border-bottom: 1px solid #f0f0f0; }}
+  table.jd td {{ border: 0; padding: 0 !important; }}
+  table.jd td:first-child {{ margin-bottom: 4px; }}
+  /* Results summary table */
+  table.cmp {{ font-size: 14px; }}
+  table.cmp td {{ padding: 10px 0 10px 10px; }}
+  /* Scorecard and OTD floor table: each station layout becomes a card with labelled lines. */
+  .score-wrap {{ overflow: visible; }}
+  table.score, table.score.floor {{ min-width: 0 !important; max-width: none; display: block; }}
+  table.score tbody {{ display: block; }}
+  table.score tr:first-child {{ display: none; }}
+  table.score tr {{ display: block; padding: 12px 12px; border-bottom: 1px solid {LINE}; }}
+  table.score tr.pick {{ background: #eef2fe; border-radius: 12px; border-bottom: 0; margin: 4px 0; }}
+  table.score tr.pick td {{ background: none; }}
+  table.score td {{ display: grid; grid-template-columns: minmax(0, 44%) 1fr; gap: 12px; padding: 5px 0;
+    border: 0; white-space: normal !important; font-size: 13.5px; }}
+  table.score td::before {{ content: attr(data-label); color: {MUTED}; font-size: 12.5px; font-weight: 500; }}
+  table.score td.name {{ display: block; font-size: 16px; padding: 0 0 6px; }}
+  table.score td.name::before {{ content: none; }}
+  table.score td.ok {{ font-size: 15px; }}
+  table.score td.cost span {{ width: auto; }}
+}}
 </style>""")
 
 
@@ -1036,19 +1105,19 @@ def scorecard(run: dict, a: dict, pick: str) -> str:
         cells, failed = "", []
         for k in keys:
             if d not in frames[k].index:
-                cells += '<td class="na">Not scored</td>'
+                cells += f'<td class="na" data-label="{SCEN.get(k, k)}"><div>Not scored</div></td>'
                 failed.append(SCEN.get(k, k).lower())
                 continue
             misses = missed_targets(frames[k].loc[d], objective_for(a, k))
             if not misses and bool(frames[k].loc[d, "feasible"]):
-                cells += '<td class="ok">✓</td>'
+                cells += f'<td class="ok" data-label="{SCEN.get(k, k)}"><div>✓</div></td>'
             else:
                 failed.append(SCEN.get(k, k).lower())
                 kind = {"normal": "normal", "holiday_peak": "holiday peak", "hub_outage": "station outage"}.get(k, "")
                 text = "<br>".join(f"<b>Misses the {n}.</b> {short_miss(n, frames[k].loc[d], objective_for(a, k), kind)}"
                                    for n, _ in misses) \
                     or "<b>Misses a target</b>"
-                cells += f'<td class="no"><span class="x">✗</span>{text}</td>'
+                cells += f'<td class="no" data-label="{SCEN.get(k, k)}"><div><span class="x">✗</span>{text}</div></td>'
         cost = r["year_cost_per_package"]
         if d == pick:
             verdict, cls = ("<b>Recommended</b>" if not failed else "<b>Closest to the OTD targets</b>"), "pick"
@@ -1060,9 +1129,10 @@ def scorecard(run: dict, a: dict, pick: str) -> str:
             listed = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
             verdict, cls = f"Ruled out in {listed} weeks", "out"
         body += (f'<tr class="{cls}"><td class="name">{plain(r["hubs"])}</td>'
-                 f'<td class="cost"><span>{money(cost)}</span></td>'
-                 + (f'<td class="topup">{topup(d) * 100:.1f}¢</td>' if show_topup else "")
-                 + f'{cells}<td class="verdict">{verdict}</td></tr>')
+                 f'<td class="cost" data-label="Cost per package over a year"><div><span>{money(cost)}</span></div></td>'
+                 + (f'<td class="topup" data-label="Of which, raising pay to ${floor:.0f}/h"><div>{topup(d) * 100:.1f}¢'
+                    '</div></td>' if show_topup else "")
+                 + f'{cells}<td class="verdict" data-label="Verdict"><div>{verdict}</div></td></tr>')
     return f'<div class="score-wrap"><table class="score">{head}{body}</table></div>'
 
 
@@ -1082,12 +1152,15 @@ def floor_table(run: dict, a: dict) -> str:
         cells = ""
         for k in keys:
             if d not in frames[k].index:
-                cells += '<td class="na">Not scored</td>'
+                cells += f'<td class="na" data-label="{names.get(k, SCEN.get(k, k))}"><div>Not scored</div></td>'
                 continue
             share = frames[k].loc[d, "weeks_meeting_service"]
             ok = share >= objective_for(a, k)["on_time_week_share"]
-            cells += (f'<td class="{"" if ok else "low"}">{share * 1000:,.0f} '
-                      f'<span class="{"yes" if ok else "x"}">{"✓" if ok else "✗"}</span></td>')
+            o = objective_for(a, k)
+            label = (f'{names.get(k, SCEN.get(k, k))} (goal: {o["on_time_week_share"] * 1000:,.0f} at '
+                     f'{o["on_time_target"]:.0%})')
+            cells += (f'<td class="{"" if ok else "low"}" data-label="{label}"><div>{share * 1000:,.0f} '
+                      f'<span class="{"yes" if ok else "x"}">{"✓" if ok else "✗"}</span></div></td>')
         body += f'<tr><td class="name">{plain(r["hubs"])}</td>{cells}</tr>'
     return f'<div class="score-wrap"><table class="score floor">{head}{body}</table></div>'
 
@@ -1657,7 +1730,18 @@ MARK = ('<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">'
         '<circle cx="24" cy="23" r="3" fill="#fff"/></svg>')
 st.html(f'<div class="masthead">{MARK}<div><div class="app-name">Delivery Station Planner</div>'
         '<div class="app-sub">Simulate next-day DoorDash Parcel delivery in Minneapolis–St. Paul and find the '
-        'cheapest network of delivery stations that still delivers on time.</div></div></div>')
+        'cheapest network of delivery stations that still delivers on time.</div></div></div>'
+        # Phones only: scroll the swipeable menu so the current page's item is in view (desktop menus wrap instead).
+        f"""<script>(function(){{
+  if (!window.matchMedia('(max-width: 640px)').matches) return;
+  var tries = 0;
+  (function center(){{
+    var nav = document.querySelector('.st-key-nav'), b = document.querySelector('.st-key-nav{page} button');
+    if (!nav || !b) {{ if (tries++ < 20) setTimeout(center, 100); return; }}
+    var r = b.getBoundingClientRect(), n = nav.getBoundingClientRect();
+    nav.scrollLeft += (r.left - n.left) - (n.width - r.width) / 2;
+  }})();
+}})();</script>""", unsafe_allow_javascript=True)
 def nav_item(i: int) -> None:
     """Every item is the same kind of element (a button), so clicking never changes the row's layout.
     The current page is styled through its key; Results stays disabled until there is a run."""
