@@ -323,3 +323,64 @@ def test_larger_networks_come_after_the_standard_list():
     assert min(len(d.hubs) for d in tiers[1]) > max(len(d.hubs) for d in tiers[0])
     assert all(len(d.hubs) <= 25 for t in tiers for d in t)
     assert len(get_design("8x medium", A).hubs) == 8
+
+
+def _cover(share: float, kept: float | None = None) -> dict:
+    cov = {**A["coverage"], "households_served": share}
+    if kept is not None:
+        cov["share_kept_at_min"] = kept
+    return {**A_PLAIN, "coverage": cov}
+
+
+def test_choose_zips_takes_closest_zips_first_and_keeps_whole_zips():
+    from engine.demand import choose_zips
+    minutes = np.array([5.0, 6.0, 30.0, 40.0, 50.0])
+    hh = np.array([100, 100, 100, 100, 100])
+    zips = np.array(["A", "A", "B", "C", "C"])
+    assert choose_zips(minutes, hh, zips, 1.0).all()
+    assert choose_zips(minutes, hh, zips, 0.4).tolist() == [True, True, False, False, False]
+    # 50% needs a third tract, so all of ZIP B comes in; ZIP C (farther) stays out.
+    assert choose_zips(minutes, hh, zips, 0.5).tolist() == [True, True, True, False, False]
+
+
+def test_coverage_share_factor_falls_in_a_straight_line():
+    from engine.demand import coverage_share_factor, expected_volume_factor
+    assert coverage_share_factor(_cover(1.0, 0.6)) == 1.0
+    assert coverage_share_factor(_cover(0.5, 0.6)) == pytest.approx(0.6)
+    assert coverage_share_factor(_cover(0.75, 0.6)) == pytest.approx(0.8)
+    assert expected_volume_factor(_cover(0.75, 0.6)) == pytest.approx(0.6)
+
+
+@needs_data
+def test_unserved_zips_get_no_packages(market):
+    from engine.simulation import served_tracts
+    d = get_design("3x small", A)
+    a = _cover(0.7)
+    served = served_tracts(market, d, a)
+    hh = market.tracts["households"].to_numpy()
+    assert 0.7 <= hh[served].sum() / hh.sum() < 0.8
+    # whole ZIPs: no ZIP is split between served and not served
+    by_zip = market.tracts.assign(s=served).groupby("zip")["s"].nunique()
+    assert (by_zip == 1).all()
+    day = average_day(len(market.site_rank), len(A["schedule"]["linehaul_waves"]), a)
+    full = simulate_day(market, d, "Mon", A_PLAIN, day, NORMAL)
+    part = simulate_day(market, d, "Mon", a, day, NORMAL)
+    assert part["metrics"]["packages_due"] < 0.7 * full["metrics"]["packages_due"]
+    assert part["metrics"]["packages_due"] > 0.3 * full["metrics"]["packages_due"]
+
+
+@needs_data
+def test_full_coverage_leaves_results_unchanged(market):
+    d = get_design("2x small", A)
+    week = draw_weeks(1, len(market.site_rank), len(A["schedule"]["linehaul_waves"]), A_PLAIN, "search", 3)[0]
+    a = {**A_PLAIN, "coverage": {**A["coverage"], "households_served": 1.0}}
+    b = {k: v for k, v in A_PLAIN.items() if k != "coverage"}
+    assert simulate_week(market, d, week, a, NORMAL) == simulate_week(market, d, week, b, NORMAL)
+
+
+def test_larger_networks_are_tried_when_the_pick_has_the_most_stations_in_the_list():
+    from engine.live import at_edge
+    top = max(A["design_grid"]["hub_counts"])
+    assert at_edge(f"{top}x small", A)
+    assert at_edge(f"{top}x small, big #1", A)
+    assert not at_edge(f"{top - 1}x medium", A)

@@ -13,6 +13,7 @@ import argparse
 import logging
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 
 from engine.checks import print_checks, run_checks
@@ -25,6 +26,40 @@ DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 def packages_per_household(cfg: dict) -> float:
     """Average packages per household per day that our network delivers."""
     return cfg["packages_per_household_per_day"] * cfg["network_share"]
+
+
+def coverage_share_factor(a: dict) -> float:
+    """Share of the full network share the network keeps in its served ZIPs at the chosen coverage: the full share
+    at 100% coverage, falling in a straight line to coverage.share_kept_at_min at the minimum coverage."""
+    cov = a.get("coverage") or {}
+    served = cov.get("households_served", 1.0)
+    lo = cov.get("min_households_served", 0.5)
+    if served >= 1.0 or lo >= 1.0:
+        return 1.0
+    f = (min(max(served, lo), 1.0) - lo) / (1.0 - lo)
+    return cov.get("share_kept_at_min", 1.0) + f * (1.0 - cov.get("share_kept_at_min", 1.0))
+
+
+def expected_volume_factor(a: dict) -> float:
+    """The network's packages as a share of what it would carry serving every ZIP: households served times the
+    share it keeps in them. Uses the coverage target; a layout's actual ZIPs land at or just above it."""
+    return min((a.get("coverage") or {}).get("households_served", 1.0), 1.0) * coverage_share_factor(a)
+
+
+def choose_zips(minutes: np.ndarray, households: np.ndarray, zips: np.ndarray, target: float) -> np.ndarray:
+    """Which tracts are served: rank ZIPs by the household-weighted drive time from their tracts to the nearest
+    station, and add ZIPs, closest first, until `target` of all households is covered. Returns a mask per tract."""
+    if target >= 1.0:
+        return np.ones(len(zips), dtype=bool)
+    df = pd.DataFrame({"zip": zips, "hh": households.astype(float), "t": minutes})
+    df["w"] = df["hh"].where(df["hh"] > 0, 1e-6)
+    df["tw"] = df["t"] * df["w"]
+    g = df.groupby("zip").agg(tw=("tw", "sum"), w=("w", "sum"), hh=("hh", "sum"))
+    g["t"] = g["tw"] / g["w"]
+    g = g.sort_values(["t", "hh"], kind="stable")
+    before = g["hh"].cumsum().shift(fill_value=0.0)
+    keep = set(g.index[before < target * max(g["hh"].sum(), 1e-9)])
+    return df["zip"].isin(keep).to_numpy()
 
 
 def check_day_multipliers(mults: dict) -> None:

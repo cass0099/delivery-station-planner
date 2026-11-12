@@ -10,28 +10,28 @@
     "year_cost": 3.814,
     "tiers": "1/4",
     "estimate": "2x small",
-    "seconds": 2.9,
-    "predicted": 4.6,
+    "seconds": 4.8,
+    "predicted": 4.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 5.5
+    "wall_seconds": 7.9
   },
   {
     "case": "demand.network_share = 0.1",
     "changes": {
       "demand.network_share": 0.1
     },
-    "pick": "4x medium",
-    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium",
+    "pick": "6x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small + #4 small + #5 small + #6 small",
     "meets_all": true,
-    "year_cost": 2.379,
-    "tiers": "1/4",
-    "estimate": "4x medium",
-    "seconds": 24.9,
-    "predicted": 17.3,
+    "year_cost": 2.318,
+    "tiers": "4/4",
+    "estimate": "6x small, big #1",
+    "seconds": 80.2,
+    "predicted": 18.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 28.9
+    "wall_seconds": 89.5
   },
   {
     "case": "demand.packages_per_household_per_day = 0.3",
@@ -44,11 +44,11 @@
     "year_cost": 3.187,
     "tiers": "1/4",
     "estimate": "2x small",
-    "seconds": 7.4,
+    "seconds": 12.0,
     "predicted": 6.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 9.6
+    "wall_seconds": 14.3
   },
   {
     "case": "demand.packages_per_household_per_day = 0.7",
@@ -59,13 +59,13 @@
     "hubs": "#1 small + #2 small + #3 small + #4 small",
     "meets_all": true,
     "year_cost": 2.578,
-    "tiers": "1/4",
+    "tiers": "4/4",
     "estimate": "4x small",
-    "seconds": 11.9,
-    "predicted": 9.5,
+    "seconds": 32.2,
+    "predicted": 9.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 37.1
   },
   {
     "case": "scenarios.holiday_peak.volume_multiplier = 1.2",
@@ -78,11 +78,11 @@
     "year_cost": 2.815,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 8.9,
-    "predicted": 6.8,
+    "seconds": 17.4,
+    "predicted": 9.4,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 11.3
+    "wall_seconds": 20.8
   },
   {
     "case": "scenarios.holiday_peak.volume_multiplier = 2.5",
@@ -93,13 +93,81 @@
     "hubs": "#1 small + #2 small + #3 small + #4 small",
     "meets_all": true,
     "year_cost": 2.885,
-    "tiers": "1/4",
+    "tiers": "4/4",
     "estimate": "4x small",
-    "seconds": 12.7,
-    "predicted": 9.1,
+    "seconds": 31.2,
+    "predicted": 14.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.4
+    "wall_seconds": 35.4
+  },
+  {
+    "case": "coverage.households_served = 0.5",
+    "changes": {
+      "coverage.households_served": 0.5
+    },
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 3.185,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 7.7,
+    "predicted": 4.7,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 9.8
+  },
+  {
+    "case": "coverage.households_served = 1.0",
+    "changes": {
+      "coverage.households_served": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.6,
+    "predicted": 7.9,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.8
+  },
+  {
+    "case": "coverage.share_kept_at_min = 0.1",
+    "changes": {
+      "coverage.share_kept_at_min": 0.1
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 13.2,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 15.9
+  },
+  {
+    "case": "coverage.share_kept_at_min = 1.0",
+    "changes": {
+      "coverage.share_kept_at_min": 1.0
+    },
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
+    "meets_all": true,
+    "year_cost": 2.781,
+    "tiers": "1/4",
+    "estimate": "3x small",
+    "seconds": 14.5,
+    "predicted": 7.1,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 17.1
   },
   {
     "case": "hubs.sizes.small.sort_rate_per_hour = 500",
@@ -112,11 +180,11 @@
     "year_cost": 2.993,
     "tiers": "1/4",
     "estimate": "2x medium",
-    "seconds": 12.2,
-    "predicted": 8.0,
+    "seconds": 17.0,
+    "predicted": 7.6,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.6
+    "wall_seconds": 19.7
   },
   {
     "case": "hubs.sizes.small.sort_rate_per_hour = 3000",
@@ -129,11 +197,11 @@
     "year_cost": 2.68,
     "tiers": "1/4",
     "estimate": "2x small",
-    "seconds": 10.0,
-    "predicted": 6.7,
+    "seconds": 12.5,
+    "predicted": 6.5,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 12.3
+    "wall_seconds": 15.1
   },
   {
     "case": "hubs.sizes.medium.sort_rate_per_hour = 1000",
@@ -146,11 +214,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 10.2,
-    "predicted": 6.6,
+    "seconds": 11.7,
+    "predicted": 6.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 12.6
+    "wall_seconds": 14.3
   },
   {
     "case": "hubs.sizes.medium.sort_rate_per_hour = 6000",
@@ -163,11 +231,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.0,
+    "seconds": 13.0,
     "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.4
+    "wall_seconds": 15.6
   },
   {
     "case": "hubs.sizes.large.sort_rate_per_hour = 2000",
@@ -180,11 +248,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 8.0,
+    "seconds": 13.2,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.4
+    "wall_seconds": 15.7
   },
   {
     "case": "hubs.sizes.large.sort_rate_per_hour = 12000",
@@ -197,11 +265,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 7.2,
+    "seconds": 13.5,
+    "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 16.1
   },
   {
     "case": "hubs.lease_per_sqft_per_year = 6.0",
@@ -214,11 +282,11 @@
     "year_cost": 2.719,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.8,
+    "seconds": 13.3,
     "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.1
+    "wall_seconds": 15.9
   },
   {
     "case": "hubs.lease_per_sqft_per_year = 16.0",
@@ -231,11 +299,11 @@
     "year_cost": 2.903,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.1,
+    "seconds": 13.2,
     "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.5
+    "wall_seconds": 15.9
   },
   {
     "case": "hubs.sizes.small.fitout_per_sqft = 5",
@@ -248,11 +316,11 @@
     "year_cost": 2.728,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.8,
-    "predicted": 7.3,
+    "seconds": 14.0,
+    "predicted": 8.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.2
+    "wall_seconds": 16.6
   },
   {
     "case": "hubs.sizes.small.fitout_per_sqft = 120",
@@ -265,11 +333,11 @@
     "year_cost": 2.993,
     "tiers": "1/4",
     "estimate": "2x medium",
-    "seconds": 14.4,
-    "predicted": 8.7,
+    "seconds": 18.3,
+    "predicted": 8.6,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 16.8
+    "wall_seconds": 21.0
   },
   {
     "case": "hubs.sizes.medium.fitout_per_sqft = 5",
@@ -282,11 +350,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.6,
-    "predicted": 7.3,
+    "seconds": 16.5,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.0
+    "wall_seconds": 19.7
   },
   {
     "case": "hubs.sizes.medium.fitout_per_sqft = 120",
@@ -299,11 +367,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.8,
-    "predicted": 7.4,
+    "seconds": 15.4,
+    "predicted": 7.5,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 18.2
   },
   {
     "case": "hubs.sizes.large.fitout_per_sqft = 5",
@@ -316,11 +384,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.1,
-    "predicted": 7.8,
+    "seconds": 16.5,
+    "predicted": 8.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.5
+    "wall_seconds": 19.1
   },
   {
     "case": "hubs.sizes.large.fitout_per_sqft = 120",
@@ -333,11 +401,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.6,
-    "predicted": 7.2,
+    "seconds": 16.8,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.0
+    "wall_seconds": 19.5
   },
   {
     "case": "hubs.nnn_per_sqft_per_year = 0.0",
@@ -350,11 +418,11 @@
     "year_cost": 2.725,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.7,
-    "predicted": 7.2,
+    "seconds": 16.0,
+    "predicted": 8.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.1
+    "wall_seconds": 18.9
   },
   {
     "case": "hubs.nnn_per_sqft_per_year = 8.0",
@@ -367,11 +435,11 @@
     "year_cost": 2.873,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.7,
+    "seconds": 15.7,
     "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.1
+    "wall_seconds": 18.5
   },
   {
     "case": "hubs.site_opening_cost = 0",
@@ -384,11 +452,11 @@
     "year_cost": 2.764,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.8,
-    "predicted": 7.1,
+    "seconds": 15.6,
+    "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.2
+    "wall_seconds": 18.3
   },
   {
     "case": "hubs.site_opening_cost = 1000000",
@@ -401,11 +469,11 @@
     "year_cost": 2.83,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.7,
+    "seconds": 16.0,
     "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.1
+    "wall_seconds": 18.8
   },
   {
     "case": "hubs.sort_wage_per_hour = 15.0",
@@ -418,11 +486,11 @@
     "year_cost": 2.708,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.6,
-    "predicted": 7.2,
+    "seconds": 17.0,
+    "predicted": 9.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.0
+    "wall_seconds": 19.7
   },
   {
     "case": "hubs.sort_wage_per_hour = 35.0",
@@ -435,11 +503,11 @@
     "year_cost": 2.915,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.2,
-    "predicted": 8.0,
+    "seconds": 17.1,
+    "predicted": 7.8,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.6
+    "wall_seconds": 19.7
   },
   {
     "case": "hubs.sizes.small.sort_packages_per_labor_hour = 60",
@@ -452,11 +520,11 @@
     "year_cost": 2.993,
     "tiers": "1/4",
     "estimate": "2x medium",
-    "seconds": 13.2,
-    "predicted": 7.9,
+    "seconds": 16.9,
+    "predicted": 7.8,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.5
+    "wall_seconds": 19.8
   },
   {
     "case": "hubs.sizes.small.sort_packages_per_labor_hour = 400",
@@ -469,11 +537,11 @@
     "year_cost": 2.688,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.8,
-    "predicted": 7.3,
+    "seconds": 14.7,
+    "predicted": 7.8,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.2
+    "wall_seconds": 17.4
   },
   {
     "case": "hubs.sizes.medium.sort_packages_per_labor_hour = 60",
@@ -486,11 +554,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.6,
-    "predicted": 7.2,
+    "seconds": 14.9,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.0
+    "wall_seconds": 17.6
   },
   {
     "case": "hubs.sizes.medium.sort_packages_per_labor_hour = 400",
@@ -503,11 +571,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.2,
-    "predicted": 7.9,
+    "seconds": 17.2,
+    "predicted": 8.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.6
+    "wall_seconds": 19.8
   },
   {
     "case": "hubs.sizes.large.sort_packages_per_labor_hour = 60",
@@ -520,11 +588,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.7,
-    "predicted": 7.2,
+    "seconds": 12.8,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.1
+    "wall_seconds": 15.4
   },
   {
     "case": "hubs.sizes.large.sort_packages_per_labor_hour = 400",
@@ -537,11 +605,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
+    "seconds": 12.8,
     "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 15.3
   },
   {
     "case": "drivers.pay_base_per_route = 0",
@@ -554,11 +622,11 @@
     "year_cost": 2.756,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.8,
+    "seconds": 13.0,
     "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.2
+    "wall_seconds": 15.7
   },
   {
     "case": "drivers.pay_base_per_route = 40",
@@ -571,11 +639,11 @@
     "year_cost": 3.106,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.2,
+    "seconds": 13.7,
     "predicted": 7.8,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.6
+    "wall_seconds": 16.3
   },
   {
     "case": "drivers.pay_per_stop = 0.0",
@@ -588,11 +656,11 @@
     "year_cost": 2.756,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 7.4,
+    "seconds": 12.4,
+    "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 15.0
   },
   {
     "case": "drivers.pay_per_stop = 3.0",
@@ -605,11 +673,11 @@
     "year_cost": 4.247,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.1,
-    "predicted": 7.8,
+    "seconds": 13.7,
+    "predicted": 7.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.5
+    "wall_seconds": 16.2
   },
   {
     "case": "drivers.pay_per_km = 0.0",
@@ -622,11 +690,11 @@
     "year_cost": 2.762,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 7.0,
+    "seconds": 12.8,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 15.5
   },
   {
     "case": "drivers.pay_per_km = 0.6214",
@@ -639,11 +707,11 @@
     "year_cost": 2.967,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.2,
-    "predicted": 8.1,
+    "seconds": 16.8,
+    "predicted": 7.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.6
+    "wall_seconds": 19.4
   },
   {
     "case": "drivers.claim_midpoint_net_per_hour = 8",
@@ -656,11 +724,11 @@
     "year_cost": 2.717,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 7.1,
+    "seconds": 15.5,
+    "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 18.3
   },
   {
     "case": "drivers.claim_midpoint_net_per_hour = 25",
@@ -673,11 +741,11 @@
     "year_cost": 3.256,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.6,
-    "predicted": 7.6,
+    "seconds": 15.7,
+    "predicted": 7.9,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.1
+    "wall_seconds": 18.7
   },
   {
     "case": "drivers.claim_curve_width = 1.0",
@@ -690,11 +758,11 @@
     "year_cost": 2.72,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.0,
+    "seconds": 15.3,
     "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.4
+    "wall_seconds": 18.0
   },
   {
     "case": "drivers.claim_curve_width = 8.0",
@@ -707,11 +775,11 @@
     "year_cost": 2.831,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.1,
-    "predicted": 7.2,
+    "seconds": 14.8,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.5
+    "wall_seconds": 17.5
   },
   {
     "case": "drivers.surge_max = 1.0",
@@ -724,11 +792,11 @@
     "year_cost": 6.322,
     "tiers": "4/4",
     "estimate": "12x small",
-    "seconds": 21.4,
-    "predicted": 5.6,
+    "seconds": 24.1,
+    "predicted": 5.5,
     "diagnosis": "dashers",
     "problems": [],
-    "wall_seconds": 26.6
+    "wall_seconds": 29.8
   },
   {
     "case": "drivers.surge_max = 3.0",
@@ -741,11 +809,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 7.1,
+    "seconds": 15.8,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 18.5
   },
   {
     "case": "drivers.raise_base_to_floor = False",
@@ -758,11 +826,11 @@
     "year_cost": 2.679,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.3,
-    "predicted": 7.8,
+    "seconds": 15.2,
+    "predicted": 7.9,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.7
+    "wall_seconds": 17.8
   },
   {
     "case": "routing.max_route_hours = 2.0",
@@ -775,11 +843,11 @@
     "year_cost": 3.064,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 14.7,
-    "predicted": 8.9,
+    "seconds": 17.5,
+    "predicted": 8.8,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 17.3
+    "wall_seconds": 20.5
   },
   {
     "case": "routing.max_route_hours = 10.0",
@@ -792,11 +860,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.1,
-    "predicted": 7.2,
+    "seconds": 13.6,
+    "predicted": 7.4,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.0
+    "wall_seconds": 15.6
   },
   {
     "case": "routing.max_packages_per_route = 30",
@@ -809,11 +877,11 @@
     "year_cost": 3.113,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.1,
-    "predicted": 8.9,
+    "seconds": 16.3,
+    "predicted": 7.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.6
+    "wall_seconds": 19.1
   },
   {
     "case": "routing.max_packages_per_route = 300",
@@ -826,11 +894,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 7.3,
+    "seconds": 16.7,
+    "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.4
+    "wall_seconds": 19.6
   },
   {
     "case": "routing.car_cargo_m3 = 0.2832",
@@ -843,11 +911,11 @@
     "year_cost": 4.069,
     "tiers": "1/4",
     "estimate": "4x small",
-    "seconds": 12.6,
-    "predicted": 7.2,
+    "seconds": 15.4,
+    "predicted": 8.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 16.0
+    "wall_seconds": 21.1
   },
   {
     "case": "routing.car_cargo_m3 = 9.911",
@@ -860,11 +928,11 @@
     "year_cost": 11.732,
     "tiers": "4/4",
     "estimate": "5x medium",
-    "seconds": 52.8,
+    "seconds": 58.3,
     "predicted": 18.6,
     "diagnosis": "vehicles",
     "problems": [],
-    "wall_seconds": 58.2
+    "wall_seconds": 63.7
   },
   {
     "case": "drivers.vehicle_availability.1.1 = 0.0",
@@ -877,11 +945,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.3,
+    "seconds": 13.0,
+    "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 15.6
   },
   {
     "case": "drivers.vehicle_availability.1.1 = 1.0",
@@ -894,11 +962,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.2,
-    "predicted": 7.0,
+    "seconds": 16.3,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.6
+    "wall_seconds": 19.2
   },
   {
     "case": "drivers.vehicle_availability.2.1 = 0.0",
@@ -911,11 +979,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.0,
-    "predicted": 7.2,
+    "seconds": 14.9,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.4
+    "wall_seconds": 17.6
   },
   {
     "case": "drivers.vehicle_availability.2.1 = 1.0",
@@ -928,11 +996,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.1,
-    "predicted": 7.1,
+    "seconds": 13.9,
+    "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.5
+    "wall_seconds": 16.8
   },
   {
     "case": "drivers.vehicle_availability.3.1 = 0.0",
@@ -945,11 +1013,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.2,
-    "predicted": 7.1,
+    "seconds": 13.9,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.6
+    "wall_seconds": 16.8
   },
   {
     "case": "drivers.vehicle_availability.3.1 = 1.0",
@@ -962,11 +1030,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.5,
-    "predicted": 7.1,
+    "seconds": 15.6,
+    "predicted": 7.4,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.9
+    "wall_seconds": 18.2
   },
   {
     "case": "schedule.sort_cutoff = D 05:00",
@@ -979,11 +1047,11 @@
     "year_cost": 3.237,
     "tiers": "4/4",
     "estimate": "3x small",
-    "seconds": 17.8,
-    "predicted": 8.1,
+    "seconds": 21.7,
+    "predicted": 7.1,
     "diagnosis": "late_trucks",
     "problems": [],
-    "wall_seconds": 22.8
+    "wall_seconds": 26.9
   },
   {
     "case": "schedule.sort_cutoff = D 09:00",
@@ -996,11 +1064,11 @@
     "year_cost": 2.778,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.4,
-    "predicted": 7.2,
+    "seconds": 14.4,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 17.5
   },
   {
     "case": "objective.on_time_typical_target = 0.9",
@@ -1013,11 +1081,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.2,
-    "predicted": 7.0,
+    "seconds": 15.5,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 18.3
   },
   {
     "case": "objective.on_time_typical_target = 0.995",
@@ -1030,11 +1098,11 @@
     "year_cost": 2.934,
     "tiers": "4/4",
     "estimate": "3x small",
-    "seconds": 17.8,
+    "seconds": 21.0,
     "predicted": 7.2,
     "diagnosis": "late_trucks",
     "problems": [],
-    "wall_seconds": 23.0
+    "wall_seconds": 26.6
   },
   {
     "case": "objective.on_time_target = 0.85",
@@ -1047,11 +1115,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.2,
-    "predicted": 7.0,
+    "seconds": 15.9,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.6
+    "wall_seconds": 18.6
   },
   {
     "case": "objective.on_time_target = 0.99",
@@ -1064,11 +1132,11 @@
     "year_cost": 2.934,
     "tiers": "4/4",
     "estimate": "3x small",
-    "seconds": 17.8,
-    "predicted": 7.2,
+    "seconds": 21.4,
+    "predicted": 7.4,
     "diagnosis": "late_trucks",
     "problems": [],
-    "wall_seconds": 20.2
+    "wall_seconds": 24.1
   },
   {
     "case": "objective.on_time_week_share = 0.5",
@@ -1081,11 +1149,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.2,
+    "seconds": 15.1,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 17.9
   },
   {
     "case": "objective.on_time_week_share = 1.0",
@@ -1098,11 +1166,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.2,
-    "predicted": 7.2,
+    "seconds": 14.4,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.5
+    "wall_seconds": 17.0
   },
   {
     "case": "objective.peak_targets.on_time_typical_target = 0.85",
@@ -1115,11 +1183,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.1,
+    "seconds": 15.1,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 18.2
   },
   {
     "case": "objective.peak_targets.on_time_typical_target = 0.995",
@@ -1132,11 +1200,11 @@
     "year_cost": 2.934,
     "tiers": "4/4",
     "estimate": "3x small",
-    "seconds": 18.0,
-    "predicted": 7.2,
+    "seconds": 20.6,
+    "predicted": 8.3,
     "diagnosis": "late_trucks",
     "problems": [],
-    "wall_seconds": 20.4
+    "wall_seconds": 23.3
   },
   {
     "case": "objective.peak_targets.on_time_target = 0.8",
@@ -1149,11 +1217,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.1,
+    "seconds": 15.2,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 17.8
   },
   {
     "case": "objective.peak_targets.on_time_target = 0.99",
@@ -1166,11 +1234,11 @@
     "year_cost": 2.934,
     "tiers": "4/4",
     "estimate": "3x small",
-    "seconds": 18.1,
-    "predicted": 7.1,
+    "seconds": 21.0,
+    "predicted": 10.9,
     "diagnosis": "late_trucks",
     "problems": [],
-    "wall_seconds": 20.5
+    "wall_seconds": 23.8
   },
   {
     "case": "objective.peak_targets.on_time_week_share = 0.5",
@@ -1183,11 +1251,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.2,
-    "predicted": 7.2,
+    "seconds": 16.3,
+    "predicted": 7.4,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 19.0
   },
   {
     "case": "objective.peak_targets.on_time_week_share = 1.0",
@@ -1200,11 +1268,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.2,
+    "seconds": 14.6,
+    "predicted": 7.6,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.6
+    "wall_seconds": 17.4
   },
   {
     "case": "objective.driver_net_per_hour_floor = 0",
@@ -1217,11 +1285,11 @@
     "year_cost": 2.679,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.9,
-    "predicted": 9.5,
+    "seconds": 15.2,
+    "predicted": 8.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 16.4
+    "wall_seconds": 17.8
   },
   {
     "case": "objective.driver_net_per_hour_floor = 25",
@@ -1234,11 +1302,11 @@
     "year_cost": 3.287,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 10.8,
-    "predicted": 6.7,
+    "seconds": 11.8,
+    "predicted": 6.6,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 13.2
+    "wall_seconds": 14.4
   },
   {
     "case": "objective.exclude_extreme_weather_weeks = False",
@@ -1251,11 +1319,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.4,
-    "predicted": 8.3,
+    "seconds": 13.0,
+    "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.9
+    "wall_seconds": 15.5
   },
   {
     "case": "uncertainty.truck_late_prob = 0.0",
@@ -1268,11 +1336,11 @@
     "year_cost": 2.78,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.2,
+    "seconds": 13.3,
+    "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 15.8
   },
   {
     "case": "uncertainty.truck_late_prob = 0.4",
@@ -1285,11 +1353,11 @@
     "year_cost": 3.213,
     "tiers": "4/4",
     "estimate": "3x small",
-    "seconds": 17.9,
+    "seconds": 19.3,
     "predicted": 7.0,
     "diagnosis": "late_trucks",
     "problems": [],
-    "wall_seconds": 20.3
+    "wall_seconds": 21.9
   },
   {
     "case": "uncertainty.volume_week_sigma = 0.0",
@@ -1302,11 +1370,11 @@
     "year_cost": 2.749,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.4,
-    "predicted": 7.3,
+    "seconds": 14.1,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 16.8
   },
   {
     "case": "uncertainty.volume_week_sigma = 0.25",
@@ -1319,11 +1387,11 @@
     "year_cost": 2.82,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.1,
+    "seconds": 13.5,
     "predicted": 6.9,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.5
+    "wall_seconds": 16.2
   },
   {
     "case": "uncertainty.no_show_rate_range = [0.0, 0.0]",
@@ -1339,11 +1407,11 @@
     "year_cost": 2.772,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.2,
+    "seconds": 13.3,
+    "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 15.9
   },
   {
     "case": "uncertainty.no_show_rate_range = [0.2, 0.2]",
@@ -1359,11 +1427,11 @@
     "year_cost": 2.82,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.6,
+    "seconds": 13.1,
     "predicted": 7.2,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.0
+    "wall_seconds": 15.7
   },
   {
     "case": "uncertainty.no_show_rate_range = [0.0, 0.2]",
@@ -1379,11 +1447,11 @@
     "year_cost": 2.784,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 8.2,
+    "seconds": 14.7,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 17.5
   },
   {
     "case": "uncertainty.slow_day_prob = 0.0",
@@ -1396,11 +1464,11 @@
     "year_cost": 2.761,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.3,
-    "predicted": 7.1,
+    "seconds": 19.6,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.7
+    "wall_seconds": 22.3
   },
   {
     "case": "uncertainty.slow_day_prob = 0.3",
@@ -1413,11 +1481,11 @@
     "year_cost": 2.79,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.5,
+    "seconds": 17.5,
     "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.9
+    "wall_seconds": 20.5
   },
   {
     "case": "uncertainty.extreme_weather_prob = 0.0",
@@ -1430,11 +1498,11 @@
     "year_cost": 2.757,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.4,
-    "predicted": 7.2,
+    "seconds": 14.7,
+    "predicted": 7.4,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 17.4
   },
   {
     "case": "uncertainty.extreme_weather_prob = 0.06",
@@ -1447,11 +1515,11 @@
     "year_cost": 2.782,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.5,
+    "seconds": 14.3,
     "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 16.9
   },
   {
     "case": "weeks_per_year.holiday_peak = 0",
@@ -1464,11 +1532,11 @@
     "year_cost": 2.806,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 8.8,
-    "predicted": 5.3,
+    "seconds": 11.4,
+    "predicted": 5.6,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 10.7
+    "wall_seconds": 13.7
   },
   {
     "case": "weeks_per_year.holiday_peak = 10",
@@ -1481,11 +1549,11 @@
     "year_cost": 2.766,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.5,
-    "predicted": 7.1,
+    "seconds": 15.4,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.9
+    "wall_seconds": 18.1
   },
   {
     "case": "weeks_per_year.hub_outage = 0",
@@ -1498,11 +1566,11 @@
     "year_cost": 2.717,
     "tiers": "1/4",
     "estimate": "1x medium",
-    "seconds": 8.1,
-    "predicted": 4.9,
+    "seconds": 9.9,
+    "predicted": 5.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 10.2
+    "wall_seconds": 12.4
   },
   {
     "case": "weeks_per_year.hub_outage = 8",
@@ -1515,11 +1583,11 @@
     "year_cost": 2.785,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.4,
+    "seconds": 13.5,
     "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.0
+    "wall_seconds": 16.1
   },
   {
     "case": "peak_flex.enabled = False",
@@ -1530,13 +1598,13 @@
     "hubs": "#1 small + #2 small + #3 small + #4 small",
     "meets_all": true,
     "year_cost": 2.888,
-    "tiers": "1/4",
+    "tiers": "4/4",
     "estimate": "4x small",
-    "seconds": 13.0,
-    "predicted": 8.0,
+    "seconds": 19.3,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.3
+    "wall_seconds": 22.7
   },
   {
     "case": "peak_flex.sort_capacity_boost = 0.0",
@@ -1547,13 +1615,13 @@
     "hubs": "#1 small + #2 small + #3 small + #4 small",
     "meets_all": true,
     "year_cost": 2.909,
-    "tiers": "1/4",
+    "tiers": "4/4",
     "estimate": "4x small",
-    "seconds": 13.7,
-    "predicted": 8.1,
+    "seconds": 20.4,
+    "predicted": 7.8,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 16.2
+    "wall_seconds": 23.9
   },
   {
     "case": "peak_flex.sort_capacity_boost = 1.0",
@@ -1566,11 +1634,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.4,
-    "predicted": 7.2,
+    "seconds": 13.5,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 16.1
   },
   {
     "case": "peak_flex.setup_cost_per_station_week = 0",
@@ -1583,11 +1651,11 @@
     "year_cost": 2.764,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.6,
-    "predicted": 7.4,
+    "seconds": 13.6,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.0
+    "wall_seconds": 16.3
   },
   {
     "case": "peak_flex.setup_cost_per_station_week = 50000",
@@ -1600,11 +1668,11 @@
     "year_cost": 2.845,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.9,
-    "predicted": 8.0,
+    "seconds": 14.8,
+    "predicted": 7.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 16.3
+    "wall_seconds": 17.4
   },
   {
     "case": "partner.enabled = True",
@@ -1617,11 +1685,11 @@
     "year_cost": 2.821,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.5,
-    "predicted": 7.2,
+    "seconds": 13.4,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 15.9
   },
   {
     "case": "partner.cost_per_package = 2.0",
@@ -1635,11 +1703,11 @@
     "year_cost": 2.783,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.5,
-    "predicted": 7.2,
+    "seconds": 13.4,
+    "predicted": 7.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.9
+    "wall_seconds": 16.0
   },
   {
     "case": "partner.cost_per_package = 15.0",
@@ -1653,11 +1721,11 @@
     "year_cost": 2.917,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.2,
-    "predicted": 6.4,
+    "seconds": 11.9,
+    "predicted": 6.6,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 13.7
+    "wall_seconds": 14.5
   },
   {
     "case": "partner.max_share_of_day = 0.0",
@@ -1671,11 +1739,11 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.6,
-    "predicted": 7.1,
+    "seconds": 13.4,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.0
+    "wall_seconds": 15.9
   },
   {
     "case": "partner.max_share_of_day = 0.5",
@@ -1689,11 +1757,11 @@
     "year_cost": 2.821,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.6,
-    "predicted": 7.3,
+    "seconds": 13.3,
+    "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.0
+    "wall_seconds": 15.9
   },
   {
     "case": "partner.on_time_rate = 0.7",
@@ -1707,11 +1775,11 @@
     "year_cost": 2.821,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.7,
-    "predicted": 7.3,
+    "seconds": 13.4,
+    "predicted": 8.5,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.0
+    "wall_seconds": 16.0
   },
   {
     "case": "partner.on_time_rate = 1.0",
@@ -1725,11 +1793,11 @@
     "year_cost": 2.821,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.6,
-    "predicted": 7.1,
+    "seconds": 13.5,
+    "predicted": 7.6,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.0
+    "wall_seconds": 16.1
   },
   {
     "case": "every control at its minimum",
@@ -1737,6 +1805,8 @@
       "demand.network_share": 0.01,
       "demand.packages_per_household_per_day": 0.3,
       "scenarios.holiday_peak.volume_multiplier": 1.2,
+      "coverage.households_served": 0.5,
+      "coverage.share_kept_at_min": 0.1,
       "hubs.sizes.small.sort_rate_per_hour": 500,
       "hubs.sizes.medium.sort_rate_per_hour": 1000,
       "hubs.sizes.large.sort_rate_per_hour": 2000,
@@ -1789,14 +1859,14 @@
     "pick": "1x small",
     "hubs": "#1 small",
     "meets_all": false,
-    "year_cost": 1212.541,
+    "year_cost": 15447.861,
     "tiers": "4/4",
     "estimate": "1x small",
-    "seconds": 7.5,
-    "predicted": 3.9,
+    "seconds": 4.0,
+    "predicted": 3.2,
     "diagnosis": "dashers",
     "problems": [],
-    "wall_seconds": 9.9
+    "wall_seconds": 6.3
   },
   {
     "case": "every control at its maximum",
@@ -1804,6 +1874,8 @@
       "demand.network_share": 0.1,
       "demand.packages_per_household_per_day": 0.7,
       "scenarios.holiday_peak.volume_multiplier": 2.5,
+      "coverage.households_served": 1.0,
+      "coverage.share_kept_at_min": 1.0,
       "hubs.sizes.small.sort_rate_per_hour": 3000,
       "hubs.sizes.medium.sort_rate_per_hour": 6000,
       "hubs.sizes.large.sort_rate_per_hour": 12000,
@@ -1859,11 +1931,11 @@
     "year_cost": 16.244,
     "tiers": "4/4",
     "estimate": "15x large",
-    "seconds": 90.4,
-    "predicted": 19.9,
+    "seconds": 107.4,
+    "predicted": 20.0,
     "diagnosis": "vehicles",
     "problems": [],
-    "wall_seconds": 102.9
+    "wall_seconds": 120.1
   },
   {
     "case": "hardest: most volume, tightest targets, most disruption",
@@ -1893,11 +1965,11 @@
     "year_cost": 2.64,
     "tiers": "4/4",
     "estimate": "5x large",
-    "seconds": 103.5,
-    "predicted": 22.5,
+    "seconds": 113.8,
+    "predicted": 21.8,
     "diagnosis": "late_trucks",
     "problems": [],
-    "wall_seconds": 112.6
+    "wall_seconds": 123.8
   },
   {
     "case": "easiest: least volume, loosest targets, no disruption",
@@ -1921,11 +1993,11 @@
     "year_cost": 3.722,
     "tiers": "1/4",
     "estimate": "2x small",
-    "seconds": 7.7,
-    "predicted": 4.7,
+    "seconds": 9.7,
+    "predicted": 4.9,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 9.6
+    "wall_seconds": 12.0
   },
   {
     "case": "only normal weeks count",
@@ -1939,11 +2011,11 @@
     "year_cost": 2.746,
     "tiers": "1/4",
     "estimate": "1x medium",
-    "seconds": 5.1,
+    "seconds": 6.3,
     "predicted": 3.8,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 6.8
+    "wall_seconds": 8.2
   },
   {
     "case": "Dashers paid nothing",
@@ -1959,11 +2031,11 @@
     "year_cost": 64.487,
     "tiers": "4/4",
     "estimate": "15x small",
-    "seconds": 60.6,
-    "predicted": 11.3,
+    "seconds": 68.2,
+    "predicted": 11.7,
     "diagnosis": "dashers",
     "problems": [],
-    "wall_seconds": 67.0
+    "wall_seconds": 74.8
   },
   {
     "case": "tiny cars, short routes",
@@ -1976,13 +2048,70 @@
     "hubs": "#1 small + #2 small + #3 small + #4 small",
     "meets_all": true,
     "year_cost": 4.093,
-    "tiers": "1/4",
+    "tiers": "4/4",
     "estimate": "4x small",
-    "seconds": 13.3,
-    "predicted": 7.8,
+    "seconds": 27.7,
+    "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 16.7
+    "wall_seconds": 33.1
+  },
+  {
+    "case": "half the metro, shippers keep their full share",
+    "changes": {
+      "coverage.households_served": 0.5,
+      "coverage.share_kept_at_min": 1.0
+    },
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 2.656,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 9.9,
+    "predicted": 5.2,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 12.2
+  },
+  {
+    "case": "half the metro, shippers send the least at the minimum",
+    "changes": {
+      "coverage.households_served": 0.5,
+      "coverage.share_kept_at_min": 0.1
+    },
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 9.605,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 5.6,
+    "predicted": 3.3,
+    "diagnosis": null,
+    "problems": [],
+    "wall_seconds": 7.5
+  },
+  {
+    "case": "half the metro at the hardest settings",
+    "changes": {
+      "coverage.households_served": 0.5,
+      "demand.network_share": 0.1,
+      "demand.packages_per_household_per_day": 0.7,
+      "uncertainty.truck_late_prob": 0.4,
+      "objective.on_time_typical_target": 0.995
+    },
+    "pick": "6x medium, big #1",
+    "hubs": "#1 large + #2 medium + #3 medium + #4 medium + #5 medium + #6 medium",
+    "meets_all": false,
+    "year_cost": 3.391,
+    "tiers": "4/4",
+    "estimate": "2x medium",
+    "seconds": 43.1,
+    "predicted": 10.6,
+    "diagnosis": "late_trucks",
+    "problems": [],
+    "wall_seconds": 46.4
   },
   {
     "case": "no vans or SUVs",
@@ -1997,534 +2126,557 @@
     "year_cost": 2.781,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.7,
-    "predicted": 7.2,
+    "seconds": 15.3,
+    "predicted": 7.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.2
+    "wall_seconds": 17.9
   },
   {
     "case": "random #1",
     "changes": {
-      "hubs.sizes.large.fitout_per_sqft": 12,
-      "routing.car_cargo_m3": 5.1687,
-      "uncertainty.slow_day_prob": 0.0112,
-      "hubs.sizes.small.sort_rate_per_hour": 1584,
-      "hubs.sizes.medium.sort_rate_per_hour": 1349,
-      "objective.peak_targets.on_time_target": 0.8172,
-      "hubs.lease_per_sqft_per_year": 10.2452,
-      "routing.max_route_hours": 8.6148,
-      "objective.exclude_extreme_weather_weeks": true
+      "hubs.sizes.small.fitout_per_sqft": 12,
+      "routing.max_route_hours": 6.0595,
+      "uncertainty.volume_week_sigma": 0.0094,
+      "coverage.households_served": 0.7168,
+      "coverage.share_kept_at_min": 0.1629,
+      "objective.on_time_week_share": 0.5454,
+      "hubs.sizes.medium.sort_rate_per_hour": 3123,
+      "drivers.surge_max": 2.6537,
+      "objective.peak_targets.on_time_week_share": 0.5619
     },
-    "pick": "12x small",
-    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small + #9 small + #10 small + #11 small + #12 small",
-    "meets_all": false,
-    "year_cost": 5.204,
-    "tiers": "4/4",
-    "estimate": "12x small",
-    "seconds": 30.6,
-    "predicted": 8.7,
-    "diagnosis": "vehicles",
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 3.002,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 9.7,
+    "predicted": 4.9,
+    "diagnosis": null,
     "problems": [],
-    "wall_seconds": 35.6
+    "wall_seconds": 11.8
   },
   {
     "case": "random #2",
     "changes": {
-      "uncertainty.no_show_rate_range": [
-        0.01,
-        0.044
-      ],
-      "partner.on_time_rate": 0.867,
-      "objective.exclude_extreme_weather_weeks": true,
-      "hubs.sizes.small.sort_rate_per_hour": 1548,
-      "objective.driver_net_per_hour_floor": 14,
-      "partner.cost_per_package": 9.4219,
-      "routing.car_cargo_m3": 5.6772
+      "uncertainty.truck_late_prob": 0.0198,
+      "partner.on_time_rate": 0.7663,
+      "objective.peak_targets.on_time_week_share": 0.7783,
+      "coverage.households_served": 0.5666,
+      "objective.peak_targets.on_time_target": 0.8796,
+      "partner.cost_per_package": 9.0289,
+      "routing.max_route_hours": 6.5673
     },
-    "pick": "12x small",
-    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small + #9 small + #10 small + #11 small + #12 small",
-    "meets_all": false,
-    "year_cost": 5.267,
-    "tiers": "4/4",
-    "estimate": "12x small",
-    "seconds": 30.5,
-    "predicted": 8.1,
-    "diagnosis": "vehicles",
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 2.986,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 9.4,
+    "predicted": 4.8,
+    "diagnosis": null,
     "problems": [],
-    "wall_seconds": 35.7
+    "wall_seconds": 11.6
   },
   {
     "case": "random #3",
     "changes": {
-      "hubs.site_opening_cost": 496414,
-      "hubs.lease_per_sqft_per_year": 11.3172,
-      "objective.exclude_extreme_weather_weeks": false,
-      "objective.driver_net_per_hour_floor": 12,
-      "uncertainty.no_show_rate_range": [
-        0.072,
-        0.185
-      ],
-      "hubs.sort_wage_per_hour": 19.9685,
-      "routing.max_route_hours": 3.4381,
-      "partner.max_share_of_day": 0.3899,
-      "objective.peak_targets.on_time_week_share": 0.5409,
-      "hubs.sizes.medium.sort_rate_per_hour": 2501,
+      "partner.max_share_of_day": 0.2822,
+      "uncertainty.slow_day_prob": 0.1857,
+      "hubs.sizes.large.fitout_per_sqft": 62,
+      "hubs.sizes.medium.sort_rate_per_hour": 3659,
+      "objective.peak_targets.on_time_week_share": 0.8886,
+      "objective.peak_targets.on_time_target": 0.8885,
+      "uncertainty.truck_late_prob": 0.3694,
+      "hubs.nnn_per_sqft_per_year": 2.8927,
+      "drivers.surge_max": 1.4969,
       "partner.enabled": true,
-      "hubs.sizes.small.sort_rate_per_hour": 1359,
-      "uncertainty.volume_week_sigma": 0.1122,
-      "hubs.sizes.small.sort_packages_per_labor_hour": 267
+      "objective.peak_targets.on_time_typical_target": 0.9631,
+      "coverage.share_kept_at_min": 0.1737
     },
     "pick": "3x small",
     "hubs": "#1 small + #2 small + #3 small",
     "meets_all": true,
-    "year_cost": 2.784,
+    "year_cost": 2.922,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.3,
+    "seconds": 14.4,
     "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.7
+    "wall_seconds": 17.0
   },
   {
     "case": "random #4",
     "changes": {
-      "hubs.sizes.small.fitout_per_sqft": 44,
-      "objective.on_time_week_share": 0.9666,
-      "drivers.vehicle_availability.1.1": 0.4217,
-      "hubs.nnn_per_sqft_per_year": 7.6962,
-      "partner.enabled": true
+      "objective.on_time_target": 0.8665,
+      "schedule.sort_cutoff": "D 08:00",
+      "drivers.claim_midpoint_net_per_hour": 11,
+      "weeks_per_year.hub_outage": 3,
+      "drivers.vehicle_availability.1.1": 0.9333,
+      "drivers.pay_base_per_route": 17,
+      "objective.driver_net_per_hour_floor": 24,
+      "coverage.share_kept_at_min": 0.1699
     },
     "pick": "3x small",
     "hubs": "#1 small + #2 small + #3 small",
     "meets_all": true,
-    "year_cost": 2.959,
+    "year_cost": 3.223,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.8,
+    "seconds": 14.5,
     "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.2
+    "wall_seconds": 17.1
   },
   {
     "case": "random #5",
     "changes": {
-      "objective.driver_net_per_hour_floor": 24,
-      "partner.max_share_of_day": 0.237,
-      "drivers.claim_curve_width": 5.6491,
-      "drivers.surge_max": 1.1213,
-      "weeks_per_year.hub_outage": 6,
-      "drivers.raise_base_to_floor": false,
-      "uncertainty.truck_late_prob": 0.3972,
-      "objective.on_time_target": 0.9651,
-      "objective.exclude_extreme_weather_weeks": true,
+      "objective.peak_targets.on_time_target": 0.9795,
+      "partner.enabled": true,
+      "drivers.pay_per_km": 0.4127,
+      "drivers.claim_midpoint_net_per_hour": 9,
+      "uncertainty.extreme_weather_prob": 0.0421,
+      "drivers.claim_curve_width": 5.5299,
+      "objective.driver_net_per_hour_floor": 25,
       "schedule.sort_cutoff": "D 08:00",
-      "hubs.sizes.medium.sort_rate_per_hour": 5435,
-      "hubs.sizes.large.sort_rate_per_hour": 5470
+      "objective.peak_targets.on_time_week_share": 0.6423,
+      "drivers.vehicle_availability.2.1": 0.3858,
+      "coverage.share_kept_at_min": 0.7018,
+      "hubs.sizes.small.sort_rate_per_hour": 556
     },
-    "pick": "15x medium",
-    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium + #5 medium + #6 medium + #7 medium + #8 medium + #9 medium + #10 medium + #11 medium + #12 medium + #13 medium + #14 medium + #15 medium",
-    "meets_all": false,
-    "year_cost": 7.343,
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 3.519,
     "tiers": "4/4",
-    "estimate": "15x large",
-    "seconds": 22.0,
-    "predicted": 5.4,
-    "diagnosis": "dashers",
+    "estimate": "5x small",
+    "seconds": 29.0,
+    "predicted": 7.8,
+    "diagnosis": null,
     "problems": [],
-    "wall_seconds": 27.2
+    "wall_seconds": 32.5
   },
   {
     "case": "random #6",
     "changes": {
-      "drivers.raise_base_to_floor": true,
-      "hubs.nnn_per_sqft_per_year": 6.9714,
-      "uncertainty.volume_week_sigma": 0.0201,
-      "hubs.sizes.small.fitout_per_sqft": 57,
-      "objective.on_time_target": 0.9269,
-      "hubs.sizes.small.sort_rate_per_hour": 2708,
-      "hubs.sizes.small.sort_packages_per_labor_hour": 339,
-      "drivers.pay_per_km": 0.5369,
-      "hubs.sizes.medium.fitout_per_sqft": 37,
-      "hubs.sizes.large.sort_packages_per_labor_hour": 201,
-      "routing.car_cargo_m3": 3.7374
+      "drivers.claim_curve_width": 3.7366,
+      "hubs.sizes.medium.fitout_per_sqft": 105,
+      "objective.exclude_extreme_weather_weeks": true,
+      "hubs.sizes.large.sort_rate_per_hour": 6492,
+      "schedule.sort_cutoff": "D 09:00",
+      "coverage.households_served": 0.6389,
+      "hubs.site_opening_cost": 136926,
+      "drivers.pay_base_per_route": 17,
+      "hubs.lease_per_sqft_per_year": 11.5022,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 300,
+      "routing.max_route_hours": 9.8917
     },
-    "pick": "12x medium",
-    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium + #5 medium + #6 medium + #7 medium + #8 medium + #9 medium + #10 medium + #11 medium + #12 medium",
-    "meets_all": false,
-    "year_cost": 7.497,
-    "tiers": "4/4",
-    "estimate": "8x small, big #1",
-    "seconds": 29.1,
-    "predicted": 12.3,
-    "diagnosis": "vehicles",
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 2.826,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 10.7,
+    "predicted": 5.1,
+    "diagnosis": null,
     "problems": [],
-    "wall_seconds": 34.2
+    "wall_seconds": 13.0
   },
   {
     "case": "random #7",
     "changes": {
-      "hubs.sizes.medium.sort_packages_per_labor_hour": 343,
-      "hubs.sizes.large.fitout_per_sqft": 26,
-      "hubs.sizes.large.sort_rate_per_hour": 4819,
-      "hubs.site_opening_cost": 145676,
-      "partner.max_share_of_day": 0.2673,
-      "partner.on_time_rate": 0.8829,
-      "uncertainty.extreme_weather_prob": 0.0191,
-      "peak_flex.sort_capacity_boost": 0.1255,
-      "demand.network_share": 0.0873,
-      "objective.on_time_target": 0.983
+      "drivers.raise_base_to_floor": true,
+      "hubs.sort_wage_per_hour": 17.9135,
+      "hubs.sizes.small.fitout_per_sqft": 66,
+      "hubs.sizes.small.sort_rate_per_hour": 2025,
+      "hubs.sizes.large.fitout_per_sqft": 42,
+      "partner.cost_per_package": 3.6314,
+      "partner.max_share_of_day": 0.4296,
+      "uncertainty.no_show_rate_range": [
+        0.131,
+        0.19
+      ],
+      "peak_flex.enabled": false,
+      "demand.network_share": 0.0511,
+      "schedule.sort_cutoff": "D 09:00",
+      "objective.peak_targets.on_time_week_share": 0.6962,
+      "peak_flex.setup_cost_per_station_week": 19949,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 95
     },
-    "pick": "8x small, big #1",
-    "hubs": "#1 medium + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small",
-    "meets_all": false,
-    "year_cost": 2.476,
+    "pick": "4x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "meets_all": true,
+    "year_cost": 2.562,
     "tiers": "4/4",
-    "estimate": "4x medium",
-    "seconds": 62.8,
-    "predicted": 17.0,
-    "diagnosis": "late_trucks",
+    "estimate": "4x small",
+    "seconds": 29.4,
+    "predicted": 9.6,
+    "diagnosis": null,
     "problems": [],
-    "wall_seconds": 66.5
+    "wall_seconds": 33.8
   },
   {
     "case": "random #8",
     "changes": {
-      "weeks_per_year.holiday_peak": 2,
-      "peak_flex.setup_cost_per_station_week": 49233,
-      "hubs.sizes.small.sort_rate_per_hour": 1602,
-      "schedule.sort_cutoff": "D 05:00",
-      "partner.on_time_rate": 0.802,
-      "objective.peak_targets.on_time_week_share": 0.5263,
-      "routing.car_cargo_m3": 0.2854,
-      "peak_flex.enabled": true,
-      "weeks_per_year.hub_outage": 1,
-      "partner.max_share_of_day": 0.1818,
-      "hubs.lease_per_sqft_per_year": 6.255,
-      "objective.on_time_typical_target": 0.9831,
-      "uncertainty.extreme_weather_prob": 0.0368,
-      "partner.cost_per_package": 3.9312
+      "routing.max_route_hours": 3.2101,
+      "coverage.households_served": 0.5507,
+      "hubs.nnn_per_sqft_per_year": 2.9089,
+      "coverage.share_kept_at_min": 0.123,
+      "hubs.site_opening_cost": 874332,
+      "drivers.vehicle_availability.1.1": 0.6141,
+      "hubs.sizes.medium.fitout_per_sqft": 22,
+      "hubs.sizes.large.sort_rate_per_hour": 4523,
+      "drivers.claim_midpoint_net_per_hour": 14,
+      "objective.driver_net_per_hour_floor": 9,
+      "partner.max_share_of_day": 0.0614,
+      "hubs.sizes.medium.sort_rate_per_hour": 5245,
+      "demand.network_share": 0.0994,
+      "objective.peak_targets.on_time_target": 0.8885
     },
-    "pick": "5x small, big #1",
-    "hubs": "#1 medium + #2 small + #3 small + #4 small + #5 small",
-    "meets_all": false,
-    "year_cost": 4.265,
-    "tiers": "4/4",
-    "estimate": "4x small",
-    "seconds": 32.0,
-    "predicted": 12.2,
-    "diagnosis": "late_trucks",
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
+    "meets_all": true,
+    "year_cost": 3.001,
+    "tiers": "1/4",
+    "estimate": "2x small",
+    "seconds": 10.0,
+    "predicted": 4.8,
+    "diagnosis": null,
     "problems": [],
-    "wall_seconds": 39.6
+    "wall_seconds": 12.4
   },
   {
     "case": "random #9",
     "changes": {
-      "drivers.raise_base_to_floor": true,
-      "uncertainty.truck_late_prob": 0.1247,
-      "routing.max_route_hours": 3.1529,
-      "objective.on_time_typical_target": 0.9712,
-      "hubs.sizes.small.fitout_per_sqft": 90,
-      "peak_flex.setup_cost_per_station_week": 23931,
-      "objective.on_time_target": 0.9469,
-      "schedule.sort_cutoff": "D 09:00"
+      "drivers.pay_per_stop": 1.549,
+      "hubs.sizes.small.sort_rate_per_hour": 1013,
+      "hubs.sizes.small.fitout_per_sqft": 114,
+      "hubs.sizes.medium.sort_rate_per_hour": 2809,
+      "peak_flex.enabled": false,
+      "drivers.claim_midpoint_net_per_hour": 24,
+      "peak_flex.setup_cost_per_station_week": 37907,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 161,
+      "drivers.vehicle_availability.3.1": 0.6429,
+      "uncertainty.extreme_weather_prob": 0.0055,
+      "hubs.sizes.medium.fitout_per_sqft": 102
     },
-    "pick": "2x small, big #1",
-    "hubs": "#1 medium + #2 small",
+    "pick": "3x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small",
     "meets_all": true,
-    "year_cost": 2.928,
+    "year_cost": 3.749,
     "tiers": "1/4",
-    "estimate": "2x small, big #1",
-    "seconds": 15.7,
-    "predicted": 8.6,
+    "estimate": "3x small, big #1",
+    "seconds": 16.1,
+    "predicted": 8.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 18.1
+    "wall_seconds": 18.8
   },
   {
     "case": "random #10",
     "changes": {
-      "hubs.sizes.small.sort_packages_per_labor_hour": 295,
-      "objective.peak_targets.on_time_typical_target": 0.9826,
-      "routing.max_route_hours": 8.0651,
-      "hubs.sizes.large.fitout_per_sqft": 39
+      "drivers.surge_max": 2.623,
+      "hubs.sizes.medium.fitout_per_sqft": 118,
+      "drivers.claim_curve_width": 6.9684,
+      "peak_flex.setup_cost_per_station_week": 40304,
+      "hubs.sort_wage_per_hour": 31.3667,
+      "objective.on_time_week_share": 0.8699,
+      "peak_flex.sort_capacity_boost": 0.2267,
+      "objective.on_time_typical_target": 0.9492,
+      "drivers.claim_midpoint_net_per_hour": 14,
+      "uncertainty.truck_late_prob": 0.0116,
+      "partner.enabled": true,
+      "objective.exclude_extreme_weather_weeks": true
     },
-    "pick": "4x small",
-    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
     "meets_all": true,
-    "year_cost": 2.837,
+    "year_cost": 3.007,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 12.9,
-    "predicted": 7.2,
+    "seconds": 17.7,
+    "predicted": 8.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.3
+    "wall_seconds": 20.4
   },
   {
     "case": "random #11",
     "changes": {
-      "hubs.sizes.large.sort_rate_per_hour": 10061,
-      "weeks_per_year.hub_outage": 7,
-      "drivers.pay_base_per_route": 30,
-      "objective.peak_targets.on_time_typical_target": 0.8829,
-      "routing.max_route_hours": 6.1411,
-      "hubs.nnn_per_sqft_per_year": 2.8445,
-      "drivers.raise_base_to_floor": true,
-      "hubs.sizes.medium.sort_packages_per_labor_hour": 69,
-      "objective.peak_targets.on_time_target": 0.8531,
-      "weeks_per_year.holiday_peak": 3,
-      "objective.on_time_week_share": 0.8463,
-      "drivers.surge_max": 2.913,
-      "partner.max_share_of_day": 0.2236,
-      "hubs.sort_wage_per_hour": 33.7404
+      "hubs.nnn_per_sqft_per_year": 0.6443,
+      "uncertainty.extreme_weather_prob": 0.0061,
+      "objective.driver_net_per_hour_floor": 12,
+      "drivers.claim_curve_width": 3.3642,
+      "drivers.vehicle_availability.1.1": 0.4827,
+      "weeks_per_year.hub_outage": 8,
+      "partner.enabled": false,
+      "drivers.surge_max": 1.0038
     },
-    "pick": "3x small",
-    "hubs": "#1 small + #2 small + #3 small",
-    "meets_all": true,
-    "year_cost": 3.07,
-    "tiers": "1/4",
-    "estimate": "3x small",
-    "seconds": 11.3,
-    "predicted": 6.5,
-    "diagnosis": null,
+    "pick": "15x medium",
+    "hubs": "#1 medium + #2 medium + #3 medium + #4 medium + #5 medium + #6 medium + #7 medium + #8 medium + #9 medium + #10 medium + #11 medium + #12 medium + #13 medium + #14 medium + #15 medium",
+    "meets_all": false,
+    "year_cost": 6.853,
+    "tiers": "4/4",
+    "estimate": "15x large",
+    "seconds": 25.2,
+    "predicted": 5.5,
+    "diagnosis": "dashers",
     "problems": [],
-    "wall_seconds": 13.7
+    "wall_seconds": 30.8
   },
   {
     "case": "random #12",
     "changes": {
-      "routing.max_route_hours": 5.8612,
-      "hubs.sizes.large.sort_rate_per_hour": 11852,
-      "hubs.sizes.medium.sort_packages_per_labor_hour": 267,
-      "hubs.lease_per_sqft_per_year": 6.0191,
-      "partner.cost_per_package": 13.8196,
-      "objective.on_time_typical_target": 0.9327,
-      "hubs.sort_wage_per_hour": 27.8627,
-      "drivers.surge_max": 2.6693,
-      "hubs.sizes.small.sort_packages_per_labor_hour": 101
+      "drivers.claim_curve_width": 1.6072,
+      "partner.cost_per_package": 14.3001,
+      "uncertainty.volume_week_sigma": 0.1805,
+      "hubs.sizes.small.sort_rate_per_hour": 1658,
+      "uncertainty.no_show_rate_range": [
+        0.017,
+        0.149
+      ],
+      "hubs.sizes.large.sort_rate_per_hour": 3589,
+      "drivers.raise_base_to_floor": false,
+      "weeks_per_year.holiday_peak": 0,
+      "hubs.nnn_per_sqft_per_year": 4.7265,
+      "drivers.vehicle_availability.3.1": 0.4654,
+      "hubs.sizes.large.fitout_per_sqft": 80,
+      "routing.car_cargo_m3": 6.1713,
+      "uncertainty.truck_late_prob": 0.2383,
+      "drivers.claim_midpoint_net_per_hour": 16
     },
-    "pick": "3x small",
-    "hubs": "#1 small + #2 small + #3 small",
-    "meets_all": true,
-    "year_cost": 2.87,
-    "tiers": "1/4",
-    "estimate": "3x small",
-    "seconds": 12.8,
-    "predicted": 7.1,
-    "diagnosis": null,
+    "pick": "15x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small + #9 small + #10 small + #11 small + #12 small + #13 small + #14 small + #15 small",
+    "meets_all": false,
+    "year_cost": 5.504,
+    "tiers": "4/4",
+    "estimate": "15x medium, big #1",
+    "seconds": 14.0,
+    "predicted": 4.2,
+    "diagnosis": "vehicles",
     "problems": [],
-    "wall_seconds": 15.2
+    "wall_seconds": 17.6
   },
   {
     "case": "random #13",
     "changes": {
-      "partner.max_share_of_day": 0.4004,
-      "peak_flex.enabled": false,
-      "partner.enabled": true,
-      "hubs.sort_wage_per_hour": 23.0277,
-      "objective.on_time_typical_target": 0.9899,
-      "hubs.site_opening_cost": 724799,
-      "drivers.vehicle_availability.2.1": 0.17,
-      "uncertainty.no_show_rate_range": [
-        0.025,
-        0.03
-      ],
-      "drivers.surge_max": 2.8097,
-      "hubs.sizes.large.sort_rate_per_hour": 10065
+      "hubs.sizes.small.fitout_per_sqft": 66,
+      "objective.peak_targets.on_time_typical_target": 0.9854,
+      "partner.max_share_of_day": 0.2169,
+      "hubs.lease_per_sqft_per_year": 14.7174,
+      "demand.packages_per_household_per_day": 0.6305,
+      "demand.network_share": 0.029,
+      "weeks_per_year.hub_outage": 2,
+      "uncertainty.volume_week_sigma": 0.0732,
+      "hubs.sizes.medium.sort_rate_per_hour": 2203
     },
-    "pick": "3x small",
-    "hubs": "#1 small + #2 small + #3 small",
+    "pick": "5x small, big #1",
+    "hubs": "#1 medium + #2 small + #3 small + #4 small + #5 small",
     "meets_all": true,
-    "year_cost": 2.859,
-    "tiers": "1/4",
-    "estimate": "3x small",
-    "seconds": 12.9,
+    "year_cost": 3.143,
+    "tiers": "4/4",
+    "estimate": "3x small, big #1",
+    "seconds": 22.8,
     "predicted": 7.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.2
+    "wall_seconds": 25.6
   },
   {
     "case": "random #14",
     "changes": {
-      "uncertainty.volume_week_sigma": 0.1372,
-      "uncertainty.truck_late_prob": 0.0524,
-      "objective.on_time_typical_target": 0.9014,
-      "uncertainty.extreme_weather_prob": 0.0583,
-      "drivers.raise_base_to_floor": false,
-      "hubs.sizes.large.fitout_per_sqft": 66
+      "drivers.pay_per_km": 0.514,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 359,
+      "objective.on_time_week_share": 0.5654,
+      "routing.max_packages_per_route": 71,
+      "hubs.lease_per_sqft_per_year": 11.1055,
+      "coverage.households_served": 0.9364,
+      "peak_flex.enabled": false,
+      "drivers.claim_curve_width": 5.2599,
+      "drivers.vehicle_availability.2.1": 0.776,
+      "uncertainty.no_show_rate_range": [
+        0.028,
+        0.03
+      ],
+      "objective.peak_targets.on_time_week_share": 0.8096,
+      "objective.on_time_target": 0.8668,
+      "partner.enabled": true
     },
-    "pick": "3x small",
-    "hubs": "#1 small + #2 small + #3 small",
+    "pick": "2x small, big #1",
+    "hubs": "#1 medium + #2 small",
     "meets_all": true,
-    "year_cost": 2.699,
+    "year_cost": 2.951,
     "tiers": "1/4",
-    "estimate": "3x small",
-    "seconds": 12.9,
-    "predicted": 7.4,
+    "estimate": "2x small, big #1",
+    "seconds": 16.4,
+    "predicted": 7.7,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 15.4
+    "wall_seconds": 19.1
   },
   {
     "case": "random #15",
     "changes": {
-      "drivers.vehicle_availability.2.1": 0.293,
-      "hubs.sort_wage_per_hour": 19.8108,
-      "hubs.sizes.small.sort_packages_per_labor_hour": 259,
-      "demand.packages_per_household_per_day": 0.4037,
-      "drivers.pay_base_per_route": 17,
-      "partner.cost_per_package": 3.704
+      "objective.on_time_target": 0.9133,
+      "partner.on_time_rate": 0.7084,
+      "objective.peak_targets.on_time_typical_target": 0.9796,
+      "drivers.vehicle_availability.3.1": 0.0634,
+      "peak_flex.setup_cost_per_station_week": 16281,
+      "hubs.sizes.medium.sort_rate_per_hour": 5867,
+      "partner.cost_per_package": 9.8798,
+      "coverage.households_served": 0.5997,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 154,
+      "hubs.nnn_per_sqft_per_year": 4.0652,
+      "hubs.sizes.large.sort_packages_per_labor_hour": 335,
+      "scenarios.holiday_peak.volume_multiplier": 1.8601,
+      "peak_flex.sort_capacity_boost": 0.2477,
+      "objective.on_time_typical_target": 0.9497
     },
-    "pick": "3x small",
-    "hubs": "#1 small + #2 small + #3 small",
+    "pick": "2x small",
+    "hubs": "#1 small + #2 small",
     "meets_all": true,
-    "year_cost": 2.817,
+    "year_cost": 2.949,
     "tiers": "1/4",
-    "estimate": "3x small",
-    "seconds": 11.9,
-    "predicted": 6.8,
+    "estimate": "2x small",
+    "seconds": 10.4,
+    "predicted": 5.0,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.3
+    "wall_seconds": 12.7
   },
   {
     "case": "random #16",
     "changes": {
-      "drivers.raise_base_to_floor": false,
-      "schedule.sort_cutoff": "D 06:00",
-      "uncertainty.extreme_weather_prob": 0.0103,
-      "objective.exclude_extreme_weather_weeks": true,
-      "objective.peak_targets.on_time_typical_target": 0.9552,
-      "drivers.vehicle_availability.1.1": 0.5565,
-      "objective.on_time_week_share": 0.663,
-      "hubs.sizes.medium.fitout_per_sqft": 65,
-      "objective.peak_targets.on_time_target": 0.9055,
-      "hubs.sizes.large.fitout_per_sqft": 95,
-      "peak_flex.setup_cost_per_station_week": 5305,
-      "peak_flex.enabled": false,
-      "demand.packages_per_household_per_day": 0.3994,
-      "drivers.vehicle_availability.3.1": 0.2769,
-      "hubs.site_opening_cost": 772261
+      "objective.peak_targets.on_time_typical_target": 0.8958,
+      "hubs.nnn_per_sqft_per_year": 5.3692,
+      "drivers.vehicle_availability.1.1": 0.4283,
+      "hubs.lease_per_sqft_per_year": 8.1269,
+      "routing.max_packages_per_route": 112,
+      "hubs.sizes.large.sort_rate_per_hour": 3223,
+      "routing.max_route_hours": 8.2155,
+      "partner.cost_per_package": 14.2136
     },
-    "pick": "4x small",
-    "hubs": "#1 small + #2 small + #3 small + #4 small",
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
     "meets_all": true,
-    "year_cost": 2.995,
+    "year_cost": 2.802,
     "tiers": "1/4",
-    "estimate": "4x small",
-    "seconds": 12.5,
-    "predicted": 7.2,
+    "estimate": "3x small",
+    "seconds": 15.1,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.8
+    "wall_seconds": 17.8
   },
   {
     "case": "random #17",
     "changes": {
-      "drivers.vehicle_availability.3.1": 0.6927,
-      "objective.peak_targets.on_time_week_share": 0.7262,
-      "demand.packages_per_household_per_day": 0.5133,
-      "partner.enabled": true,
-      "hubs.sizes.medium.sort_rate_per_hour": 5708,
-      "partner.on_time_rate": 0.9098,
-      "drivers.claim_curve_width": 7.1357,
-      "uncertainty.volume_week_sigma": 0.2355,
-      "objective.on_time_week_share": 0.6298,
-      "uncertainty.truck_late_prob": 0.2238,
-      "weeks_per_year.holiday_peak": 9,
-      "hubs.sort_wage_per_hour": 31.8
+      "uncertainty.no_show_rate_range": [
+        0.141,
+        0.199
+      ],
+      "drivers.surge_max": 1.8076,
+      "hubs.sizes.small.fitout_per_sqft": 53,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 181,
+      "hubs.lease_per_sqft_per_year": 6.9219,
+      "drivers.vehicle_availability.2.1": 0.366,
+      "hubs.sort_wage_per_hour": 21.7596,
+      "hubs.sizes.medium.sort_rate_per_hour": 3293,
+      "routing.max_route_hours": 7.6252,
+      "schedule.sort_cutoff": "D 08:00",
+      "hubs.sizes.medium.fitout_per_sqft": 43,
+      "partner.on_time_rate": 0.8872,
+      "peak_flex.enabled": false,
+      "uncertainty.slow_day_prob": 0.0193
     },
-    "pick": "3x small",
-    "hubs": "#1 small + #2 small + #3 small",
+    "pick": "2x small, big #1",
+    "hubs": "#1 medium + #2 small",
     "meets_all": true,
-    "year_cost": 2.981,
+    "year_cost": 2.833,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 13.9,
-    "predicted": 7.3,
+    "seconds": 15.2,
+    "predicted": 7.1,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 16.3
+    "wall_seconds": 17.8
   },
   {
     "case": "random #18",
     "changes": {
-      "drivers.vehicle_availability.1.1": 0.6712,
-      "hubs.sizes.small.fitout_per_sqft": 54,
-      "routing.car_cargo_m3": 2.3309,
-      "drivers.vehicle_availability.3.1": 0.3028,
-      "drivers.claim_curve_width": 1.8564,
-      "hubs.sizes.medium.sort_rate_per_hour": 4885
+      "hubs.sizes.medium.sort_rate_per_hour": 4779,
+      "hubs.sizes.small.sort_rate_per_hour": 2549,
+      "hubs.sizes.medium.sort_packages_per_labor_hour": 349,
+      "hubs.sizes.large.sort_packages_per_labor_hour": 290,
+      "scenarios.holiday_peak.volume_multiplier": 2.4298,
+      "hubs.sizes.large.fitout_per_sqft": 52,
+      "partner.enabled": false
     },
     "pick": "3x small",
     "hubs": "#1 small + #2 small + #3 small",
     "meets_all": true,
-    "year_cost": 2.906,
+    "year_cost": 2.76,
     "tiers": "1/4",
     "estimate": "3x small",
-    "seconds": 11.7,
-    "predicted": 6.6,
+    "seconds": 18.1,
+    "predicted": 8.3,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 14.1
+    "wall_seconds": 20.8
   },
   {
     "case": "random #19",
     "changes": {
-      "uncertainty.slow_day_prob": 0.2982,
-      "uncertainty.extreme_weather_prob": 0.0242,
-      "routing.max_route_hours": 5.3702,
-      "hubs.sizes.large.fitout_per_sqft": 46,
-      "drivers.pay_base_per_route": 4,
-      "hubs.sizes.medium.fitout_per_sqft": 47,
-      "schedule.sort_cutoff": "D 07:00",
-      "hubs.sizes.medium.sort_packages_per_labor_hour": 248,
-      "hubs.lease_per_sqft_per_year": 10.4046,
-      "routing.car_cargo_m3": 0.4573,
-      "objective.on_time_target": 0.8964,
-      "hubs.nnn_per_sqft_per_year": 4.9914,
-      "weeks_per_year.hub_outage": 4,
-      "uncertainty.no_show_rate_range": [
-        0.013,
-        0.197
-      ],
-      "drivers.vehicle_availability.2.1": 0.7884
+      "objective.peak_targets.on_time_target": 0.9783,
+      "schedule.sort_cutoff": "D 05:00",
+      "uncertainty.extreme_weather_prob": 0.0481,
+      "drivers.pay_per_km": 0.052,
+      "hubs.sizes.small.sort_rate_per_hour": 2641,
+      "hubs.sizes.large.sort_packages_per_labor_hour": 83,
+      "coverage.households_served": 0.9314,
+      "partner.cost_per_package": 7.8991,
+      "hubs.sizes.large.fitout_per_sqft": 44,
+      "routing.car_cargo_m3": 5.608,
+      "coverage.share_kept_at_min": 0.934,
+      "peak_flex.sort_capacity_boost": 0.2679
     },
-    "pick": "3x small",
-    "hubs": "#1 small + #2 small + #3 small",
-    "meets_all": true,
-    "year_cost": 3.4,
-    "tiers": "1/4",
-    "estimate": "3x small",
-    "seconds": 16.9,
-    "predicted": 9.4,
-    "diagnosis": null,
+    "pick": "15x small",
+    "hubs": "#1 small + #2 small + #3 small + #4 small + #5 small + #6 small + #7 small + #8 small + #9 small + #10 small + #11 small + #12 small + #13 small + #14 small + #15 small",
+    "meets_all": false,
+    "year_cost": 6.11,
+    "tiers": "4/4",
+    "estimate": "8x small, big #1",
+    "seconds": 42.1,
+    "predicted": 10.7,
+    "diagnosis": "vehicles",
     "problems": [],
-    "wall_seconds": 19.8
+    "wall_seconds": 47.4
   },
   {
     "case": "random #20",
     "changes": {
-      "hubs.sizes.large.sort_rate_per_hour": 3816,
-      "drivers.pay_base_per_route": 30,
-      "drivers.pay_per_stop": 2.4593,
-      "scenarios.holiday_peak.volume_multiplier": 2.3045,
-      "partner.cost_per_package": 10.7877
+      "scenarios.holiday_peak.volume_multiplier": 1.5405,
+      "objective.on_time_target": 0.8754,
+      "weeks_per_year.holiday_peak": 9,
+      "hubs.sizes.small.sort_packages_per_labor_hour": 274,
+      "hubs.sizes.large.sort_rate_per_hour": 7311,
+      "hubs.sizes.medium.fitout_per_sqft": 29
     },
-    "pick": "2x medium",
-    "hubs": "#1 medium + #2 medium",
+    "pick": "3x small",
+    "hubs": "#1 small + #2 small + #3 small",
     "meets_all": true,
-    "year_cost": 4.21,
+    "year_cost": 2.719,
     "tiers": "1/4",
-    "estimate": "2x medium",
-    "seconds": 16.7,
-    "predicted": 9.2,
+    "estimate": "3x small",
+    "seconds": 14.6,
+    "predicted": 6.9,
     "diagnosis": null,
     "problems": [],
-    "wall_seconds": 19.3
+    "wall_seconds": 17.1
   }
 ]

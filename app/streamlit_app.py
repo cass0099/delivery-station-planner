@@ -53,7 +53,7 @@ def _reload_if_engine_changed() -> None:
 
 
 _reload_if_engine_changed()
-from engine.demand import DAYS
+from engine.demand import DAYS, choose_zips, coverage_share_factor, expected_volume_factor
 from engine.search import objective_for
 from engine.live import (RunStopped, estimate_seconds, load_baseline, planned_weeks, quick_estimate, run as live_run,
                          screen_all, settings_hash)
@@ -402,7 +402,7 @@ def load_geo(market: str):
     d = ROOT / "data" / "prepared" / market
     tracts = gpd.read_file(d / "tract_demand.gpkg")
     tracts["geometry"] = tracts.to_crs(26915).simplify(40).to_crs(4326)
-    tracts = tracts[["GEOID", "county", "households", "pkgs_per_day", "pkgs_per_km2", "geometry"]]
+    tracts = tracts[["GEOID", "zip", "county", "households", "pkgs_per_day", "pkgs_per_km2", "geometry"]]
     sites = gpd.read_file(d / "hub_candidates.gpkg")
     pts = sites.to_crs(26915).representative_point().to_crs(4326)
     sites = pd.DataFrame({"rank": sites["rank"], "lat": pts.y, "lon": pts.x})
@@ -559,12 +559,28 @@ def hint(path: str, a: dict) -> str | None:
     """One sentence saying what the current value means in practice."""
     dem, h, dr, u = a["demand"], a["hubs"], a["drivers"], a["uncertainty"]
     hh = HOUSEHOLDS
-    per_day = hh * dem["packages_per_household_per_day"] * dem["network_share"]
+    per_day = hh * dem["packages_per_household_per_day"] * dem["network_share"] * expected_volume_factor(a)
     monday = per_day * max(dem["day_of_week_multipliers"].values())
     small, large = h["sizes"]["small"]["square_feet"], h["sizes"]["large"]["square_feet"]
     if path == "demand.network_share":
         return (f"At these settings, the network carries about {round(per_day, -2):,.0f} packages on an average day "
                 f"and about {round(monday, -2):,.0f} on a Monday.")
+    if path == "coverage.households_served":
+        cov = a["coverage"]
+        if cov["households_served"] >= 1:
+            return (f"The network serves every ZIP code in the metro and carries about {round(per_day, -2):,.0f} "
+                    "packages on an average day.")
+        return (f"About {round(hh * cov['households_served'], -3):,.0f} households live in the served ZIP codes. "
+                f"The network keeps {coverage_share_factor(a):.0%} of its full share of their packages and carries "
+                f"about {round(per_day, -2):,.0f} packages on an average day.")
+    if path == "coverage.share_kept_at_min":
+        cov = a["coverage"]
+        if cov["households_served"] >= 1:
+            return ("At 100% coverage the network keeps its full share, so this setting only matters when coverage is "
+                    "below 100%. Between the lowest coverage and 100%, the share rises in a straight line.")
+        return (f"At the current coverage of {cov['households_served']:.0%}, the network keeps "
+                f"{coverage_share_factor(a):.0%} of its full share in the ZIP codes it serves. The share rises in a "
+                "straight line to the full share at 100% coverage.")
     if path == "scenarios.holiday_peak.volume_multiplier":
         peak = monday * a["scenarios"]["holiday_peak"]["volume_multiplier"]
         return f"A Monday during the holiday peak would bring about {round(peak, -2):,.0f} packages."
@@ -690,6 +706,9 @@ def variability(path: str, a: dict) -> tuple[bool, str]:
         "weeks_per_year.holiday_peak": "This weights the kinds of week in the yearly cost.",
         "weeks_per_year.hub_outage": "This weights the kinds of week in the yearly cost.",
         "partner.on_time_rate": "The model applies this share to the partner's packages every day.",
+        "coverage.households_served": "Each station layout serves the same share of households, in the ZIP codes "
+                                      "closest to its own stations.",
+        "coverage.share_kept_at_min": "Daily volume in the served ZIP codes still varies around the average.",
     }
     return False, fixed.get(path, "")
 
@@ -889,7 +908,7 @@ def _style(chart, height):
 
 def volume_preview(a: dict, households: float) -> alt.Chart:
     dem = a["demand"]
-    base = households * dem["packages_per_household_per_day"] * dem["network_share"]
+    base = households * dem["packages_per_household_per_day"] * dem["network_share"] * expected_volume_factor(a)
     peak = a["scenarios"]["holiday_peak"]["volume_multiplier"]
     rows = []
     for day in DAYS:
@@ -906,11 +925,35 @@ def volume_preview(a: dict, households: float) -> alt.Chart:
                  alt.Tooltip("pkgs:Q", title="Packages", format=",.0f")]), 230)
 
 
+def coverage_preview(a: dict, households: float) -> alt.Chart:
+    """Packages on an average day at each coverage level, with the current setting marked."""
+    dem, cov = a["demand"], a["coverage"]
+    lo = cov["min_households_served"]
+    levels = sorted({round(lo + i * 0.01, 2) for i in range(int(round((1 - lo) * 100)) + 1)})
+    rows = []
+    for c in levels:
+        b = {**a, "coverage": {**cov, "households_served": c}}
+        rows.append({"cov": c, "pkgs": households * dem["packages_per_household_per_day"] * dem["network_share"]
+                     * expected_volume_factor(b)})
+    d = pd.DataFrame(rows)
+    now = d.iloc[[int((d["cov"] - cov["households_served"]).abs().idxmin())]]
+    x = alt.X("cov:Q", title="Households in served ZIP codes", scale=alt.Scale(domain=[lo, 1]),
+              axis=alt.Axis(format=".0%", tickCount=6, domain=False, ticks=False))
+    y = alt.Y("pkgs:Q", title=None, scale=alt.Scale(zero=True),
+              axis=alt.Axis(format=",.0f", tickCount=4, domain=False, ticks=False))
+    tip = [alt.Tooltip("cov:Q", title="Households served", format=".0%"),
+           alt.Tooltip("pkgs:Q", title="Packages, average day", format=",.0f")]
+    line = alt.Chart(d).mark_line(color=INK, strokeWidth=2).encode(x=x, y=y, tooltip=tip)
+    dot = alt.Chart(now).mark_point(filled=True, size=110, color=RED, stroke="#fff", strokeWidth=2,
+                                    opacity=1).encode(x=x, y=y, tooltip=tip)
+    return _style(line + dot, 230)
+
+
 def sort_numbers(a: dict, households: float) -> dict:
     """One station's overnight sort capacity by size, and the busiest normal and peak nights."""
     dem, h = a["demand"], a["hubs"]
     monday = households * dem["packages_per_household_per_day"] * dem["network_share"] * \
-        max(dem["day_of_week_multipliers"].values())
+        expected_volume_factor(a) * max(dem["day_of_week_multipliers"].values())
     window = clock(a["schedule"]["sort_cutoff"]) - clock(a["schedule"]["linehaul_waves"][0]["arrive"])
     cap = {size: s["sort_rate_per_hour"] * window for size, s in h["sizes"].items()}
     return {"cap": cap, "normal": monday, "peak": monday * a["scenarios"]["holiday_peak"]["volume_multiplier"]}
@@ -1057,22 +1100,35 @@ def disruption_preview(a: dict) -> alt.Chart:
     return _style(bars + txt, alt.Step(44))
 
 
-def network_map(tracts, sites, drive, label: str) -> folium.Map:
+def served_zips(tracts, drive, label: str, a: dict):
+    """Which tracts the layout serves at the coverage setting (the same rule the engine uses)."""
+    minutes = drive.loc[[r for r, _ in hub_list(label)], tracts["GEOID"]].to_numpy().min(axis=0)
+    return choose_zips(minutes, tracts["households"].to_numpy(), tracts["zip"].to_numpy(),
+                       a["coverage"]["households_served"])
+
+
+def network_map(tracts, sites, drive, label: str, a: dict | None = None) -> folium.Map:
     hubs = hub_list(label)
     nearest = drive.loc[[r for r, _ in hubs], tracts["GEOID"]].to_numpy().argmin(axis=0)
-    share = pd.Series(tracts["pkgs_per_day"].to_numpy()).groupby(nearest).sum() / tracts["pkgs_per_day"].sum()
+    served = served_zips(tracts, drive, label, a or A0)
+    pkgs = tracts["pkgs_per_day"].to_numpy() * served
+    share = pd.Series(pkgs).groupby(nearest).sum() / max(pkgs.sum(), 1e-9)
     t = tracts.copy()
     t["hub"] = nearest
+    t["on"] = served
     t["opacity"] = 0.15 + 0.5 * t["pkgs_per_km2"].rank(pct=True)
-    t["served"] = [f"Station {i + 1}" for i in nearest]
+    t["served"] = [f"Station {i + 1}" if ok else "Not served (another carrier)" for i, ok in zip(nearest, served)]
     t["pkgs"] = t["pkgs_per_day"].round(0)
     m = folium.Map(location=[44.96, -93.25], zoom_start=9, tiles=None, scrollWheelZoom=False, control_scale=True)
     add_basemap(m)
     folium.GeoJson(
-        t, style_function=lambda f: {"fillColor": HUB_COLORS[f["properties"]["hub"] % 4], "color": "#ffffff",
-                                     "weight": 0.25, "fillOpacity": f["properties"]["opacity"]},
-        tooltip=folium.GeoJsonTooltip(["served", "county", "pkgs"],
-                                      aliases=["Served by", "County", "Packages, average day (default volume)"],
+        t, style_function=lambda f: (
+            {"fillColor": HUB_COLORS[f["properties"]["hub"] % 4], "color": "#ffffff", "weight": 0.25,
+             "fillOpacity": f["properties"]["opacity"]} if f["properties"]["on"] else
+            {"fillColor": "#9a9a9a", "color": "#ffffff", "weight": 0.25, "fillOpacity": 0.12}),
+        tooltip=folium.GeoJsonTooltip(["served", "zip", "county", "pkgs"],
+                                      aliases=["Served by", "ZIP code", "County",
+                                               "Packages, average day, at default volume and full coverage"],
                                       localize=True)).add_to(m)
     loc = sites.set_index("rank")
     for i, (r, size) in enumerate(hubs):
@@ -1378,7 +1434,14 @@ def method_page() -> None:
             f'{sizes["large"]["share"]:.0%} are large, and the size decides how much space a package takes in a '
             f'Dasher\'s car. Packages reach the stations in {WORDS.get(len(waves), len(waves))} overnight truck '
             f'arrivals. The first trucks arrive at {clock_label(waves[0]["arrive"])}, and the last ones arrive at '
-            f'{clock_label(waves[-1]["arrive"])}</p>'
+            f'{clock_label(waves[-1]["arrive"])}.</p>'
+            '<h3>Which ZIP codes the network serves</h3>'
+            f'<p>By default the network serves all {tracts["zip"].nunique()} ZIP codes in the region. The coverage '
+            'step lets it serve fewer. Each station layout then serves the ZIP codes closest to its own stations '
+            'by drive time, adding whole ZIP codes until the chosen share of households is covered. Packages for '
+            'the other ZIP codes go to other carriers and never enter the simulation. Each Census tract belongs '
+            'to the ZIP code that holds most of its land, from the Census Bureau\'s 2020 relationship file '
+            'between ZIP codes and tracts.</p>'
             '</div>')
     with right:
         st_folium(demand_map(tracts, sites), height=520, use_container_width=True, returned_objects=[])
@@ -2035,6 +2098,12 @@ elif page < FIRST_STEP + len(STEPS):
     previews = {
         "volume": ("Packages per day", "This chart shows the number of packages on each day of the week at the "
                    "current settings.", lambda: volume_preview(a, households)),
+        "coverage": ("Packages per day at each coverage level", "This chart shows the network's packages on an "
+                     "average day as coverage changes. The red dot marks the current setting. "
+                     + ("Volume falls faster than coverage, because shippers send less of their volume to a carrier "
+                        "that covers less of the metro." if a["coverage"]["share_kept_at_min"] < 1 else
+                        "Volume falls in step with coverage, because the network keeps its full share in the ZIP "
+                        "codes it serves."), lambda: coverage_preview(a, households)),
         "hubs": ("How much one station can sort overnight", sort_note(a), lambda: sort_preview(a, households)),
         "drivers": ("How likely a Dasher is to accept a route", claim_note(a), lambda: claim_preview(a)),
         "service": ("When packages arrive, get sorted and are delivered", schedule_note(a),
@@ -2114,7 +2183,8 @@ elif page == RESULTS - 1:
             st.html(f'<div class="tab-body"><div class="note" style="max-width:75ch">{text}</div>'
                     f'<div class="note" style="max-width:75ch">This run simulates about {weeks:,} weeks, counting each '
                     f'station layout separately, and should take {seconds_label(secs)} on this server. If no layout of up to '
-                    f'{WORDS.get(max(a["design_grid"]["hub_counts"]))} stations meets every target, the run also tries '
+                    f'{WORDS.get(max(a["design_grid"]["hub_counts"]))} stations meets every target, or the cheapest one '
+                    f'that does has {WORDS.get(max(a["design_grid"]["hub_counts"]))} stations, the run also tries '
                     'larger networks, which can make it take up to three times as long.</div>'
                     + (f'<div class="note" style="max-width:75ch"><b>With these settings, this run would take longer '
                        f'than the {CTL["run"].get("max_minutes", 30)}-minute limit on this server, so it is turned '
@@ -2173,13 +2243,25 @@ else:
                "recommendation changes.")
     std_max = max(ra["design_grid"]["hub_counts"])
     if feasible and run.get("tiers_tried", 1) > 1:
-        sub += (f" No network of up to {WORDS.get(std_max, std_max)} stations met every target, so the model also "
-                f"tried larger networks, up to {run.get('max_stations')} stations.")
+        if run.get("larger_reason") == "edge":
+            sub += (f" The cheapest network of up to {WORDS.get(std_max, std_max)} stations that met every target had "
+                    f"{WORDS.get(std_max, std_max)} stations, so the model also tried larger networks, up to "
+                    f"{run.get('max_stations')} stations, in case one of them costs less.")
+        else:
+            sub += (f" No network of up to {WORDS.get(std_max, std_max)} stations met every target, so the model also "
+                    f"tried larger networks, up to {run.get('max_stations')} stations.")
     if not feasible:
         sub += ((f" This station layout meets every target in {yours['meets']} of {yours['of']} kinds of week."
                  if yours["meets"] else " This station layout misses at least one target in every kind of week.")
                 + f" The model tried networks of up to {run.get('max_stations', std_max)} stations. "
                 + diagnosis_text(run.get("diagnosis"), ra))
+    cov_target = ra["coverage"]["households_served"]
+    if cov_target < 1:
+        on = served_zips(tracts, drive, yours["hubs"], ra)
+        hh_on = tracts["households"].to_numpy()[on].sum() / households
+        sub += (f" This network serves {hh_on:.0%} of the metro's households, in {tracts['zip'][on].nunique()} of "
+                f"{tracts['zip'].nunique()} ZIP codes, shown in color on the map. Packages for the other ZIP codes go "
+                "to other carriers, so the costs and OTD below cover the served ZIP codes only.")
     est = run.get("estimate")
     if est:
         est_name = spoken(get_design(est["design"], ra).label())
@@ -2240,7 +2322,7 @@ else:
     with left:
         st.html(table)
     with right:
-        st_folium(network_map(tracts, sites, drive, yours["hubs"]), height=460, use_container_width=True,
+        st_folium(network_map(tracts, sites, drive, yours["hubs"], ra), height=460, use_container_width=True,
                   returned_objects=[])
 
     frames = run["frames"]

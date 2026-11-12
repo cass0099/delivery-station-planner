@@ -120,6 +120,14 @@ def cases(only: str | None, n_random: int, seed: int) -> list[tuple[str, dict]]:
                                           "drivers.pay_per_km": 0.0, "drivers.raise_base_to_floor": False}),
                 ("tiny cars, short routes", {"routing.car_cargo_m3": 0.2832, "routing.max_route_hours": 2.0,
                                              "routing.max_packages_per_route": 30}),
+                ("half the metro, shippers keep their full share",
+                 {"coverage.households_served": 0.5, "coverage.share_kept_at_min": 1.0}),
+                ("half the metro, shippers send the least at the minimum",
+                 {"coverage.households_served": 0.5, "coverage.share_kept_at_min": 0.1}),
+                ("half the metro at the hardest settings",
+                 {"coverage.households_served": 0.5, "demand.network_share": 0.10,
+                  "demand.packages_per_household_per_day": 0.70, "uncertainty.truck_late_prob": 0.4,
+                  "objective.on_time_typical_target": 0.995}),
                 ("no vans or SUVs", {"drivers.vehicle_availability.1.1": 0.0, "drivers.vehicle_availability.2.1": 0.0,
                                      "drivers.vehicle_availability.3.1": 0.0})]
     if only in (None, "random"):
@@ -188,7 +196,25 @@ def check_run(a: dict, r: dict) -> list[str]:
             bad.append("the closest layout is not the one with the smallest OTD gap")
     for d in y.index:
         get_design(d, a)
+    target = a["coverage"]["households_served"]
+    if target < 1:                                      # the pick serves whole ZIPs adding up to the target
+        from engine.simulation import served_tracts
+        m = _market()
+        hh = m.tracts["households"].to_numpy()
+        got = hh[served_tracts(m, get_design(y.index[0], a), a)].sum() / hh.sum()
+        if not target <= got < target + 0.1:
+            bad.append(f"the pick serves {got:.1%} of households, not about {target:.0%}")
     return bad
+
+
+_M = []
+
+
+def _market():
+    if not _M:
+        from engine.simulation import load_market
+        _M.append(load_market("msp"))
+    return _M[0]
 
 
 # ---------------------------------------------------------------- app pages

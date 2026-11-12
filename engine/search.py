@@ -61,7 +61,7 @@ def screen(m, a, scenario: str, designs: list | None = None) -> pd.DataFrame:
     avg = average_day(len(m.site_rank), len(a["schedule"]["linehaul_waves"]), a)
     rows = []
     for d in (design_grid(a) if designs is None else designs):
-        outage = busiest_hub(m, d) if sc.get("outage_day") else None
+        outage = busiest_hub(m, d, a) if sc.get("outage_day") else None
         r = simulate_day(m, d, day, a, avg, sc, outage_hub=outage)["metrics"]
         rows.append({"design": d.name, "screen_on_time": r["on_time_rate"],
                      "screen_cost": r["cost_total"] / max(r["delivered"], 1)})

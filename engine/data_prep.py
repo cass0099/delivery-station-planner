@@ -35,6 +35,7 @@ WGS84 = "EPSG:4326"
 ACS_VARIABLES = {"B11001_001E": "households", "B01003_001E": "population"}
 TRACT_URL = "https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_{state}_tract_500k.zip"
 ACS_URL = "https://api.census.gov/data/{year}/acs/acs5"
+ZCTA_TRACT_URL = "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_tract20_natl.txt"
 
 
 # ---------------------------------------------------------------- helpers
@@ -304,7 +305,30 @@ def prepare_drive_times(market: str) -> pd.DataFrame:
     return out
 
 
-STEPS = {"tracts": prepare_tracts, "roads": prepare_roads, "stores": prepare_stores, "sites": prepare_sites,
+def tract_zips(rel: pd.DataFrame, geoids: pd.Series) -> pd.Series:
+    """Each tract's ZIP code: the ZIP code tabulation area (ZCTA) that holds most of the tract's land.
+    Tracts and ZIPs do not nest, so a ZIP here is the group of tracts that mostly fall inside it."""
+    rel = rel[rel["GEOID_TRACT_20"].isin(set(geoids)) & rel["GEOID_ZCTA5_20"].notna()].copy()
+    rel["land"] = pd.to_numeric(rel["AREALAND_PART"])
+    best = rel.sort_values("land").groupby("GEOID_TRACT_20")["GEOID_ZCTA5_20"].last()
+    return geoids.map(best)
+
+
+def prepare_zips(market: str) -> gpd.GeoDataFrame:
+    path = _download(ZCTA_TRACT_URL, cache_dir("raw", "census") / "tab20_zcta520_tract20_natl.txt")
+    rel = pd.read_csv(path, sep="|", dtype=str, encoding="utf-8-sig")
+    tracts = gpd.read_file(prepared_dir(market) / "tracts.gpkg")
+    tracts["zip"] = tract_zips(rel, tracts["GEOID"])
+    missing = tracts["zip"].isna().sum()
+    if missing:
+        log.warning("%d tracts have no ZIP; each is treated as its own area", missing)
+        tracts["zip"] = tracts["zip"].fillna("T" + tracts["GEOID"])
+    tracts.to_file(prepared_dir(market) / "tracts.gpkg", driver="GPKG")
+    log.info("ZIPs: %d for %d tracts", tracts["zip"].nunique(), len(tracts))
+    return tracts
+
+
+STEPS = {"tracts": prepare_tracts, "zips": prepare_zips, "roads": prepare_roads, "stores": prepare_stores, "sites": prepare_sites,
          "drive_times": prepare_drive_times}
 
 

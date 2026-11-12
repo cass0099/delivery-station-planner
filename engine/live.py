@@ -209,6 +209,12 @@ def larger_candidates(screens: dict, top_n: int) -> list[str]:
     return keep
 
 
+def at_edge(design: str, a: dict) -> bool:
+    """True when a layout has as many stations as the largest in the standard list. A cheaper network might then
+    have more stations, so the run also tries the larger networks."""
+    return len(get_design(design, a).hubs) >= max(a["design_grid"]["hub_counts"])
+
+
 def merge_screens(old: dict | None, new: dict) -> dict:
     return {sc: pd.concat([old[sc], s], ignore_index=True) if old else s for sc, s in new.items()}
 
@@ -230,7 +236,16 @@ def quick_estimate(a: dict, screens: dict, market: str = "msp") -> dict:
     (weighted by weeks per year) that meets the OTD target on an average day in every kind of week. If none in the
     standard list does, the larger networks are screened too (still well under a second each)."""
     tier, t = 0, _estimate_table(a, screens)
-    while not (t["passes"] == len(screens)).any() and tier + 1 < n_tiers(a, market):
+
+    def more(t, tier):
+        ok = t[t["passes"] == len(screens)]
+        if tier + 1 >= n_tiers(a, market):
+            return False
+        if not len(ok):
+            return True
+        # The cheapest passing layout has the most stations screened so far: a larger network might be cheaper.
+        return len(get_design(ok.iloc[0]["design"], a).hubs) >= max(len(get_design(d, a).hubs) for d in t["design"])
+    while more(t, tier):
         tier += 1
         screens = merge_screens(screens, screen_all(a, market, tier)["screens"])
         t = _estimate_table(a, screens)
@@ -328,9 +343,10 @@ def _batch(pool, a: dict, mode: str, ctl: dict, scenarios: list[str], designs_by
 def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None = None,
         progress: Progress | None = None, screen_info: dict | None = None,
         should_stop: Callable[[], bool] | None = None) -> dict:
-    """Simulate the standard list of layouts. If none meets every OTD target in every kind of week, screen every
-    larger network (design_grid.larger_networks) on an average day and simulate the most promising few in one more
-    batch on the same random weeks. One extra batch keeps a hard case to roughly twice the usual time."""
+    """Simulate the standard list of layouts. If none meets every OTD target in every kind of week, or the cheapest
+    one that does has the most stations in the list (so a larger network might be cheaper), screen every larger
+    network (design_grid.larger_networks) on an average day and simulate the most promising few in one more batch on
+    the same random weeks. One extra batch keeps a hard case to roughly twice the usual time."""
     t0 = time.perf_counter()
     ctl = a["app_controls"]["run"]
     screen_info = screen_info or screen_all(a, market)
@@ -353,16 +369,21 @@ def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None =
         designs = _batch(pool, a, mode, ctl, scenarios, first, rows, done, progress, "")
         frames = _frames(rows, a, scenarios, mode)
         year = year_round_table(frames, a)
-        larger_tried = False
-        if not (len(year) and bool(year["meets_all"].iloc[0])) and tiers > 1:
+        larger_tried, larger_reason = False, None
+        passed = len(year) and bool(year["meets_all"].iloc[0])
+        if tiers > 1 and (not passed or at_edge(year.index[0], a)):
+            larger_reason = "edge" if passed else "none_passed"
             if progress:
-                progress(1.0, "No layout met every target. Screening larger networks", dict(done, total=done["weeks"]))
+                why = ("The cheapest network that met every target has the most stations in the list" if passed else
+                       "No layout met every target")
+                progress(1.0, f"{why}. Screening larger networks", dict(done, total=done["weeks"]))
             big = screen_all(a, market, "larger")["screens"]
             screens = merge_screens(screens, big)
             pick = larger_candidates(big, top)
             designs += [d for d in _batch(pool, a, mode, ctl, scenarios, {sc: pick for sc in scenarios}, rows, done,
-                                          progress, "No layout met every target, so the run is now trying larger "
-                                                    "networks. ") if d not in designs]
+                                          progress, ("The run is now checking whether a larger network costs less. "
+                                                     if passed else "No layout met every target, so the run is now "
+                                                                    "trying larger networks. ")) if d not in designs]
             frames = _frames(rows, a, scenarios, mode)
             year = year_round_table(frames, a)
             larger_tried = True
@@ -385,7 +406,7 @@ def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None =
             "designs": designs, "scenarios": scenarios, "seconds": round(time.perf_counter() - t0, 1),
             "hash": settings_hash(a), "estimate": quick_estimate(a, screen_info["screens"], market),
             "weeks_simulated": done["weeks"], "packages_simulated": done["packages"],
-            "tiers_tried": tiers if larger_tried else 1, "tiers_available": tiers,
+            "tiers_tried": tiers if larger_tried else 1, "tiers_available": tiers, "larger_reason": larger_reason,
             "diagnosis": diagnose(frames, year, a),
             "max_stations": max(len(get_design(d, a).hubs) for d in screened), **weeks_note}
 
@@ -431,6 +452,7 @@ def load_baseline(market: str, mode: str, a: dict) -> dict | None:
 
 def share_sensitivity(a: dict, shares: list[float], market: str = "msp", progress: Progress | None = None) -> list:
     """Full run at several network shares; one summary row per share (recommended network, cost, packages a day)."""
+    from engine.demand import expected_volume_factor
     from engine.simulation import load_market
     m = load_market(market)
     households = float(m.tracts["households"].sum())
@@ -443,7 +465,8 @@ def share_sensitivity(a: dict, shares: list[float], market: str = "msp", progres
         y = r["year"]
         ok = y[y["meets_all"]]
         pick = (ok if len(ok) else y).iloc[0]
-        out.append({"share": share, "packages_per_day": households * b["demand"]["packages_per_household_per_day"] * share,
+        out.append({"share": share, "packages_per_day": households * b["demand"]["packages_per_household_per_day"] * share
+                    * expected_volume_factor(b),
                     "design": str((ok if len(ok) else y).index[0]), "hubs": pick["hubs"],
                     "year_cost": float(pick["year_cost_per_package"]), "meets_all": bool(len(ok)),
                     "runner_up": str(y.index[1]) if len(y) > 1 else None,

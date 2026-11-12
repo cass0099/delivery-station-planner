@@ -85,6 +85,19 @@ demand:
     medium: {share: 0.30, volume_m3: 0.025}
     large:  {share: 0.10, volume_m3: 0.070}
 
+# Coverage: the ZIP codes the network serves. A shipper checks each package's ZIP against the carrier's coverage
+# list when it buys the label, so packages for ZIPs outside the list go to another carrier and never reach this
+# network. Each station layout serves the ZIPs closest to its stations by drive time (household-weighted), adding
+# ZIPs until this share of the metro's households is covered. ZIPs are ZIP code tabulation areas: each Census
+# tract belongs to the ZCTA that holds most of its land (Census 2020 ZCTA-to-tract relationship file).
+coverage:
+  households_served: 1.0       # share of the metro's households in served ZIPs (1.0 serves every ZIP)
+  min_households_served: 0.5   # assumption: below this, shippers would not add the carrier, so coverage can't go lower
+  # Assumption: a carrier that covers less of the metro wins a smaller share of shippers' packages in the ZIPs it does
+  # serve, because many shippers want one carrier for most of their volume. At the minimum coverage, the network keeps
+  # this share of its full network share in its served ZIPs, rising in a straight line to the full share at 100%.
+  share_kept_at_min: 0.6
+
 # ---------------------------------------------------------------- phase 2: local engine
 
 # Hand-picked design list (phase 3 scores every one; no search algorithm yet).
@@ -94,8 +107,9 @@ design_grid:
   hub_counts: [1, 2, 3, 4]
   sizes: [small, medium, large]
   big_first_hub_variants: true
-  # When no layout above meets every OTD target, a run tries these larger networks, one group at a time, and stops
-  # at the first group where a layout meets every target. Capped at the number of candidate sites (25 in MSP).
+  # When no layout above meets every OTD target, or the cheapest one that does has the most stations in hub_counts
+  # (so a larger network might cost less), a run screens these larger networks on an average day and simulates the
+  # most promising ones. Capped at the number of candidate sites (25 in MSP).
   larger_networks: [[5, 6], [8, 10], [12, 15]]
 
 # Next-day service. Times are "D-1 HH:MM" (evening before) or "D HH:MM" (delivery day).
@@ -342,6 +356,15 @@ app_controls:
         - {path: demand.network_share, label: Share of metro parcels, min: 0.01, max: 0.10, step: 0.005, format: pct1, unit: of all metro parcels}
         - {path: demand.packages_per_household_per_day, label: Parcels per household per day, min: 0.30, max: 0.70, step: 0.01, format: num2, unit: parcels per household per day}
         - {path: scenarios.holiday_peak.volume_multiplier, label: Holiday peak volume above normal, min: 1.2, max: 2.5, step: 0.05, format: pct_above, unit: more packages than a normal week}
+    - key: coverage
+      name: Coverage
+      title: Set the coverage assumptions
+      question: Which ZIP codes will the network serve?
+      note: A carrier does not have to serve every ZIP code. Leaving out outlying ZIPs shortens routes and Dasher commutes, but the network carries fewer packages to spread its station costs over, and shippers send less of their volume to a carrier that covers less of the metro.
+      uses: Each station layout serves the ZIP codes closest to its stations by drive time, adding ZIPs until this share of the metro's households is covered. Packages for other ZIPs go to other carriers and never enter the simulation, so OTD and cost are measured on the served ZIPs only.
+      controls:
+        - {path: coverage.households_served, label: Households in served ZIP codes, min: 0.50, max: 1.00, step: 0.05, format: pct, unit: of metro households}
+        - {path: coverage.share_kept_at_min, label: Network share kept at 50% coverage, min: 0.1, max: 1.0, step: 0.05, format: pct, unit: of the full network share}
     - key: hubs
       name: Station costs
       title: Set the station cost assumptions

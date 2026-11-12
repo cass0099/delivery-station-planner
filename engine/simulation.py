@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import argparse
 import heapq
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 
 import geopandas as gpd
@@ -24,7 +24,7 @@ import pandas as pd
 
 from engine.checks import print_checks, run_checks
 from engine.config import load_assumptions, prepared_dir
-from engine.demand import DAYS, packages_per_household
+from engine.demand import DAYS, choose_zips, coverage_share_factor, packages_per_household
 from engine.randomness import DayDraws, average_day
 from engine.routing import Route, build_routes, load_minutes, packages_per_stop, tract_profiles
 
@@ -59,6 +59,7 @@ class Market:
     drive_min: np.ndarray         # sites x tracts, free-flow minutes
     drive_km: np.ndarray
     profiles: dict
+    served_cache: dict = field(default_factory=dict, repr=False)
 
 
 def load_market(market: str) -> Market:
@@ -143,15 +144,33 @@ def assign_tracts(m: Market, design: Design, closed: int | None = None) -> np.nd
     return np.argmin(times, axis=0)
 
 
-def busiest_hub(m: Market, design: Design) -> int:
-    hh = np.bincount(assign_tracts(m, design), weights=m.tracts["households"].to_numpy(), minlength=len(design.hubs))
+def served_tracts(m: Market, design: Design, a: dict) -> np.ndarray:
+    """Tracts in the ZIP codes this layout serves (coverage.households_served). All stations count as open: a
+    station outage does not change which ZIPs the network has promised to serve."""
+    target = (a.get("coverage") or {}).get("households_served", 1.0)
+    if target >= 1.0 or "zip" not in m.tracts:
+        return np.ones(len(m.tracts), dtype=bool)
+    key = (design.name, round(float(target), 6))
+    if key not in m.served_cache:
+        sites = [int(np.flatnonzero(m.site_rank == h["site"])[0]) for h in design.hubs]
+        m.served_cache[key] = choose_zips(m.drive_min[sites].min(axis=0), m.tracts["households"].to_numpy(),
+                                          m.tracts["zip"].to_numpy(), target)
+    return m.served_cache[key]
+
+
+def busiest_hub(m: Market, design: Design, a: dict | None = None) -> int:
+    """The station serving the most households in served ZIPs (the one whose outage hurts most)."""
+    w = m.tracts["households"].to_numpy().astype(float)
+    if a is not None:
+        w = w * served_tracts(m, design, a)
+    hh = np.bincount(assign_tracts(m, design), weights=w, minlength=len(design.hubs))
     return int(hh.argmax())
 
 
 def generate_packages(m: Market, day: str, rng: np.random.Generator, a: dict, volume_multiplier: float) -> pd.DataFrame:
     """One day of new packages: tract, volume and linehaul wave, in truck unload order.
     Depends only on the random draws, never on the design (common random numbers)."""
-    lam = m.tracts["households"].to_numpy() * packages_per_household(a["demand"])
+    lam = m.tracts["households"].to_numpy() * packages_per_household(a["demand"]) * coverage_share_factor(a)
     lam = lam * a["demand"]["day_of_week_multipliers"][day] * volume_multiplier
     tract = np.repeat(np.arange(len(lam)), rng.poisson(lam))
     sizes = list(a["demand"]["package_sizes"].values())
@@ -272,6 +291,12 @@ def simulate_day(m: Market, design: Design, day: str, a: dict, draws: DayDraws, 
     ops_rng = np.random.default_rng([*draws.seed, 1])
 
     new = generate_packages(m, day, pkg_rng, a, scenario["volume_multiplier"] * draws.volume_factor)
+    # Drawn for every generated package before unserved ZIPs are dropped, so every layout sees the same draws.
+    missed = pkg_rng.random(len(new)) < draws.handoff_share
+    served = served_tracts(m, design, a)
+    if not served.all():                    # packages for ZIPs outside the coverage list go to other carriers
+        keep = served[new["tract"].to_numpy()]
+        new, missed = new[keep].reset_index(drop=True), missed[keep]
     sites = [int(np.flatnonzero(m.site_rank == h["site"])[0]) for h in design.hubs]
     tract_hub = assign_tracts(m, design, closed=outage_hub)
     closed_all = outage_hub is not None and len(design.hubs) == 1   # nowhere to reroute
@@ -281,7 +306,6 @@ def simulate_day(m: Market, design: Design, day: str, a: dict, draws: DayDraws, 
     hub_of_new = tract_hub[new["tract"].to_numpy()]
     site_of_new = np.array(sites)[hub_of_new]
     wave = new["wave"].to_numpy()
-    missed = pkg_rng.random(len(new)) < draws.handoff_share
     w2 = np.where(missed, np.minimum(wave + 1, len(wave_t) - 1), wave)
     arrive = wave_t[w2] + draws.truck_delay_h[site_of_new, w2]
     arrive = arrive + np.where(missed & (wave == len(wave_t) - 1), LAST_WAVE_MISS_HOURS, 0.0)
@@ -343,13 +367,13 @@ def simulate_day(m: Market, design: Design, day: str, a: dict, draws: DayDraws, 
         prof = {**m.profiles, "packages_per_stop": packages_per_stop(
             counts, m.profiles["stop_points"], rt["items_per_delivery"])}
         dx, dy = (m.tract_xy - m.site_xy[sites[h]]).T
-        built = build_routes(h, np.flatnonzero(tract_hub == h), counts, vols, prof,
+        built = build_routes(h, np.flatnonzero((tract_hub == h) & served), counts, vols, prof,
                              np.arctan2(dy, dx), m.drive_min[sites[h]], m.drive_km[sites[h]], rt)
         # Loading lanes: Dashers get staggered pickup slots, longest routes first. Each lane loads one route at a
         # time, taking that route's loading time; a route goes to the lane that frees up first. Later slots leave
         # (and finish) later; Dashers arrive at their slot, so they don't wait.
         lanes = hub_cfg["sizes"][design.hubs[h]["size"]]["loading_lanes"]
-        c_min, c_km = hub_commute(m, sites[h], tract_hub == h, rt, drv)
+        c_min, c_km = hub_commute(m, sites[h], (tract_hub == h) & served, rt, drv)
         floor = a["objective"]["driver_net_per_hour_floor"] if drv.get("raise_base_to_floor") else None
         priced = sorted((price_route(r, rt, drv, c_min, c_km, floor) for r in built), key=lambda r: -r["minutes"])
         lane_free = [0.0] * lanes
@@ -537,7 +561,7 @@ def summarize_day(m, design, day, a, routes, tract, volume, is_carry, pkg_hub, s
 def simulate_week(m: Market, design: Design, week: list[DayDraws], a: dict, scenario: dict) -> dict:
     """Seven days in a row; late packages carry over. Returns weekly metrics."""
     outage_day = scenario.get("outage_day")
-    outage = busiest_hub(m, design) if outage_day else None
+    outage = busiest_hub(m, design, a) if outage_day else None
     carry, days = None, []
     for day, draws in zip(DAYS, week):
         res = simulate_day(m, design, day, a, draws, scenario, carry, outage if day == outage_day else None,
@@ -615,7 +639,7 @@ def main() -> None:
     avg = average_day(len(m.site_rank), len(a["schedule"]["linehaul_waves"]), a)
     results = []
     for d in designs:
-        outage = busiest_hub(m, d) if scenario.get("outage_day") == args.day else None
+        outage = busiest_hub(m, d, a) if scenario.get("outage_day") == args.day else None
         results.append(simulate_day(m, d, args.day, a, avg, scenario, outage_hub=outage))
     for res in results:
         print_day(res)
