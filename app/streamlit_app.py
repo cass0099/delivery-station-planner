@@ -302,10 +302,13 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
   .app-sub {{ font-size: 13px; line-height: 1.4; }}
   /* Menu: the explanation pages and assumption steps form one swipeable row with an arrow at its right edge;
      Run simulation, Results and Reset sit on their own row underneath. */
-  .st-key-nav {{ flex-direction: column !important; flex-wrap: nowrap !important; align-items: stretch !important;
-    justify-content: flex-start !important; gap: 4px !important; padding: 8px 0 6px !important; height: auto !important; }}
-  .st-key-nav > :has(> .st-key-nav_scroll) {{ display: block !important; width: 100% !important; height: auto !important;
-    min-height: 0 !important; margin: 0 !important; padding: 0 !important; }}
+  /* A strict two-row grid: row 1 is the swipe row, row 2 the run row. Anything else Streamlit puts inside the menu
+     is hidden, so nothing can open a gap between the rows. */
+  .st-key-nav {{ display: grid !important; grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto;
+    row-gap: 4px !important; column-gap: 0 !important; align-content: start !important; align-items: start !important;
+    justify-items: start; padding: 8px 0 6px !important; height: auto !important; min-height: 0 !important; }}
+  .st-key-nav > :not(.st-key-nav_scroll):not(.st-key-nav_run) {{ display: none !important; }}
+  .st-key-nav > .st-key-nav_scroll {{ justify-self: stretch; }}
   .st-key-nav_scroll {{ display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
     align-items: center !important; height: 40px !important; min-height: 0 !important; flex: 0 0 auto !important;
     overflow-x: auto; overflow-y: hidden; gap: 6px !important; width: auto !important; max-width: none !important;
