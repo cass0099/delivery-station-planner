@@ -307,8 +307,14 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
   .st-key-nav {{ display: grid !important; grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto;
     row-gap: 4px !important; column-gap: 0 !important; align-content: start !important; align-items: start !important;
     justify-items: start; padding: 8px 0 6px !important; height: auto !important; min-height: 0 !important; }}
-  .st-key-nav > :not(.st-key-nav_scroll):not(.st-key-nav_run) {{ display: none !important; }}
-  .st-key-nav > .st-key-nav_scroll {{ justify-self: stretch; }}
+  /* Each row sits inside a wrapper element: size the wrappers to their row and nothing more. */
+  .stApp .st-key-nav > :is(.st-key-nav_scroll, :has(.st-key-nav_scroll)) {{ justify-self: stretch; width: auto !important;
+    min-width: 0 !important; max-width: none !important; }}
+  .st-key-nav > :is(.st-key-nav_run, :has(.st-key-nav_run)) {{ justify-self: start; }}
+  .st-key-nav > :has(.st-key-nav_scroll), .st-key-nav > :has(.st-key-nav_run) {{ display: block !important;
+    height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; flex: none !important; }}
+  .st-key-nav > :not(.st-key-nav_scroll):not(.st-key-nav_run):not(:has(.st-key-nav_scroll)):not(:has(.st-key-nav_run)) {{
+    display: none !important; }}
   .st-key-nav_scroll {{ display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
     align-items: center !important; height: 40px !important; min-height: 0 !important; flex: 0 0 auto !important;
     overflow-x: auto; overflow-y: hidden; gap: 6px !important; width: auto !important; max-width: none !important;
