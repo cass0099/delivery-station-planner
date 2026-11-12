@@ -98,7 +98,7 @@ header[data-testid="stHeader"], #MainMenu, footer, [data-testid="stSidebarCollap
   /* Frozen at the top of the window while the page scrolls underneath. */
   position: sticky; top: 0; z-index: 1000; background: #fff; padding: 10px 0 !important;
   box-shadow: 0 1px 0 {LINE}; }}
-.st-key-mnav {{ display: none !important; }}
+.st-key-nav_scroll, .st-key-nav > :has(> .st-key-nav_scroll) {{ display: contents !important; }}
 .st-key-nav_about, .st-key-nav_assume, .st-key-nav_run {{ flex-wrap: nowrap !important; flex: 0 0 auto !important;
   gap: 2px !important; align-items: center; }}
 .st-key-nav_assume {{ background: {PANEL}; border-radius: 999px; padding: 4px 6px 4px 16px !important; }}
@@ -278,25 +278,30 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
   .masthead svg {{ width: 28px; height: 28px; }}
   .app-name {{ font-size: 17px; }}
   .app-sub {{ font-size: 13px; line-height: 1.4; }}
-  /* Menu: the pill row is replaced by one full-width button that names the current page and opens the list. */
-  .st-key-nav {{ display: none !important; }}
-  .st-key-mnav {{ display: block !important; position: sticky; top: 0; z-index: 1000; background: #fff;
-    padding: 8px 0 10px; box-shadow: 0 1px 0 {LINE}; }}
-  .st-key-mnav [data-testid="stPopoverButton"] {{ width: 100%; justify-content: flex-start !important; text-align: left; border-radius: 12px !important;
-    background: {PANEL} !important; border: 1px solid {PANEL} !important; color: {INK} !important; min-height: 46px;
-    font-size: 15px !important; font-weight: 700 !important; padding: 10px 14px !important; }}
-  .st-key-mnav [data-testid="stPopoverButton"] p {{ white-space: nowrap !important; }}
-  .st-key-mnav [data-testid="stPopoverButton"] > div:last-child {{ margin-left: auto; }}
-  [data-testid="stPopoverBody"] {{ min-width: calc(100vw - 32px) !important; max-height: 75vh; overflow-y: auto;
-    padding: 6px 10px 10px !important; border-radius: 14px !important; }}
-  .mnav-group {{ font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: {MUTED};
-    margin: 12px 4px 2px; }}
-  [data-testid="stPopoverBody"] .stButton > button[kind="tertiary"] {{ justify-content: flex-start; width: 100%;
-    padding: 11px 12px !important; min-height: 44px; border-radius: 10px; font-size: 15.5px !important;
-    font-weight: 600 !important; color: {INK} !important; text-decoration: none !important; }}
-  [data-testid="stPopoverBody"] .stButton > button[kind="tertiary"]:hover {{ background: {PANEL}; }}
-  [data-testid="stPopoverBody"] .stButton > button[kind="tertiary"]:disabled {{ color: #c4c4c4 !important; background: none; }}
-  .st-key-m_reset .stButton > button[kind="tertiary"], .st-key-m_reset button {{ color: {RED} !important; }}
+  /* Menu: the explanation pages and assumption steps form one swipeable row with an arrow at its right edge;
+     Run simulation, Results and Reset sit on their own row underneath. */
+  .st-key-nav {{ flex-direction: column !important; flex-wrap: nowrap !important; align-items: stretch !important;
+    gap: 6px !important; padding: 8px 0 !important; }}
+  .st-key-nav > :has(> .st-key-nav_scroll) {{ display: block !important; width: 100% !important; }}
+  .st-key-nav_scroll {{ display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+    overflow-x: auto; overflow-y: hidden; gap: 6px !important; width: auto !important; max-width: none !important;
+    margin: 0 -16px; padding: 0 44px 0 16px !important; scrollbar-width: none; -webkit-overflow-scrolling: touch; }}
+  .st-key-nav_scroll::-webkit-scrollbar {{ display: none; }}
+  .st-key-nav::after {{ content: "›"; position: absolute; top: 8px; right: -16px; width: 52px; height: 38px;
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 14px; box-sizing: border-box;
+    font-size: 26px; font-weight: 700; line-height: 1; color: {INK}; pointer-events: none;
+    background: linear-gradient(to right, rgba(255,255,255,0), #fff 55%); }}
+  .st-key-nav.at-end::after {{ content: none; }}
+  .st-key-nav_run {{ padding-left: 0 !important; }}
+  /* Nothing in the menu may shrink: each group and item keeps its full width, and the row scrolls instead. */
+  .st-key-nav_about, .st-key-nav_assume, .st-key-nav_run,
+  .st-key-nav [data-testid="stElementContainer"], .st-key-nav .stButton, .st-key-nav button {{
+    flex: 0 0 auto !important; width: max-content !important; min-width: max-content !important;
+    max-width: none !important; }}
+  .st-key-nav button, .st-key-nav button p {{ white-space: nowrap !important; }}
+  .st-key-nav button {{ font-size: 13px !important; padding: 6px 10px !important; }}
+  .st-key-nav_assume {{ padding: 3px 4px 3px 12px !important; }}
+  .nav-group {{ font-size: 12px; padding-right: 8px; }}
   hr.nav {{ margin: 4px 0 20px; }}
   /* Type */
   .q {{ font-size: 24px; line-height: 1.2; }}
@@ -1753,8 +1758,25 @@ MARK = ('<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">'
         '<circle cx="24" cy="23" r="3" fill="#fff"/></svg>')
 st.html(f'<div class="masthead">{MARK}<div><div class="app-name">Delivery Station Planner</div>'
         '<div class="app-sub">Simulate next-day DoorDash Parcel delivery in Minneapolis–St. Paul and find the '
-        'cheapest network of delivery stations that still delivers on time.</div></div></div>')
-
+        'cheapest network of delivery stations that still delivers on time.</div></div></div>'
+        # Phones only: scroll the swipeable menu so the current page's item is in view (desktop menus wrap instead).
+        f"""<script>(function(){{
+  if (!window.matchMedia('(max-width: 640px)').matches) return;
+  var tries = 0;
+  (function center(){{
+    var nav = document.querySelector('.st-key-nav'), row = document.querySelector('.st-key-nav_scroll');
+    if (!nav || !row) {{ if (tries++ < 20) setTimeout(center, 100); return; }}
+    var b = row.querySelector('.st-key-nav{page} button');
+    if (b) {{
+      var r = b.getBoundingClientRect(), n = row.getBoundingClientRect();
+      row.scrollLeft += (r.left - n.left) - (n.width - r.width) / 2;
+    }}
+    var mark = function() {{
+      nav.classList.toggle('at-end', row.scrollLeft + row.clientWidth >= row.scrollWidth - 4); }};
+    if (!row.dataset.watch) {{ row.dataset.watch = '1'; row.addEventListener('scroll', mark, {{passive: true}}); }}
+    mark();
+  }})();
+}})();</script>""", unsafe_allow_javascript=True)
 def nav_item(i: int) -> None:
     """Every item is the same kind of element (a button), so clicking never changes the row's layout.
     The current page is styled through its key; Results stays disabled until there is a run."""
@@ -1764,7 +1786,6 @@ def nav_item(i: int) -> None:
 
 # Style the current page's menu item (bold, underlined) without changing its size.
 st.html(f"""<style>
-.st-key-m{page} button, .st-key-m{page} button:hover,
 .st-key-nav{page} button, .st-key-nav{page} button:hover {{ background: {INK} !important; color: #fff !important;
   font-weight: 700 !important; text-decoration: none !important; cursor: default; }}
 </style>""")
@@ -1785,32 +1806,13 @@ def nav_group(g: str, idxs, title: str | None) -> None:
                       disabled=not changed(), help="Set every assumption back to its default value.")
 
 
+# On desktop the scroll wrapper is invisible (display: contents), so all three groups share one wrapping row.
+# On phones the explanation pages and assumption steps become one swipeable row, with the run group on its own row.
 with st.container(key="nav", horizontal=True, vertical_alignment="center"):
-    for g, idxs, title in NAV_GROUPS:
-        nav_group(g, idxs, title)
-
-
-def phone_go(i: int) -> None:
-    st.session_state.page = i
-    st.session_state["mmenu"] = False          # close the phone menu after a choice
-
-
-def phone_reset() -> None:
-    reset_all()
-    st.session_state["mmenu"] = False
-
-
-# Phones only (hidden on desktop by CSS): one full-width button naming the current page opens the whole menu as a list.
-PHONE_GROUPS = {"about": "About", "assume": "Assumptions", "run": "Run"}
-with st.container(key="mnav"):
-    with st.popover(names[page], key="mmenu", on_change="rerun", width="stretch", icon=":material/menu:"):
-        for g, idxs, _ in NAV_GROUPS:
-            st.html(f'<div class="mnav-group">{PHONE_GROUPS[g]}</div>')
-            for i in idxs:
-                st.button(names[i], key=f"m{i}", type="tertiary", on_click=phone_go, args=(i,), width="stretch",
-                          disabled=(i == RESULTS and not has_result))
-        st.button("↺ Reset to defaults", key="m_reset", type="tertiary", on_click=phone_reset, width="stretch",
-                  disabled=not changed())
+    with st.container(key="nav_scroll", horizontal=True, vertical_alignment="center"):
+        for g, idxs, title in NAV_GROUPS[:2]:
+            nav_group(g, idxs, title)
+    nav_group(*NAV_GROUPS[2])
 st.html('<hr class="nav under-menu">')
 
 a = settings()
