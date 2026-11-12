@@ -25,6 +25,28 @@ from branca.element import MacroElement, Template
 from streamlit_folium import st_folium
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+
+def _reload_if_engine_changed() -> None:
+    """After a deploy, Streamlit reruns the new app script but keeps the engine modules (and anything cached) from the
+    old code in memory, so new app code can call old engine code. When any engine file or assumptions.yaml has changed
+    since the last run in this process, drop the engine modules so they import fresh, and clear the caches."""
+    root = Path(__file__).resolve().parents[1]
+    files = sorted((root / "engine").glob("*.py")) + [root / "assumptions.yaml"]
+    stamp = tuple((f.name, f.stat().st_mtime_ns, f.stat().st_size) for f in files)
+    holder = sys.modules.get("_engine_stamp")
+    if holder is None:
+        import types
+        holder = sys.modules["_engine_stamp"] = types.ModuleType("_engine_stamp")
+    if getattr(holder, "stamp", stamp) != stamp:
+        for name in [n for n in sys.modules if n == "engine" or n.startswith("engine.")]:
+            del sys.modules[name]
+        st.cache_data.clear()
+        st.cache_resource.clear()
+    holder.stamp = stamp
+
+
+_reload_if_engine_changed()
 from engine.demand import DAYS
 from engine.search import objective_for
 from engine.live import estimate_seconds, load_baseline, planned_weeks, quick_estimate, run as live_run, screen_all, settings_hash
