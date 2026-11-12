@@ -281,18 +281,22 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
   /* Menu: the explanation pages and assumption steps form one swipeable row with an arrow at its right edge;
      Run simulation, Results and Reset sit on their own row underneath. */
   .st-key-nav {{ flex-direction: column !important; flex-wrap: nowrap !important; align-items: stretch !important;
-    gap: 6px !important; padding: 8px 0 !important; }}
-  .st-key-nav > :has(> .st-key-nav_scroll) {{ display: block !important; width: 100% !important; }}
+    justify-content: flex-start !important; gap: 4px !important; padding: 8px 0 6px !important; height: auto !important; }}
+  .st-key-nav > :has(> .st-key-nav_scroll) {{ display: block !important; width: 100% !important; height: auto !important;
+    min-height: 0 !important; margin: 0 !important; padding: 0 !important; }}
   .st-key-nav_scroll {{ display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+    align-items: center !important; height: 40px !important; min-height: 0 !important; flex: 0 0 auto !important;
     overflow-x: auto; overflow-y: hidden; gap: 6px !important; width: auto !important; max-width: none !important;
     margin: 0 -16px; padding: 0 44px 0 16px !important; scrollbar-width: none; -webkit-overflow-scrolling: touch; }}
   .st-key-nav_scroll::-webkit-scrollbar {{ display: none; }}
-  .st-key-nav::after {{ content: "›"; position: absolute; top: 8px; right: -16px; width: 52px; height: 38px;
+  .st-key-nav::after {{ content: "›"; position: absolute; top: 8px; right: -16px; width: 52px; height: 40px;
     display: flex; align-items: center; justify-content: flex-end; padding-right: 14px; box-sizing: border-box;
     font-size: 26px; font-weight: 700; line-height: 1; color: {INK}; pointer-events: none;
     background: linear-gradient(to right, rgba(255,255,255,0), #fff 55%); }}
   .st-key-nav.at-end::after {{ content: none; }}
-  .st-key-nav_run {{ padding-left: 0 !important; }}
+  .st-key-nav_run {{ padding: 0 !important; margin: 0 !important; height: 34px !important; min-height: 0 !important;
+    align-items: center !important; }}
+  .st-key-nav_run .stButton > button[kind="tertiary"] {{ padding: 6px 10px !important; }}
   /* Nothing in the menu may shrink: each group and item keeps its full width, and the row scrolls instead. */
   .st-key-nav_about, .st-key-nav_assume, .st-key-nav_run,
   .st-key-nav [data-testid="stElementContainer"], .st-key-nav .stButton, .st-key-nav button {{
@@ -1772,9 +1776,11 @@ st.html(f'<div class="masthead">{MARK}<div><div class="app-name">Delivery Statio
       row.scrollLeft += (r.left - n.left) - (n.width - r.width) / 2;
     }}
     var mark = function() {{
-      nav.classList.toggle('at-end', row.scrollLeft + row.clientWidth >= row.scrollWidth - 4); }};
+      nav.classList.toggle('at-end', row.scrollWidth > row.clientWidth + 4 &&
+                                     row.scrollLeft + row.clientWidth >= row.scrollWidth - 4); }};
     if (!row.dataset.watch) {{ row.dataset.watch = '1'; row.addEventListener('scroll', mark, {{passive: true}}); }}
-    mark();
+    nav.classList.remove('at-end');
+    setTimeout(mark, 600);
   }})();
 }})();</script>""", unsafe_allow_javascript=True)
 def nav_item(i: int) -> None:
