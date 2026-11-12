@@ -276,7 +276,7 @@ peak_flex:
 # Partner-carrier overflow: packages a station cannot sort by the cut-off (peak volume, a station outage) go to a
 # partner carrier instead of waiting a day (assumption; typical negotiated ground rates, not a quote).
 partner:
-  enabled: false                     # off by default; switch on in step 5 to test it
+  enabled: false                     # off by default; switch it on in the Disruptions step to test it
   cost_per_package: 6.00
   max_share_of_day: 0.15             # at most this share of the day's packages can go to the partner
   on_time_rate: 0.95                 # share of partner-delivered packages that arrive on time

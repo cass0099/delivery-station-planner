@@ -432,6 +432,7 @@ def run_store() -> dict:
 A0 = defaults()
 CTL = A0["app_controls"]
 STEPS = CTL["steps"]
+STEP_NO = {st_["key"]: i for i, st_ in enumerate(STEPS, 1)}   # step numbers as the menu shows them
 CONTROLS = {c["path"]: c for s in STEPS for c in s["controls"]}
 PCT = {"pct", "pct1"}
 
@@ -570,16 +571,16 @@ def hint(path: str, a: dict) -> str | None:
         served, kept = cov["households_served"], coverage_share_factor(a)
     if path == "coverage.households_served":
         if served >= 1:
-            return (f"At 100%, the network delivers to every ZIP code in the metro, about {round(per_day, -2):,.0f} "
-                    "packages on an average day.")
+            return (f"At 100%, the network delivers to every ZIP code in the metro. It carries about "
+                    f"{round(per_day, -2):,.0f} packages on an average day.")
         return (f"The network delivers only to the ZIP codes closest to its stations, which are home to about "
                 f"{round(hh * served, -3):,.0f} households. Packages for other ZIP codes go to other carriers. The "
                 f"network carries about {round(per_day, -2):,.0f} packages on an average day.")
     if path == "coverage.share_kept_at_min":
-        why = ("Shippers prefer a carrier that covers most of the metro, so a carrier that serves fewer ZIP codes gets "
-               "fewer of their packages, even in the ZIP codes it does serve. This setting says how many fewer. At "
-               f"{cov['share_kept_at_min']:.0%}, a network that serves half the metro gets "
-               f"{cov['share_kept_at_min']:.0%} of the packages it would otherwise get there.")
+        why = ("Shippers prefer a carrier that covers most of the metro. A carrier that serves fewer ZIP codes gets "
+               "fewer of their packages in the ZIP codes it does serve. This setting says how many fewer. A network "
+               f"that serves half the metro gets {cov['share_kept_at_min']:.0%} of the packages it would otherwise "
+               "get there.")
         if served >= 1:
             return why + " It has no effect while the network serves the whole metro."
         return (why + f" At the current coverage of {served:.0%}, the network gets {kept:.0%} of the packages it "
@@ -663,7 +664,7 @@ def hint(path: str, a: dict) -> str | None:
         if dr.get("raise_base_to_floor"):
             return ("Every route is paid at least this much per hour after car costs. When a route would pay less, "
                     "its base pay is raised, and the extra pay counts in that station layout's cost.")
-        return ("Raising pay to the floor is switched off in step 3, so any station layout whose Dashers earn less "
+        return (f"Raising pay to the floor is switched off in step {STEP_NO['drivers']}, so any station layout whose Dashers earn less "
                 "than this in a typical week is ruled out.")
     if path == "uncertainty.truck_late_prob":
         n = len(a["schedule"]["linehaul_waves"]) * 7 * u["truck_late_prob"]
@@ -1500,7 +1501,7 @@ def method_page() -> None:
             f'{rt["max_packages_per_route"]} packages, and hold {rt["car_cargo_m3"] * _CUFT:.0f} cubic feet of '
             'cargo, which is about the usable space in a sedan. Loading a route at the station takes '
             f'{rt["hub_load_minutes"]:g} minutes plus {rt["hub_load_seconds_per_package"]:g} seconds per package.</p>'
-            '<p>You can give Dashers bigger vehicles in step 3, but bigger vehicles cost more to run, and fewer '
+            f'<p>You can give Dashers bigger vehicles in step {STEP_NO["drivers"]}, but bigger vehicles cost more to run, and fewer '
             'Dashers have them. Running costs rise from the IRS mileage rate for a sedan to an assumed rate for a '
             'cargo van. The share of Dashers with a vehicle of at least a given size is also a stated assumption, '
             'falling from all Dashers for a sedan to a few percent for a cargo van.</p>'
@@ -1511,7 +1512,7 @@ def method_page() -> None:
             f'${h["nnn_per_sqft_per_year"]:.2f} per square foot a year for them. Sort and loading '
             f'labor is paid ${h["sort_wage_per_hour"]:.2f} an hour, based on Bureau of Labor Statistics wages for '
             'material movers in the Minneapolis area. Dashers\' car costs use the IRS 2026 standard mileage rate. '
-            f'Fit-out, site opening costs and overhead are stated assumptions, and you can change them in step 2. Sort labor productivity rises with station size, from {h["sizes"]["small"].get("sort_packages_per_labor_hour", h["sort_packages_per_labor_hour"])} packages per labor hour at a small station to {h["sizes"]["large"].get("sort_packages_per_labor_hour", h["sort_packages_per_labor_hour"])} at a large one, because bigger stations can justify more automation. This is also a stated assumption.</p>'
+            f'Fit-out, site opening costs and overhead are stated assumptions, and you can change them in step {STEP_NO["hubs"]}. Sort labor productivity rises with station size, from {h["sizes"]["small"].get("sort_packages_per_labor_hour", h["sort_packages_per_labor_hour"])} packages per labor hour at a small station to {h["sizes"]["large"].get("sort_packages_per_labor_hour", h["sort_packages_per_labor_hour"])} at a large one, because bigger stations can justify more automation. This is also a stated assumption.</p>'
             '</div>')
     nav_buttons("Next: simulation methodology →")
 
@@ -1597,10 +1598,10 @@ def methodology_page() -> None:
             f'<p>In holiday peak weeks, each station can add temporary staff and longer shifts, which raises its '
             f'sort rate by {A0["peak_flex"]["sort_capacity_boost"]:.0%}. The extra volume is paid at the overtime '
             'rate, and each open station pays a weekly setup cost. Packages that are still not sorted at the '
-            'cut-off wait a day. In step 5 you can also switch on a partner carrier, which takes those packages '
-            f'instead, up to {A0["partner"]["max_share_of_day"]:.0%} of the day\'s packages at '
-            f'${A0["partner"]["cost_per_package"]:.2f} each, and delivers {A0["partner"]["on_time_rate"]:.0%} of '
-            'them on time. It is off by default.</p>'
+            f'cut-off wait a day. In step {STEP_NO["disruptions"]} you can also switch on a partner carrier, which '
+            f'takes those packages instead. It can take up to {A0["partner"]["max_share_of_day"]:.0%} of the day\'s '
+            f'packages at ${A0["partner"]["cost_per_package"]:.2f} each, and it delivers '
+            f'{A0["partner"]["on_time_rate"]:.0%} of them on time. It is off by default.</p>'
             '<p>At the cut-off, the model groups each station\'s sorted packages into routes. It sweeps around the station '
             'by direction and adds neighborhoods to a route until the route reaches its time, package or cargo '
             'limit. Each station loads routes through a fixed number of loading lanes, so Dashers receive staggered '
@@ -2054,7 +2055,7 @@ if page == 0:
         ("Where should packages be sorted, and how much capacity is needed?",
          "The model compares station counts and sizes, and it accounts for sort speed, staffing and overtime."),
         ("What delivery promise and cut-off times should the network set?",
-         "You can change the sort cut-off and the OTD targets in step 4."),
+         f"You can change the sort cut-off and the OTD targets in step {STEP_NO['service']}."),
         ("How much capacity is needed for peak season and disruptions?",
          "The model tests holiday peak weeks and station outage weeks, along with storms and late trucks."),
         ("Can routes be attractive to Dashers and still profitable?",
@@ -2245,11 +2246,11 @@ else:
     if feasible and run.get("tiers_tried", 1) > 1:
         if run.get("larger_reason") == "edge":
             sub += (f" The cheapest network of up to {WORDS.get(std_max, std_max)} stations that met every target had "
-                    f"{WORDS.get(std_max, std_max)} stations, so the model also tried larger networks, up to "
-                    f"{run.get('max_stations')} stations, in case one of them costs less.")
+                    f"{WORDS.get(std_max, std_max)} stations. A larger network might cost less, so the model also tried "
+                    f"networks of up to {run.get('max_stations')} stations.")
         else:
             sub += (f" No network of up to {WORDS.get(std_max, std_max)} stations met every target, so the model also "
-                    f"tried larger networks, up to {run.get('max_stations')} stations.")
+                    f"tried larger networks of up to {run.get('max_stations')} stations.")
     if not feasible:
         sub += ((f" This station layout meets every target in {yours['meets']} of {yours['of']} kinds of week."
                  if yours["meets"] else " This station layout misses at least one target in every kind of week.")
