@@ -253,8 +253,6 @@ table.jd th {{ text-align: left; font-weight: 600; color: {MUTED}; font-size: 13
 table.jd td {{ padding: 12px 12px 12px 0; border-bottom: 1px solid #f0f0f0; color: {BODY}; vertical-align: top;
               line-height: 1.5; }}
 table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-right: 32px; }}
-table.jd td.st {{ white-space: nowrap; font-size: 13px; color: {MUTED}; }}
-table.jd td.st.on {{ color: {BLUE}; font-weight: 600; }}
 .method h3 {{ font-size: 18px; font-weight: 700; color: {INK}; margin: 28px 0 8px; padding: 0; }}
 .method h3:first-child {{ margin-top: 0; }}
 .method p {{ font-size: 15.5px; line-height: 1.65; color: {BODY}; margin: 0 0 12px; max-width: 70ch; }}
@@ -1782,30 +1780,23 @@ if page == 0:
                           for h, b in steps) + '</div>')
 
     st.html('<hr class="nav" style="margin:40px 0 28px">')
-    on, nxt = '<td class="st on">Included now</td>', '<td class="st">Planned</td>'
     rows = [
         ("Where should packages be sorted, and how much capacity is needed?",
-         "The model compares station counts and sizes, and it accounts for sort speed, staffing and overtime.", on),
+         "The model compares station counts and sizes, and it accounts for sort speed, staffing and overtime."),
         ("What delivery promise and cut-off times should the network set?",
-         "You can change the sort cut-off and the OTD targets in step 4.", on),
+         "You can change the sort cut-off and the OTD targets in step 4."),
         ("How much capacity is needed for peak season and disruptions?",
-         "The model tests holiday peak weeks and station outage weeks, along with storms and late trucks.", on),
+         "The model tests holiday peak weeks and station outage weeks, along with storms and late trucks."),
         ("Can routes be attractive to Dashers and still profitable?",
          "The model sets route pay, raises it above the base rate when a route goes unaccepted, and enforces a minimum hourly pay "
-         "for Dashers.", on),
+         "for Dashers."),
         ("How do cost, speed, productivity, Dasher experience and reliability vary from week to week?",
          "The model reports cost per package, OTD, miles driven per package and Dasher pay as "
-         "ranges, showing both a typical week and a bad week.", on),
-        ("Should the network build, lease or partner in each city?",
-         "This will be added when the model expands to six markets.", nxt),
-        ("Where should packages enter the network, and how should long-distance trucking work with partner "
-         "carriers?",
-         "This will be added in the national layer, which covers shipper regions, entry points, long-haul "
-         "trucking and partner carriers.", nxt),
+         "ranges, showing both a typical week and a bad week."),
     ]
     st.html('<div class="section">What a network planner can use it for</div>'
-            '<table class="jd"><tr><th>Planning question</th><th>How the model handles it</th><th></th></tr>'
-            + "".join(f"<tr><td>{q}</td><td>{h}</td>{s}</tr>" for q, h, s in rows) + "</table>")
+            '<table class="jd"><tr><th>Planning question</th><th>How the model handles it</th></tr>'
+            + "".join(f"<tr><td>{q}</td><td>{h}</td></tr>" for q, h in rows) + "</table>")
 
 elif page == 1:
     method_page()
