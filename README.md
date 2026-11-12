@@ -36,7 +36,7 @@ This is a basic model. It covers one metro area, and the national layer of shipp
 
 ## Testing
 
-Besides the unit tests in `tests/`, three scripts in `tools/` test the model and the app as a visitor would use them. `tools/stress_test.py` sets every control to both ends of its range, then tries combined extremes and random combinations. For each case it runs the model, checks that every number is valid and that the pick is the cheapest layout meeting every target, and opens the app's pages with the result. `tools/widget_test.py` moves every slider in the app to both ends and checks the stored value in real units. `tools/app_flow_test.py` clicks through the app, runs a live simulation, stops a long one and resets the settings.
+Besides the unit tests in `tests/`, three scripts in `tools/` test the model and the app as a visitor would use them. `tools/stress_test.py` sets every control to both ends of its range, then tries combined extremes and random combinations. For each case it runs the model, checks that every number is valid and that the pick is the cheapest layout meeting every target, and opens the app's pages with the result. `tools/widget_test.py` moves every slider in the app to both ends and checks the stored value in real units. `tools/app_flow_test.py` clicks through the app, runs a live simulation, stops a long one and resets the settings. `tools/deploy_reload_test.py` changes the engine on disk while a process is running, as a deploy does, and checks that the next run's workers use the new code.
 
 A run that would take longer than 30 minutes on the server is turned off before it starts, and any run can be stopped, so one visitor cannot hold the server.
 

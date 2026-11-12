@@ -30,27 +30,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 def _reload_if_engine_changed() -> None:
     """After a deploy, Streamlit reruns the new app script but keeps the engine modules (and anything cached) from the
-    old code in memory, so new app code can call old engine code. When any engine file or assumptions.yaml has changed
-    since the last run in this process, drop the engine modules so they import fresh, and clear the caches."""
-    root = Path(__file__).resolve().parents[1]
-    files = sorted((root / "engine").glob("*.py")) + [root / "assumptions.yaml"]
-    stamp = tuple((f.name, f.stat().st_mtime_ns, f.stat().st_size) for f in files)
-    holder = sys.modules.get("_engine_stamp")
-    if holder is None:
-        import types
-        holder = sys.modules["_engine_stamp"] = types.ModuleType("_engine_stamp")
-    if getattr(holder, "stamp", stamp) != stamp:
-        # Reload in place, in import order, so every module object (and anything holding it, such as a run already
-        # in progress in another session) sees the new code rather than a copy that no longer matches sys.modules.
-        import importlib
-        order = ["config", "randomness", "demand", "routing", "simulation", "checks", "search", "live"]
-        loaded = [n for n in sys.modules if n.startswith("engine.")]
-        for name in [f"engine.{m}" for m in order if f"engine.{m}" in loaded] + \
-                [n for n in loaded if n.split(".", 1)[1] not in order]:
-            importlib.reload(sys.modules[name])
-        st.cache_data.clear()
-        st.cache_resource.clear()
-    holder.stamp = stamp
+    old code in memory, so new app code could call old engine code. engine.config records the engine files as they
+    were when it loaded. When they no longer match the files on disk, or the loaded engine is too old to record them,
+    reload every engine module in place and clear the caches."""
+    if "engine.config" not in sys.modules:
+        return                                       # first import in this process: everything loads fresh
+    import importlib
+    cfg = sys.modules["engine.config"]
+    current = getattr(cfg, "code_stamp", None)
+    if current is not None and getattr(cfg, "LOADED_STAMP", None) == current():
+        return
+    # Reload in place, in import order, so every module object (and anything holding it, such as a run already in
+    # progress in another session) sees the new code rather than a copy that no longer matches sys.modules.
+    order = ["config", "randomness", "demand", "routing", "simulation", "checks", "search", "live"]
+    loaded = [n for n in sys.modules if n.startswith("engine.")]
+    for name in [f"engine.{m}" for m in order if f"engine.{m}" in loaded] + \
+            [n for n in loaded if n.split(".", 1)[1] not in order]:
+        importlib.reload(sys.modules[name])
+    st.cache_data.clear()
+    st.cache_resource.clear()
 
 
 _reload_if_engine_changed()

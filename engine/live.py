@@ -104,9 +104,28 @@ def workers_memory_allows() -> int:
 
 # ---------------------------------------------------------------- workers
 
-def _init(market: str, a: dict) -> None:
+def _init(market: str, a: dict, stamp: tuple | None = None) -> None:
+    """Worker start-up. `stamp` is the app's engine version; a worker started from older code refuses to run."""
     global _M, _A
+    from engine import config
+    if stamp is not None and config.LOADED_STAMP != stamp:
+        raise RuntimeError("A run worker started with older engine code than the app. Start the run again.")
     _M, _A = load_market(market), a
+
+
+def _pool_context():
+    """The forkserver context, with a fresh server whenever the engine changed since the server started.
+    The forkserver loads the engine once, when it starts, and every worker is a copy of it. Under Streamlit it also
+    outlives deploys, so without a restart, workers after a deploy would run the engine from before it."""
+    import multiprocessing.forkserver as fs
+    from engine import config
+    if getattr(fs, "_engine_stamp", None) != config.LOADED_STAMP:
+        try:
+            fs._forkserver._stop()          # the next pool starts a new server, which loads the engine as it is now
+        except Exception:                   # noqa: BLE001  (no server running yet, or a Python without _stop)
+            pass
+        fs._engine_stamp = config.LOADED_STAMP
+    return multiprocessing.get_context("forkserver")
 
 
 def _job(job: tuple) -> tuple:
@@ -359,8 +378,9 @@ def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None =
     top = ctl["quick"]["top_designs_per_scenario"]
     # forkserver: workers start from a clean process, not a copy of this multi-threaded one (the web server, other
     # runs), which avoids rare fork deadlocks. It is the default on Python 3.14, which the hosted app uses.
-    pool = ProcessPoolExecutor(workers, mp_context=multiprocessing.get_context("forkserver"),
-                               initializer=_init, initargs=(market, a))
+    from engine import config
+    pool = ProcessPoolExecutor(workers, mp_context=_pool_context(), initializer=_init,
+                               initargs=(market, a, config.LOADED_STAMP))
     try:
         if mode == "quick":
             first = {sc: candidates(screens, top) for sc in scenarios}
