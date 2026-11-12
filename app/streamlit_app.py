@@ -101,6 +101,8 @@ header[data-testid="stHeader"], #MainMenu, footer, [data-testid="stSidebarCollap
   border-radius: 999px !important; cursor: pointer; transition: background .12s ease, color .12s ease !important; }}
 .st-key-nav button:hover {{ background: #ececec !important; color: {INK} !important; text-decoration: none !important; }}
 .st-key-nav_assume button:hover {{ background: #e2e2e2 !important; }}
+.st-key-nav_reset button {{ color: {RED} !important; }}
+.st-key-nav_reset button:disabled {{ color: #a6a6a6 !important; }}
 .st-key-nav button:disabled {{ color: #c4c4c4 !important; background: none !important; cursor: default; }}
 /* No grey-out fade while the next page renders, and no element fade-in: pages swap instantly. */
 [data-stale="true"], .stale-element {{ opacity: 1 !important; transition: none !important; }}
@@ -713,6 +715,11 @@ def reset_step(step: dict):
     for c in step["controls"]:
         vals[c["path"]] = copy.deepcopy(get_path(A0, c["path"]))
         st.session_state.pop(f"w:{c['path']}", None)
+
+
+def reset_all():
+    for step in STEPS:
+        reset_step(step)
 
 
 # ---------------------------------------------------------------- names and charts
@@ -1642,6 +1649,9 @@ with st.container(key="nav", horizontal=True, vertical_alignment="center"):
                 st.html(f'<span class="nav-group">{title}</span>')
             for i in idxs:
                 nav_item(i)
+            if g == "run":
+                st.button("↺ Reset to defaults", key="nav_reset", type="tertiary", on_click=reset_all,
+                          disabled=not changed(), help="Set every assumption back to its default value.")
 st.html('<hr class="nav under-menu">')
 
 a = settings()
