@@ -98,11 +98,12 @@ class Design:
         return " + ".join(f"#{h['site']} {h['size']}" for h in self.hubs)
 
 
-def design_grid(a: dict | None = None) -> list[Design]:
-    """The hand-picked design list: k hubs at the top-k sites, one size, plus big-first-hub variants."""
+def design_grid(a: dict | None = None, counts: list[int] | None = None) -> list[Design]:
+    """The hand-picked design list: k hubs at the top-k sites, one size, plus big-first-hub variants.
+    `counts` picks the hub counts (default: design_grid.hub_counts, the standard list)."""
     g = (a or load_assumptions())["design_grid"]
     sizes, out = g["sizes"], []
-    for k in g["hub_counts"]:
+    for k in (g["hub_counts"] if counts is None else counts):
         for i, size in enumerate(sizes):
             out.append(Design(f"{k}x {size}", [{"site": s + 1, "size": size} for s in range(k)]))
             if g["big_first_hub_variants"] and k >= 2 and i + 1 < len(sizes):
@@ -111,11 +112,26 @@ def design_grid(a: dict | None = None) -> list[Design]:
     return out
 
 
+def design_tiers(a: dict, n_sites: int | None = None) -> list[list[Design]]:
+    """The standard list first, then each group of larger networks tried when nothing in the earlier ones
+    meets every target. Networks with more stations than candidate sites are left out."""
+    g = a["design_grid"]
+    groups = [g["hub_counts"]] + g.get("larger_networks", [])
+    tiers = []
+    for counts in groups:
+        counts = [k for k in counts if n_sites is None or k <= n_sites]
+        if counts:
+            tiers.append(design_grid(a, counts))
+    return tiers
+
+
 def get_design(name: str, a: dict | None = None) -> Design:
-    for d in design_grid(a):
-        if d.name == name:
-            return d
-    raise KeyError(f"Unknown design '{name}'. Known: {[d.name for d in design_grid(a)]}")
+    a = a or load_assumptions()
+    for tier in design_tiers(a):
+        for d in tier:
+            if d.name == name:
+                return d
+    raise KeyError(f"Unknown design '{name}'.")
 
 
 def assign_tracts(m: Market, design: Design, closed: int | None = None) -> np.ndarray:

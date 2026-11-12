@@ -94,6 +94,9 @@ design_grid:
   hub_counts: [1, 2, 3, 4]
   sizes: [small, medium, large]
   big_first_hub_variants: true
+  # When no layout above meets every OTD target, a run tries these larger networks, one group at a time, and stops
+  # at the first group where a layout meets every target. Capped at the number of candidate sites (25 in MSP).
+  larger_networks: [[5, 6], [8, 10], [12, 15]]
 
 # Next-day service. Times are "D-1 HH:MM" (evening before) or "D HH:MM" (delivery day).
 schedule:

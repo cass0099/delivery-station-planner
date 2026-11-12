@@ -296,3 +296,30 @@ def test_station_costs_include_fitout_by_size_and_building_charges():
     without = {**h, "nnn_per_sqft_per_year": 0.0}
     assert hub_fixed_cost_per_day(small, h) > hub_fixed_cost_per_day(small, without)
     assert h["sizes"]["large"]["fitout_per_sqft"] > h["sizes"]["small"]["fitout_per_sqft"]
+
+
+def _frame(rows):
+    """Minimal per-scenario summary: design -> (cost, OTD typical, share of weeks meeting the floor, feasible)."""
+    import pandas as pd
+    return pd.DataFrame([{"design": d, "hubs": d, "cost_p50": c, "on_time_p50": ot, "weeks_meeting_service": w,
+                          "feasible": f, "storm_on_time_p50": ot} for d, c, ot, w, f in rows]).set_index("design")
+
+
+def test_year_round_pick_puts_otd_before_cost():
+    from engine.search import year_round_table
+    a = {**A, "weeks_per_year": {"normal": 1}}
+    # Nothing meets the targets: the closer layout ranks first even though it costs more.
+    t = year_round_table({"normal": _frame([("cheap", 2.0, 0.90, 0.40, False), ("close", 3.0, 0.975, 0.93, False)])}, a)
+    assert t.index[0] == "close" and not t["meets_all"].iloc[0]
+    # One layout meets the targets: it wins over a cheaper one that misses.
+    t = year_round_table({"normal": _frame([("cheap", 2.0, 0.90, 0.40, False), ("ok", 3.0, 0.99, 0.99, True)])}, a)
+    assert t.index[0] == "ok" and t["meets_all"].iloc[0]
+
+
+def test_larger_networks_come_after_the_standard_list():
+    from engine.simulation import design_tiers
+    tiers = design_tiers(A, n_sites=25)
+    assert [d.name for d in tiers[0]] == [d.name for d in design_grid(A)]
+    assert min(len(d.hubs) for d in tiers[1]) > max(len(d.hubs) for d in tiers[0])
+    assert all(len(d.hubs) <= 25 for t in tiers for d in t)
+    assert len(get_design("8x medium", A).hubs) == 8

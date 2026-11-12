@@ -42,7 +42,8 @@ NAVY = "#233069"
 RED, RED_BRIGHT, RED_DARK = "#eb1700", "#ff3008", "#c81400"
 HUB_COLORS = [BLUE, CORAL, TEAL, GOLD]
 WEEK_COLORS = {"normal": BLUE, "holiday_peak": CORAL, "hub_outage": TEAL}
-WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven"}
+WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
+         10: "ten", 11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen"}
 SCEN = {"normal": "Normal week", "holiday_peak": "Holiday peak", "hub_outage": "Station outage"}
 # Esri light gray canvas: clean, needs no API key (CARTO's basemaps now require one). Labels sit in a separate
 # layer drawn above the shaded tracts so place names stay readable.
@@ -979,6 +980,41 @@ def missed_target(r, obj: dict) -> str:
     return "Misses " + " and ".join(names) if names else "Misses a target"
 
 
+def diagnosis_text(dg: dict | None, a: dict) -> str:
+    """Why no network meets the targets, in plain sentences: the target missed by the most, the best any network
+    reached, and the main reason packages are late."""
+    if not dg:
+        return ""
+    kind = {"normal": "a normal week", "holiday_peak": "a holiday peak week",
+            "hub_outage": "a station outage week"}.get(dg["scenario"], "a week")
+    kinds = {"normal": "normal weeks", "holiday_peak": "holiday peak weeks",
+             "hub_outage": "station outage weeks"}.get(dg["scenario"], "weeks")
+    if dg["target"] == "OTD target":
+        miss = (f"The hardest target is the OTD target in {kind}. The best any network reached was "
+                f"{dg['best']:.1%} OTD in a typical week, against a target of {dg['need']:.1%}.")
+    else:
+        obj = objective_for(a, dg["scenario"])
+        miss = (f"The hardest target is the OTD floor in {kinds}. The best any network reached was "
+                f"{dg['best']:.0%} of weeks at {obj['on_time_target']:.0%} OTD or better, against a floor of "
+                f"{dg['need']:.0%} of weeks.")
+    late, sort_miss = dg["late_share"], dg["sort_miss_share"]
+    why = {
+        "late_trucks": (f"In the closest network, {late:.1%} of packages are late in a typical week, and "
+                        f"{sort_miss:.1%} miss the sort cut-off even though the stations use only about "
+                        f"{dg['sort_utilization_p90']:.0%} of their sort capacity in a busy week. Those packages arrive on late "
+                        "trucks or miss their truck upstream, so adding stations cannot fix them. A later sort "
+                        "cut-off, fewer late trucks or a lower target would."),
+        "sort_capacity": (f"In the closest network, {late:.1%} of packages are late in a typical week, and "
+                          f"{sort_miss:.1%} miss the sort cut-off because the stations run out of sort capacity. "
+                          "Faster sorting, a later cut-off or more peak flex would help."),
+        "dashers": (f"In the closest network, {dg['unclaimed']:.1%} of routes go unclaimed in a typical week. More "
+                    "Dashers or higher base pay would help."),
+        "routes": (f"In the closest network, {late:.1%} of packages are late in a typical week, mostly because routes "
+                   "finish after the 8 p.m. delivery deadline. Shorter routes or more Dashers would help."),
+    }[dg["cause"]]
+    return f"{miss} {why}"
+
+
 def scorecard(run: dict, a: dict, pick: str) -> str:
     """One table that brings the three kinds of week together: year cost, a tick or cross per kind of week,
     and a verdict."""
@@ -1017,7 +1053,7 @@ def scorecard(run: dict, a: dict, pick: str) -> str:
                 cells += f'<td class="no"><span class="x">✗</span>{text}</td>'
         cost = r["year_cost_per_package"]
         if d == pick:
-            verdict, cls = "<b>Recommended</b>", "pick"
+            verdict, cls = ("<b>Recommended</b>" if not failed else "<b>Closest to the OTD targets</b>"), "pick"
         elif not failed:
             verdict, cls = f"Meets every target, {abs(cost - best) * 100:.1f}¢ more per package", ""
         else:
@@ -1073,11 +1109,11 @@ def short_miss(name: str, r, obj: dict, kind: str = "") -> str:
             f"${obj['driver_net_per_hour_floor']:.0f} floor.")
 
 
-def cost_chart(d: pd.DataFrame, pick: str, obj: dict) -> alt.Chart:
+def cost_chart(d: pd.DataFrame, pick: str, obj: dict, pick_word: str = "recommended") -> alt.Chart:
     d = d.rename_axis("design").reset_index()
     d["name"] = d["hubs"].map(plain)
     d["status"] = ["pick" if x == pick else ("meets" if f else "misses") for x, f in zip(d["design"], d["feasible"])]
-    d["label"] = [money(r["cost_p50"]) + ("   recommended" if s == "pick" else
+    d["label"] = [money(r["cost_p50"]) + (f"   {pick_word}" if s == "pick" else
                                           f"   {missed_target(r, obj)}" if s == "misses" else "")
                   for (_, r), s in zip(d.iterrows(), d["status"])]
     d["why"] = [" ".join(x for _, x in missed_targets(r, obj)) or "Meets every target." for _, r in d.iterrows()]
@@ -1853,8 +1889,11 @@ elif page == RESULTS - 1:
     tab_est, tab_quick, tab_full = st.tabs(["Instant estimate", "Quick run", "Full run"])
     with tab_est:
         est = quick_estimate(a, si["screens"])
-        st.html('<div class="tab-body"><div class="note" style="max-width:75ch">On an average day without '
-                'disruptions, the cheapest station layout that meets the targets is '
+        lead = ('On an average day without disruptions, the cheapest station layout that meets the OTD targets is '
+                if est.get("passes_all", True) else
+                'On an average day without disruptions, no station layout the model tried meets the OTD targets. The '
+                'closest is ')
+        st.html('<div class="tab-body"><div class="note" style="max-width:75ch">' + lead +
                 f'<b>{spoken(get_design(est["design"], a).label())}</b>, at about {money(est["year_cost"])} per '
                 'package.</div><div class="note" style="max-width:75ch">This estimate takes under a second because it '
                 'skips the random weeks. Late trucks, Dasher no-shows and swings in volume often mean the network '
@@ -1913,8 +1952,15 @@ else:
     else:
         sub = ("You can change any assumption in the earlier steps and run the simulation again to see how the "
                "recommendation changes.")
+    std_max = max(ra["design_grid"]["hub_counts"])
+    if feasible and run.get("tiers_tried", 1) > 1:
+        sub += (f" No network of up to {WORDS.get(std_max, std_max)} stations met every target, so the model also "
+                f"tried larger networks, up to {run.get('max_stations')} stations.")
     if not feasible:
-        sub += f" This station layout meets every target in {yours['meets']} of {yours['of']} kinds of week."
+        sub += ((f" This station layout meets every target in {yours['meets']} of {yours['of']} kinds of week."
+                 if yours["meets"] else " This station layout misses at least one target in every kind of week.")
+                + f" The model tried networks of up to {run.get('max_stations', std_max)} stations. "
+                + diagnosis_text(run.get("diagnosis"), ra))
     est = run.get("estimate")
     if est:
         est_name = spoken(get_design(est["design"], ra).label())
@@ -1944,7 +1990,9 @@ else:
     wpy = ra["weeks_per_year"]
     table = ('<table class="cmp"><tr><th></th><th>'
              + ("With your settings" if R["changes"] else "With the default settings") + '</th></tr>'
-             + row("Recommended network", "This is the number and size of delivery stations to run.",
+             + row("Recommended network" if feasible else "Closest network",
+                   "This is the number and size of delivery stations to run." if feasible else
+                   "No network meets every target. This one comes closest on OTD.",
                    lambda s: s["name"], True)
              + row("Cost per package, year average",
                    f"It weights {wpy.get('normal', 0)} normal, {wpy.get('holiday_peak', 0)} peak and "
@@ -1982,13 +2030,16 @@ else:
     shown = sorted(shown, key=lambda d: frames[list(frames)[0]].loc[d, "cost_p50"])
     obj = ra["objective"]
 
-    st.html('<div class="chart-title" style="margin-top:34px">Why this network wins</div>'
+    st.html('<div class="chart-title" style="margin-top:34px">'
+            + ("Why this network wins" if feasible else "How close each network comes") + '</div>'
             '<div class="chart-note" style="max-width:95ch">The recommendation has to meet every target in all three '
             'kinds of week: normal weeks, holiday peak weeks and station outage weeks. This table lists every '
             'station layout that the model scored in all three, from cheapest to most expensive over a year. A tick '
-            'means the layout meets every target in that kind of week. A cross names the target it misses. The '
-            'recommended network is the cheapest one with a tick in every column, so any cheaper row above it is '
-            'ruled out by a cross.'
+            'means the layout meets every target in that kind of week. A cross names the target it misses. '
+            + ('The recommended network is the cheapest one with a tick in every column, so any cheaper row above it '
+               'is ruled out by a cross.' if feasible else
+               'No layout has a tick in every column, so there is no recommendation. The layout marked as closest '
+               'comes nearest to the OTD targets, whatever it costs.')
             + (f' Every station layout pays Dashers at least ${obj["driver_net_per_hour_floor"]:.0f} an hour after car '
                'costs. The column after the cost shows how much of each layout\'s cost per package goes to raising '
                'pay to that level. Station layouts with longer drives need bigger raises.'
@@ -2016,7 +2067,8 @@ else:
                 'kind of week, and grey rows miss a target in that week.</div>')
         k = st.segmented_control("Show costs for", list(frames), format_func=lambda x: SCEN.get(x, x),
                                  default=list(frames)[0], key="res_week") or list(frames)[0]
-        st.altair_chart(cost_chart(frames[k], yours["pick"], objective_for(ra, k)), width="stretch")
+        st.altair_chart(cost_chart(frames[k], yours["pick"], objective_for(ra, k),
+                                  "recommended" if feasible else "closest to the targets"), width="stretch")
     with st.expander("How many weeks stay on time?"):
         st.html('<div class="chart-note">Out of every 1,000 simulated weeks, how many reach the on-time floor. '
                 'Each kind of week has its own goal, shown under its heading.</div>' + floor_table(run, ra))

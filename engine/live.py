@@ -31,8 +31,8 @@ import pandas as pd
 
 from engine.config import REPO_ROOT, load_assumptions
 from engine.randomness import draw_weeks
-from engine.search import screen, summarize, year_round_table
-from engine.simulation import get_design, load_market, simulate_week
+from engine.search import diagnose, screen, summarize, year_round_table
+from engine.simulation import design_tiers, get_design, load_market, simulate_week
 
 _M = _A = None
 # A simulated week costs about this many screened design-days on the same machine. Measured on default settings:
@@ -134,39 +134,62 @@ def scenarios_in_play(a: dict) -> list[str]:
     return [s for s in a["scenarios"] if a["weeks_per_year"].get(s, 0) > 0] or ["normal"]
 
 
-def screen_all(a: dict, market: str = "msp") -> dict:
-    """Average-day screen of every design in every scenario in play. Takes well under a second per
-    scenario; its duration also calibrates the run-time estimate on whatever machine runs it."""
+def screen_all(a: dict, market: str = "msp", tier: int = 0) -> dict:
+    """Average-day screen of one group of layouts (0 = the standard list) in every scenario in play. Takes well
+    under a second per scenario; its duration also calibrates the run-time estimate on whatever machine runs it."""
     m = load_market(market)
+    designs = design_tiers(a, len(m.site_rank))[tier]
     t0 = time.perf_counter()
-    screens = {sc: screen(m, a, sc) for sc in scenarios_in_play(a)}
-    return {"screens": screens, "seconds": time.perf_counter() - t0}
+    screens = {sc: screen(m, a, sc, designs) for sc in scenarios_in_play(a)}
+    return {"screens": screens, "seconds": time.perf_counter() - t0, "tier": tier}
+
+
+def n_tiers(a: dict, market: str = "msp") -> int:
+    return len(design_tiers(a, len(load_market(market).site_rank)))
 
 
 def candidates(screens: dict, top_n: int) -> list[str]:
+    """Per kind of week: the cheapest few layouts that passed the screen, plus the cheapest few that also meet the
+    OTD target on the average day, so the run always includes layouts likely to meet OTD."""
     keep = []
     for s in screens.values():
-        for d in s[s["kept"]].nsmallest(top_n, "screen_cost")["design"]:
+        k = s[s["kept"]]
+        hit = k[k["meets_target"]] if "meets_target" in k else k.iloc[:0]
+        for d in list(k.nsmallest(top_n, "screen_cost")["design"]) + list(hit.nsmallest(top_n, "screen_cost")["design"]):
             if d not in keep:
                 keep.append(d)
     return keep
 
 
-def quick_estimate(a: dict, screens: dict) -> dict:
-    """Instant answer from the average-day screen: no randomness, so a rough guide only. Cheapest design
-    (weighted by weeks per year) among those that pass the screen in every kind of week."""
+def merge_screens(old: dict | None, new: dict) -> dict:
+    return {sc: pd.concat([old[sc], s], ignore_index=True) if old else s for sc, s in new.items()}
+
+
+def _estimate_table(a: dict, screens: dict) -> pd.DataFrame:
     weights = {sc: a["weeks_per_year"].get(sc, 0) for sc in screens}
     total = sum(weights.values()) or 1
-    names = next(iter(screens.values()))["design"]
     rows = []
-    for d in names:
+    for d in next(iter(screens.values()))["design"]:
         r = {sc: s.set_index("design").loc[d] for sc, s in screens.items()}
-        rows.append({"design": d, "passes": sum(bool(x["kept"]) for x in r.values()),
+        hit = [bool(x.get("meets_target", x["kept"])) for x in r.values()]
+        rows.append({"design": d, "passes": sum(hit), "on_time": min(x["screen_on_time"] for x in r.values()),
                      "year_cost": sum(weights[sc] * x["screen_cost"] for sc, x in r.items()) / total})
-    t = pd.DataFrame(rows).sort_values(["passes", "year_cost"], ascending=[False, True])
-    best = t.iloc[0]
-    return {"design": best["design"], "year_cost": float(best["year_cost"]),
-            "passes_all": int(best["passes"]) == len(screens)}
+    return pd.DataFrame(rows).sort_values(["passes", "year_cost"], ascending=[False, True])
+
+
+def quick_estimate(a: dict, screens: dict, market: str = "msp") -> dict:
+    """Instant answer from the average-day screen: no randomness, so a rough guide only. The cheapest layout
+    (weighted by weeks per year) that meets the OTD target on an average day in every kind of week. If none in the
+    standard list does, the larger networks are screened too (still well under a second each)."""
+    tier, t = 0, _estimate_table(a, screens)
+    while not (t["passes"] == len(screens)).any() and tier + 1 < n_tiers(a, market):
+        tier += 1
+        screens = merge_screens(screens, screen_all(a, market, tier)["screens"])
+        t = _estimate_table(a, screens)
+    ok = t[t["passes"] == len(screens)]
+    best = ok.iloc[0] if len(ok) else t.sort_values("on_time", ascending=False).iloc[0]
+    return {"design": best["design"], "year_cost": float(best["year_cost"]), "passes_all": bool(len(ok)),
+            "tiers_screened": tier + 1}
 
 
 def planned_weeks(screen_info: dict, mode: str, ctl: dict) -> int:
@@ -192,58 +215,95 @@ def estimate_seconds(screen_info: dict, mode: str, ctl: dict, workers: int | Non
 
 # ---------------------------------------------------------------- runs
 
+def _frames(rows: dict, a: dict, scenarios: list[str], mode: str) -> dict:
+    """Summaries per kind of week from every week simulated so far. In a full run, rechecked layouts use their
+    fresh-week numbers and the rest keep their search numbers."""
+    if mode == "quick":
+        return {sc: summarize(pd.DataFrame(rows[("final", sc)]), a, sc) for sc in scenarios}
+    frames = {}
+    for sc in scenarios:
+        search = summarize(pd.DataFrame(rows[("search", sc)]), a, sc)
+        if rows.get(("final", sc)):
+            recheck = summarize(pd.DataFrame(rows[("final", sc)]), a, sc)
+            fr = recheck.combine_first(search)[recheck.columns]
+        else:
+            fr = search
+        fr["feasible"] = fr["feasible"].astype(bool)
+        frames[sc] = pd.concat([fr[fr["feasible"]].sort_values("cost_p50"),
+                                fr[~fr["feasible"]].sort_values(["weeks_meeting_service", "cost_p50"],
+                                                                ascending=[False, True])])
+    return frames
+
+
+def _merge(into: dict, new: dict) -> None:
+    for k, v in new.items():
+        into.setdefault(k, []).extend(v)
+
+
 def run(a: dict, mode: str = "quick", market: str = "msp", workers: int | None = None,
         progress: Progress | None = None, screen_info: dict | None = None) -> dict:
+    """Simulate the standard list of layouts. If none meets every OTD target in every kind of week, add the next
+    group of larger networks (design_grid.larger_networks) and simulate those on the same random weeks, until a
+    layout meets every target or the groups run out."""
     t0 = time.perf_counter()
     ctl = a["app_controls"]["run"]
     screen_info = screen_info or screen_all(a, market)
-    screens = screen_info["screens"]
-    scenarios = list(screens)
+    tier_screens = screen_info["screens"]
+    scenarios = list(tier_screens)
     workers = workers or available_cpus()
+    tiers = n_tiers(a, market)
     done = {"weeks": 0, "packages": 0}
+    rows: dict = {}
+    screens, designs, tier = None, [], 0
     with ProcessPoolExecutor(workers, initializer=_init, initargs=(market, a)) as pool:
-        if mode == "quick":
-            q = ctl["quick"]
-            designs = candidates(screens, q["top_designs_per_scenario"])
-            jobs = _chunks(designs, scenarios, "final", q["weeks"])
-            total = len(designs) * len(scenarios) * q["weeks"]
-            rows = _simulate(pool, jobs, done, total, f"Simulating {len(designs)} layouts", progress)
-            frames = {sc: summarize(pd.DataFrame(rows[("final", sc)]), a, sc) for sc in scenarios}
-            weeks_note = {"weeks": q["weeks"]}
-        else:
-            f = ctl["full"]
-            kept = {sc: s.loc[s["kept"], "design"].tolist() for sc, s in screens.items()}
-            search_jobs = [j for sc in scenarios for j in _chunks(kept[sc], [sc], "search", f["search_weeks"])]
-            n_search = sum(len(v) for v in kept.values()) * f["search_weeks"]
-            guess = len(candidates(screens, f["recheck_top_designs"])) * len(scenarios) * f["recheck_weeks"]
-            rows = _simulate(pool, search_jobs, done, n_search + guess,
-                             f"Searching: every layout that passed the screen, {f['search_weeks']} weeks each",
-                             progress)
-            search = {sc: summarize(pd.DataFrame(rows[("search", sc)]), a, sc) for sc in scenarios}
-            designs = []
-            for sc in scenarios:
-                for d in search[sc].index[: f["recheck_top_designs"]]:
-                    if d not in designs:
-                        designs.append(d)
-            n_recheck = len(designs) * len(scenarios) * f["recheck_weeks"]
-            rows = _simulate(pool, _chunks(designs, scenarios, "final", f["recheck_weeks"]), done,
-                             n_search + n_recheck,
-                             f"Rechecking the {len(designs)} closest layouts on {f['recheck_weeks']:,} fresh weeks",
-                             progress)
-            recheck = {sc: summarize(pd.DataFrame(rows[("final", sc)]), a, sc) for sc in scenarios}
-            frames = {}
-            for sc in scenarios:   # rechecked layouts use their fresh-week numbers; the rest keep search numbers
-                fr = recheck[sc].combine_first(search[sc])[recheck[sc].columns]
-                fr["feasible"] = fr["feasible"].astype(bool)
-                frames[sc] = pd.concat([fr[fr["feasible"]].sort_values("cost_p50"),
-                                        fr[~fr["feasible"]].sort_values(["weeks_meeting_service", "cost_p50"],
-                                                                        ascending=[False, True])])
-            weeks_note = {"search_weeks": f["search_weeks"], "recheck_weeks": f["recheck_weeks"],
-                          "rechecked": designs}
-    return {"mode": mode, "frames": frames, "year": year_round_table(frames, a), "screens": screens,
+        while True:
+            screens = merge_screens(screens, tier_screens)
+            info = {"screens": tier_screens}
+            total = done["weeks"] + planned_weeks(info, mode, ctl)
+            more = "" if tier == 0 else ("No layout met every target, so the run is now trying larger networks. ")
+            if mode == "quick":
+                q = ctl["quick"]
+                new = candidates(tier_screens, q["top_designs_per_scenario"])
+                _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", q["weeks"]), done, total,
+                                       f"{more}Simulating {len(new)} layouts", progress))
+                weeks_note = {"weeks": q["weeks"]}
+            else:
+                f = ctl["full"]
+                kept = {sc: s.loc[s["kept"], "design"].tolist() for sc, s in tier_screens.items()}
+                search_jobs = [j for sc in scenarios for j in _chunks(kept[sc], [sc], "search", f["search_weeks"])]
+                _merge(rows, _simulate(pool, search_jobs, done, total,
+                                       f"{more}Searching: every layout that passed the screen, "
+                                       f"{f['search_weeks']} weeks each", progress))
+                search = {sc: summarize(pd.DataFrame(rows[("search", sc)]), a, sc) for sc in scenarios}
+                new = []
+                tier_names = set(tier_screens[scenarios[0]]["design"])
+                for sc in scenarios:
+                    for d in [x for x in search[sc].index if x in tier_names][: f["recheck_top_designs"]]:
+                        if d not in new:
+                            new.append(d)
+                n_recheck = len(new) * len(scenarios) * f["recheck_weeks"]
+                _merge(rows, _simulate(pool, _chunks(new, scenarios, "final", f["recheck_weeks"]), done,
+                                       done["weeks"] + n_recheck,
+                                       f"{more}Rechecking the {len(new)} closest layouts on "
+                                       f"{f['recheck_weeks']:,} fresh weeks", progress))
+                weeks_note = {"search_weeks": f["search_weeks"], "recheck_weeks": f["recheck_weeks"]}
+            designs += [d for d in new if d not in designs]
+            frames = _frames(rows, a, scenarios, mode)
+            year = year_round_table(frames, a)
+            if (len(year) and bool(year["meets_all"].iloc[0])) or tier + 1 >= tiers:
+                break
+            tier += 1
+            if progress:
+                progress(1.0, "No layout met every target. Screening larger networks", dict(done, total=done["weeks"]))
+            tier_screens = screen_all(a, market, tier)["screens"]
+    if mode == "full":
+        weeks_note["rechecked"] = designs
+    return {"mode": mode, "frames": frames, "year": year, "screens": screens,
             "designs": designs, "scenarios": scenarios, "seconds": round(time.perf_counter() - t0, 1),
-            "hash": settings_hash(a), "estimate": quick_estimate(a, screens), "weeks_simulated": done["weeks"],
-            "packages_simulated": done["packages"], **weeks_note}
+            "hash": settings_hash(a), "estimate": quick_estimate(a, screen_info["screens"], market),
+            "weeks_simulated": done["weeks"], "packages_simulated": done["packages"],
+            "tiers_tried": tier + 1, "tiers_available": tiers, "diagnosis": diagnose(frames, year, a),
+            "max_stations": max(len(get_design(d, a).hubs) for d in designs), **weeks_note}
 
 
 # ---------------------------------------------------------------- saved default runs
@@ -297,7 +357,7 @@ def share_sensitivity(a: dict, shares: list[float], market: str = "msp", progres
         r = (load_baseline(market, "full", b) if share == a["demand"]["network_share"] else None) or \
             run(b, "full", market, progress=progress)
         y = r["year"]
-        ok = y[y["scenarios_meeting_targets"] == len(r["scenarios"])]
+        ok = y[y["meets_all"]]
         pick = (ok if len(ok) else y).iloc[0]
         out.append({"share": share, "packages_per_day": households * b["demand"]["packages_per_household_per_day"] * share,
                     "design": str((ok if len(ok) else y).index[0]), "hubs": pick["hubs"],

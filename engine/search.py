@@ -51,21 +51,25 @@ def _score_design(job: tuple) -> list[dict]:
             for i, w in enumerate(_weeks(stream, n))]
 
 
-def screen(m, a, scenario: str) -> pd.DataFrame:
-    """Fast average-day estimate for every design on the scenario's hardest day."""
+def screen(m, a, scenario: str, designs: list | None = None) -> pd.DataFrame:
+    """Fast average-day estimate for every design (default: the standard list) on the scenario's hardest day.
+    Keeps every layout cheaper than the cheapest one that meets the scenario's OTD target on the average day,
+    plus layouts up to screen_max_cost_vs_best above it, so pricier layouts that might meet OTD stay in."""
     sc = a["scenarios"][scenario]
     day = sc.get("outage_day", "Mon")
     avg = average_day(len(m.site_rank), len(a["schedule"]["linehaul_waves"]), a)
     rows = []
-    for d in design_grid(a):
+    for d in (design_grid(a) if designs is None else designs):
         outage = busiest_hub(m, d) if sc.get("outage_day") else None
         r = simulate_day(m, d, day, a, avg, sc, outage_hub=outage)["metrics"]
         rows.append({"design": d.name, "screen_on_time": r["on_time_rate"],
                      "screen_cost": r["cost_total"] / max(r["delivered"], 1)})
     s = pd.DataFrame(rows)
-    obj = a["objective"]
+    obj = objective_for(a, scenario)
+    s["meets_target"] = s["screen_on_time"] >= obj["on_time_typical_target"]
     ok_service = s["screen_on_time"] >= obj["screen_min_on_time"]
-    best_cost = s.loc[ok_service, "screen_cost"].min() if ok_service.any() else s["screen_cost"].min()
+    ref = s["meets_target"] if s["meets_target"].any() else ok_service
+    best_cost = s.loc[ref, "screen_cost"].min() if ref.any() else s["screen_cost"].min()
     s["kept"] = ok_service & (s["screen_cost"] <= best_cost * obj["screen_max_cost_vs_best"])
     if not s["kept"].any():   # nothing passes: keep the best few by on-time so the search still runs
         s.loc[s["screen_on_time"].nlargest(5).index, "kept"] = True
@@ -120,6 +124,8 @@ def summarize(weeks: pd.DataFrame, a: dict, scenario: str | None = None) -> pd.D
         "overtime_cost_p90": g["cost_sort_overtime"].quantile(0.9),
         "routes_surged_p50": g["routes_surged_share"].quantile(0.5),
         "pickup_slot_delay_p50": g["pickup_slot_delay_minutes"].quantile(0.5),
+        "missed_sort_share_p50": (g["missed_sort_cutoff"].quantile(0.5) / g["packages_due"].quantile(0.5)
+                                  if "missed_sort_cutoff" in weeks else g["on_time_rate"].quantile(0.5) * 0),
         "weeks": g.size(),
     })
     s["meets_service"] = ((s["weeks_meeting_service"] >= obj["on_time_week_share"])
@@ -190,9 +196,10 @@ def run_scenario(market: str, scenario: str, n_weeks: int | None, workers: int, 
 
 
 def year_round_table(frames: dict[str, pd.DataFrame], a: dict) -> pd.DataFrame:
-    """One network for all scenarios: designs scored in every scenario, ranked by how many scenarios
-    they meet the targets in, then by typical cost weighted by weeks per year. Near-ties on cost at the
-    top go to the network that holds service best in its worst scenario."""
+    """One network for all kinds of week. OTD comes first: layouts that meet every target in every kind of week
+    rank first, cheapest first (weighted by weeks per year), and near-ties on cost go to the network that holds
+    OTD best in its worst kind of week. When no layout meets every target, the table ranks layouts by how close
+    they come to the OTD targets, not by cost, and the first row is only the closest layout, not a pick."""
     weights = {k: v for k, v in a["weeks_per_year"].items() if k in frames}
     if not frames or not weights:
         return pd.DataFrame()
@@ -200,27 +207,70 @@ def year_round_table(frames: dict[str, pd.DataFrame], a: dict) -> pd.DataFrame:
     rows = []
     for d in common:
         row = {"design": d, "hubs": next(iter(frames.values())).loc[d, "hubs"]}
+        gaps = []
         for name, f in frames.items():
+            obj = objective_for(a, name)
             row[f"{name}_cost_p50"] = f.loc[d, "cost_p50"]
             row[f"{name}_feasible"] = bool(f.loc[d, "feasible"])
             row[f"{name}_weeks_meeting_service"] = f.loc[d, "weeks_meeting_service"]
             row[f"{name}_storm_on_time_p50"] = f.loc[d, "storm_on_time_p50"]
+            # How far below the OTD targets: typical-week OTD points short, plus share of weeks short of the floor.
+            gaps.append(max(0.0, obj["on_time_typical_target"] - f.loc[d, "on_time_p50"])
+                        + max(0.0, obj["on_time_week_share"] - f.loc[d, "weeks_meeting_service"]))
         row["scenarios_meeting_targets"] = sum(row[f"{n}_feasible"] for n in frames)
+        row["meets_all"] = row["scenarios_meeting_targets"] == len(frames)
+        row["otd_gap"] = sum(gaps)
         row["worst_weeks_meeting_service"] = min(row[f"{n}_weeks_meeting_service"] for n in frames)
         total = sum(weights.values()) or 1
         row["year_cost_per_package"] = sum(weights.get(n, 0) * row[f"{n}_cost_p50"] for n in frames) / total
         rows.append(row)
     if not rows:
         return pd.DataFrame()
-    t = pd.DataFrame(rows).set_index("design").sort_values(
-        ["scenarios_meeting_targets", "year_cost_per_package"], ascending=[False, True])
-    top = t["scenarios_meeting_targets"] == t["scenarios_meeting_targets"].max()
-    tie = a["objective"].get("year_round_cost_tie", 0.0)
-    near = top & (t["year_cost_per_package"] <= t.loc[top, "year_cost_per_package"].min() * (1 + tie) + 1e-12)
-    t = pd.concat([t[near].sort_values(["worst_weeks_meeting_service", "year_cost_per_package"],
-                                       ascending=[False, True]), t[~near]])
+    t = pd.DataFrame(rows).set_index("design")
+    ok, rest = t[t["meets_all"]].sort_values("year_cost_per_package"), t[~t["meets_all"]]
+    rest = rest.sort_values(["otd_gap", "year_cost_per_package"])
+    if len(ok):
+        tie = a["objective"].get("year_round_cost_tie", 0.0)
+        near = ok["year_cost_per_package"] <= ok["year_cost_per_package"].min() * (1 + tie) + 1e-12
+        ok = pd.concat([ok[near].sort_values(["worst_weeks_meeting_service", "year_cost_per_package"],
+                                             ascending=[False, True]), ok[~near]])
+    t = pd.concat([ok, rest])
     t.insert(0, "rank", range(1, len(t) + 1))
     return t
+
+
+def diagnose(frames: dict[str, pd.DataFrame], year: pd.DataFrame, a: dict) -> dict | None:
+    """When no layout meets every target: for the closest layout, the kind of week and target it misses by the most,
+    the best value any simulated layout reached there, and the main reason packages are late."""
+    if year.empty or bool(year["meets_all"].iloc[0]):
+        return None
+    d = year.index[0]
+    worst = None
+    for sc, f in frames.items():
+        if d not in f.index:
+            continue
+        r, obj = f.loc[d], objective_for(a, sc)
+        for target, have, need, col in (("OTD target", r["on_time_p50"], obj["on_time_typical_target"], "on_time_p50"),
+                                        ("OTD floor", r["weeks_meeting_service"], obj["on_time_week_share"],
+                                         "weeks_meeting_service")):
+            gap = need - have
+            if gap > 0 and (worst is None or gap > worst["gap"]):
+                worst = {"scenario": sc, "target": target, "have": float(have), "need": float(need), "gap": float(gap),
+                         "best": float(f[col].max()), "best_design": str(f[col].idxmax())}
+    if worst is None:
+        return None
+    r = frames[worst["scenario"]].loc[d]
+    late = max(1 - r["on_time_p50"], 1e-9)
+    sort_miss = float(r.get("missed_sort_share_p50", 0) or 0)
+    if sort_miss >= 0.5 * late:
+        cause = "sort_capacity" if r["peak_sort_utilization_p90"] >= 0.95 else "late_trucks"
+    elif r["unclaimed_p50"] > 0.01:
+        cause = "dashers"
+    else:
+        cause = "routes"
+    return {**worst, "design": str(d), "cause": cause, "late_share": float(late), "sort_miss_share": sort_miss,
+            "sort_utilization_p90": float(r["peak_sort_utilization_p90"]), "unclaimed": float(r["unclaimed_p50"]),
+            "on_time_p50": float(r["on_time_p50"])}
 
 
 def year_round_choice(market: str, a: dict) -> pd.DataFrame:

@@ -9,7 +9,7 @@
     "runner_up": "3x small",
     "runner_up_hubs": "#1 small + #2 small + #3 small",
     "runner_up_cost": 3.122397953978181,
-    "hash": "b64fd12ff67725ee"
+    "hash": "e68f62afd8c56698"
   },
   {
     "share": 0.03,
@@ -21,7 +21,7 @@
     "runner_up": "4x small",
     "runner_up_hubs": "#1 small + #2 small + #3 small + #4 small",
     "runner_up_cost": 2.8762877596000003,
-    "hash": "b64fd12ff67725ee"
+    "hash": "e68f62afd8c56698"
   },
   {
     "share": 0.05,
@@ -33,6 +33,6 @@
     "runner_up": "4x small, big #1",
     "runner_up_hubs": "#1 medium + #2 small + #3 small + #4 small",
     "runner_up_cost": 2.585594754092068,
-    "hash": "b64fd12ff67725ee"
+    "hash": "e68f62afd8c56698"
   }
 ]
