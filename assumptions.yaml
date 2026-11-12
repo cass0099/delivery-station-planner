@@ -363,8 +363,8 @@ app_controls:
       note: A carrier does not have to serve every ZIP code. Leaving out outlying ZIPs shortens routes and Dasher commutes, but the network carries fewer packages to spread its station costs over, and shippers send less of their volume to a carrier that covers less of the metro.
       uses: Each station layout serves the ZIP codes closest to its stations by drive time, adding ZIPs until this share of the metro's households is covered. Packages for other ZIPs go to other carriers and never enter the simulation, so OTD and cost are measured on the served ZIPs only.
       controls:
-        - {path: coverage.households_served, label: Households in served ZIP codes, min: 0.50, max: 1.00, step: 0.05, format: pct, unit: of metro households}
-        - {path: coverage.share_kept_at_min, label: Network share kept at 50% coverage, min: 0.1, max: 1.0, step: 0.05, format: pct, unit: of the full network share}
+        - {path: coverage.households_served, label: Share of metro households served, min: 0.50, max: 1.00, step: 0.05, format: pct, unit: of metro households}
+        - {path: coverage.share_kept_at_min, label: Shipper volume kept when serving half the metro, min: 0.1, max: 1.0, step: 0.05, format: pct, unit: of their usual volume}
     - key: hubs
       name: Station costs
       title: Set the station cost assumptions

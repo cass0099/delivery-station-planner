@@ -565,22 +565,25 @@ def hint(path: str, a: dict) -> str | None:
     if path == "demand.network_share":
         return (f"At these settings, the network carries about {round(per_day, -2):,.0f} packages on an average day "
                 f"and about {round(monday, -2):,.0f} on a Monday.")
+    if path in ("coverage.households_served", "coverage.share_kept_at_min"):
+        cov = a["coverage"]
+        served, kept = cov["households_served"], coverage_share_factor(a)
     if path == "coverage.households_served":
-        cov = a["coverage"]
-        if cov["households_served"] >= 1:
-            return (f"The network serves every ZIP code in the metro and carries about {round(per_day, -2):,.0f} "
+        if served >= 1:
+            return (f"At 100%, the network delivers to every ZIP code in the metro, about {round(per_day, -2):,.0f} "
                     "packages on an average day.")
-        return (f"About {round(hh * cov['households_served'], -3):,.0f} households live in the served ZIP codes. "
-                f"The network keeps {coverage_share_factor(a):.0%} of its full share of their packages and carries "
-                f"about {round(per_day, -2):,.0f} packages on an average day.")
+        return (f"The network delivers only to the ZIP codes closest to its stations, which are home to about "
+                f"{round(hh * served, -3):,.0f} households. Packages for other ZIP codes go to other carriers. The "
+                f"network carries about {round(per_day, -2):,.0f} packages on an average day.")
     if path == "coverage.share_kept_at_min":
-        cov = a["coverage"]
-        if cov["households_served"] >= 1:
-            return ("At 100% coverage the network keeps its full share, so this setting only matters when coverage is "
-                    "below 100%. Between the lowest coverage and 100%, the share rises in a straight line.")
-        return (f"At the current coverage of {cov['households_served']:.0%}, the network keeps "
-                f"{coverage_share_factor(a):.0%} of its full share in the ZIP codes it serves. The share rises in a "
-                "straight line to the full share at 100% coverage.")
+        why = ("Shippers prefer a carrier that covers most of the metro, so a carrier that serves fewer ZIP codes gets "
+               "fewer of their packages, even in the ZIP codes it does serve. This setting says how many fewer. At "
+               f"{cov['share_kept_at_min']:.0%}, a network that serves half the metro gets "
+               f"{cov['share_kept_at_min']:.0%} of the packages it would otherwise get there.")
+        if served >= 1:
+            return why + " It has no effect while the network serves the whole metro."
+        return (why + f" At the current coverage of {served:.0%}, the network gets {kept:.0%} of the packages it "
+                "would otherwise get in the ZIP codes it serves.")
     if path == "scenarios.holiday_peak.volume_multiplier":
         peak = monday * a["scenarios"]["holiday_peak"]["volume_multiplier"]
         return f"A Monday during the holiday peak would bring about {round(peak, -2):,.0f} packages."
@@ -706,9 +709,6 @@ def variability(path: str, a: dict) -> tuple[bool, str]:
         "weeks_per_year.holiday_peak": "This weights the kinds of week in the yearly cost.",
         "weeks_per_year.hub_outage": "This weights the kinds of week in the yearly cost.",
         "partner.on_time_rate": "The model applies this share to the partner's packages every day.",
-        "coverage.households_served": "Each station layout serves the same share of households, in the ZIP codes "
-                                      "closest to its own stations.",
-        "coverage.share_kept_at_min": "Daily volume in the served ZIP codes still varies around the average.",
     }
     return False, fixed.get(path, "")
 
@@ -2102,8 +2102,8 @@ elif page < FIRST_STEP + len(STEPS):
                      "average day as coverage changes. The red dot marks the current setting. "
                      + ("Volume falls faster than coverage, because shippers send less of their volume to a carrier "
                         "that covers less of the metro." if a["coverage"]["share_kept_at_min"] < 1 else
-                        "Volume falls in step with coverage, because the network keeps its full share in the ZIP "
-                        "codes it serves."), lambda: coverage_preview(a, households)),
+                        "Volume falls in step with coverage, because shippers still send the network all of their "
+                        "packages in the ZIP codes it serves."), lambda: coverage_preview(a, households)),
         "hubs": ("How much one station can sort overnight", sort_note(a), lambda: sort_preview(a, households)),
         "drivers": ("How likely a Dasher is to accept a route", claim_note(a), lambda: claim_preview(a)),
         "service": ("When packages arrive, get sorted and are delivered", schedule_note(a),
