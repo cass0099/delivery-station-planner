@@ -18,6 +18,7 @@ from pathlib import Path
 import altair as alt
 import folium
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import streamlit as st
 import yaml
@@ -1108,6 +1109,49 @@ def served_zips(tracts, drive, label: str, a: dict):
                        a["coverage"]["households_served"])
 
 
+@st.cache_data
+def zip_shapes(market: str) -> gpd.GeoDataFrame:
+    """One shape per ZIP code, built from its Census tracts, with its households."""
+    t, _, _ = load_geo(market)
+    z = t[["zip", "households", "geometry"]].dissolve(by="zip", aggfunc={"households": "sum"}).reset_index()
+    z["geometry"] = z.to_crs(26915).simplify(80).to_crs(4326)
+    return z
+
+
+def reference_layout() -> str:
+    """The network the model recommends with the default settings (three small stations unless the saved runs say
+    otherwise). The coverage map uses it, because each layout serves the ZIP codes closest to its own stations."""
+    r = saved_run(A0, "full") or saved_run(A0, "quick")
+    return str(r["year"].index[0]) if r is not None and len(r["year"]) else "3x small"
+
+
+def coverage_map(a: dict) -> folium.Map:
+    """Served and unserved ZIP codes for the reference layout at the current coverage setting."""
+    label = get_design(reference_layout(), a).label()
+    on_tract = served_zips(tracts, drive, label, a)
+    on_zips = set(tracts.loc[on_tract, "zip"])
+    z = zip_shapes(MARKET).copy()
+    z["on"] = z["zip"].isin(on_zips)
+    z["status"] = np.where(z["on"], "Served", "Not served (another carrier)")
+    z["hh"] = z["households"].round(0)
+    m = folium.Map(location=[44.96, -93.25], zoom_start=9, tiles=None, scrollWheelZoom=False, control_scale=True)
+    add_basemap(m)
+    folium.GeoJson(
+        z[["zip", "status", "hh", "on", "geometry"]],
+        style_function=lambda f: ({"fillColor": BLUE, "color": "#ffffff", "weight": 0.6, "fillOpacity": 0.55}
+                                  if f["properties"]["on"] else
+                                  {"fillColor": "#9a9a9a", "color": "#ffffff", "weight": 0.6, "fillOpacity": 0.15}),
+        tooltip=folium.GeoJsonTooltip(["zip", "status", "hh"], aliases=["ZIP code", "Coverage", "Households"],
+                                      localize=True)).add_to(m)
+    loc = sites.set_index("rank")
+    for i, (r, size) in enumerate(hub_list(label)):
+        s_ = loc.loc[r]
+        folium.CircleMarker([s_.lat, s_.lon], radius=7, color="#ffffff", weight=2.5, fill=True, fill_color=INK,
+                            fill_opacity=1, tooltip=f"Station {i + 1}: {size}").add_to(m)
+    add_labels(m)
+    return m
+
+
 def network_map(tracts, sites, drive, label: str, a: dict | None = None) -> folium.Map:
     hubs = hub_list(label)
     nearest = drive.loc[[r for r, _ in hubs], tracts["GEOID"]].to_numpy().argmin(axis=0)
@@ -2112,6 +2156,17 @@ elif page < FIRST_STEP + len(STEPS):
         "disruptions": ("What a year looks like", "This chart shows how many of each event to expect in a year at "
                         "the current settings.", lambda: disruption_preview(a)),
     }
+    if step["key"] == "coverage":
+        ref = spoken(get_design(reference_layout(), a).label())
+        n_on = tracts.loc[served_zips(tracts, drive, get_design(reference_layout(), a).label(), a), "zip"].nunique()
+        st.html('<div class="chart-title">Which ZIP codes the network serves</div>'
+                f'<div class="chart-note">This map shows the ZIP codes served at the current setting, in blue. The '
+                f'network serves {n_on} of the metro\'s {tracts["zip"].nunique()} ZIP codes. The map uses {ref}, '
+                'which the model recommends with the default settings, and the dark dots mark those stations. A '
+                'different station layout serves the ZIP codes closest to its own stations, so its map would be '
+                'slightly different.</div>')
+        st_folium(coverage_map(a), height=460, use_container_width=True, returned_objects=[],
+                  key=f"covmap_{a['coverage']['households_served']:.2f}")
     if step["key"] in previews:
         title, note, fn = previews[step["key"]]
         st.html(f'<div class="chart-title">{title}</div><div class="chart-note">{note}</div>'
