@@ -98,6 +98,7 @@ header[data-testid="stHeader"], #MainMenu, footer, [data-testid="stSidebarCollap
   /* Frozen at the top of the window while the page scrolls underneath. */
   position: sticky; top: 0; z-index: 1000; background: #fff; padding: 10px 0 !important;
   box-shadow: 0 1px 0 {LINE}; }}
+.st-key-nav_scroll, .st-key-nav > :has(> .st-key-nav_scroll) {{ display: contents !important; }}
 .st-key-nav_about, .st-key-nav_assume, .st-key-nav_run {{ flex-wrap: nowrap !important; flex: 0 0 auto !important;
   gap: 2px !important; align-items: center; }}
 .st-key-nav_assume {{ background: {PANEL}; border-radius: 999px; padding: 4px 6px 4px 16px !important; }}
@@ -277,13 +278,23 @@ table.jd td:first-child {{ color: {INK}; font-weight: 600; width: 34%; padding-r
   .masthead svg {{ width: 28px; height: 28px; }}
   .app-name {{ font-size: 17px; }}
   .app-sub {{ font-size: 13px; line-height: 1.4; }}
-  /* Menu: one swipeable row instead of three wrapped lines; the current page scrolls into view. */
-  .st-key-nav {{ flex-wrap: nowrap !important; overflow-x: auto; overflow-y: hidden; gap: 6px !important;
-    padding: 8px 0 !important; margin: 0 -16px; padding-left: 16px !important; padding-right: 16px !important;
-    scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-padding: 0 16px; }}
-  .st-key-nav::-webkit-scrollbar {{ display: none; }}
+  /* Menu: the explanation pages and assumption steps form one swipeable row with an arrow at its right edge;
+     Run simulation, Results and Reset sit on their own row underneath. */
+  .st-key-nav {{ flex-direction: column !important; flex-wrap: nowrap !important; align-items: stretch !important;
+    gap: 6px !important; padding: 8px 0 !important; }}
+  .st-key-nav > :has(> .st-key-nav_scroll) {{ display: block !important; width: 100% !important; }}
+  .st-key-nav_scroll {{ display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+    overflow-x: auto; overflow-y: hidden; gap: 6px !important; width: auto !important; max-width: none !important;
+    margin: 0 -16px; padding: 0 44px 0 16px !important; scrollbar-width: none; -webkit-overflow-scrolling: touch; }}
+  .st-key-nav_scroll::-webkit-scrollbar {{ display: none; }}
+  .st-key-nav::after {{ content: "›"; position: absolute; top: 8px; right: -16px; width: 52px; height: 38px;
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 14px; box-sizing: border-box;
+    font-size: 26px; font-weight: 700; line-height: 1; color: {INK}; pointer-events: none;
+    background: linear-gradient(to right, rgba(255,255,255,0), #fff 55%); }}
+  .st-key-nav.at-end::after {{ content: none; }}
+  .st-key-nav_run {{ padding-left: 0 !important; }}
   /* Nothing in the menu may shrink: each group and item keeps its full width, and the row scrolls instead. */
-  .st-key-nav > *, .st-key-nav_about, .st-key-nav_assume, .st-key-nav_run,
+  .st-key-nav_about, .st-key-nav_assume, .st-key-nav_run,
   .st-key-nav [data-testid="stElementContainer"], .st-key-nav .stButton, .st-key-nav button {{
     flex: 0 0 auto !important; width: max-content !important; min-width: max-content !important;
     max-width: none !important; }}
@@ -1753,10 +1764,17 @@ st.html(f'<div class="masthead">{MARK}<div><div class="app-name">Delivery Statio
   if (!window.matchMedia('(max-width: 640px)').matches) return;
   var tries = 0;
   (function center(){{
-    var nav = document.querySelector('.st-key-nav'), b = document.querySelector('.st-key-nav{page} button');
-    if (!nav || !b) {{ if (tries++ < 20) setTimeout(center, 100); return; }}
-    var r = b.getBoundingClientRect(), n = nav.getBoundingClientRect();
-    nav.scrollLeft += (r.left - n.left) - (n.width - r.width) / 2;
+    var nav = document.querySelector('.st-key-nav'), row = document.querySelector('.st-key-nav_scroll');
+    if (!nav || !row) {{ if (tries++ < 20) setTimeout(center, 100); return; }}
+    var b = row.querySelector('.st-key-nav{page} button');
+    if (b) {{
+      var r = b.getBoundingClientRect(), n = row.getBoundingClientRect();
+      row.scrollLeft += (r.left - n.left) - (n.width - r.width) / 2;
+    }}
+    var mark = function() {{
+      nav.classList.toggle('at-end', row.scrollLeft + row.clientWidth >= row.scrollWidth - 4); }};
+    if (!row.dataset.watch) {{ row.dataset.watch = '1'; row.addEventListener('scroll', mark, {{passive: true}}); }}
+    mark();
   }})();
 }})();</script>""", unsafe_allow_javascript=True)
 def nav_item(i: int) -> None:
@@ -1777,16 +1795,24 @@ st.html(f"""<style>
 NAV_GROUPS = [("about", range(0, FIRST_STEP), None),
               ("assume", range(FIRST_STEP, FIRST_STEP + len(STEPS)), "Assumptions"),
               ("run", range(FIRST_STEP + len(STEPS), len(names)), None)]
+def nav_group(g: str, idxs, title: str | None) -> None:
+    with st.container(key=f"nav_{g}", horizontal=True, vertical_alignment="center", width="content"):
+        if title:
+            st.html(f'<span class="nav-group">{title}</span>')
+        for i in idxs:
+            nav_item(i)
+        if g == "run":
+            st.button("↺ Reset to defaults", key="nav_reset", type="tertiary", on_click=reset_all,
+                      disabled=not changed(), help="Set every assumption back to its default value.")
+
+
+# On desktop the scroll wrapper is invisible (display: contents), so all three groups share one wrapping row.
+# On phones the explanation pages and assumption steps become one swipeable row, with the run group on its own row.
 with st.container(key="nav", horizontal=True, vertical_alignment="center"):
-    for g, idxs, title in NAV_GROUPS:
-        with st.container(key=f"nav_{g}", horizontal=True, vertical_alignment="center", width="content"):
-            if title:
-                st.html(f'<span class="nav-group">{title}</span>')
-            for i in idxs:
-                nav_item(i)
-            if g == "run":
-                st.button("↺ Reset to defaults", key="nav_reset", type="tertiary", on_click=reset_all,
-                          disabled=not changed(), help="Set every assumption back to its default value.")
+    with st.container(key="nav_scroll", horizontal=True, vertical_alignment="center"):
+        for g, idxs, title in NAV_GROUPS[:2]:
+            nav_group(g, idxs, title)
+    nav_group(*NAV_GROUPS[2])
 st.html('<hr class="nav under-menu">')
 
 a = settings()
