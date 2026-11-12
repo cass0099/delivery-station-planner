@@ -69,7 +69,7 @@ ORANGE, GREEN = CORAL, TEAL
 NAVY = "#233069"
 # Red accents: #eb1700 for buttons and red text (4.5:1 with white), brighter #ff3008 for lines and handles.
 RED, RED_BRIGHT, RED_DARK = "#eb1700", "#ff3008", "#c81400"
-HUB_COLORS = [BLUE, CORAL, TEAL, GOLD]
+HUB_COLORS = [BLUE, CORAL, TEAL, GOLD, "#5a9e4b", "#8a5cf5", "#d45d9b", "#4a5d78"]   # station colors on maps
 WEEK_COLORS = {"normal": BLUE, "holiday_peak": CORAL, "hub_outage": TEAL}
 WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
          10: "ten", 11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen"}
@@ -1166,7 +1166,7 @@ def network_map(tracts, sites, drive, label: str, a: dict | None = None) -> foli
     add_basemap(m)
     folium.GeoJson(
         t, style_function=lambda f: (
-            {"fillColor": HUB_COLORS[f["properties"]["hub"] % 4], "color": "#ffffff", "weight": 0.25,
+            {"fillColor": HUB_COLORS[f["properties"]["hub"] % len(HUB_COLORS)], "color": "#ffffff", "weight": 0.25,
              "fillOpacity": f["properties"]["opacity"]} if f["properties"]["on"] else
             {"fillColor": "#9a9a9a", "color": "#ffffff", "weight": 0.25, "fillOpacity": 0.12}),
         tooltip=folium.GeoJsonTooltip(["served", "zip", "county", "pkgs"],
@@ -1178,11 +1178,12 @@ def network_map(tracts, sites, drive, label: str, a: dict | None = None) -> foli
         s = loc.loc[r]
         html = (f'<div style="display:flex;align-items:center;gap:6px;white-space:nowrap;'
                 f'font:600 13px \'{FONT}\',sans-serif;color:{INK};text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff">'
-                f'<span style="flex:none;width:14px;height:14px;border-radius:50%;background:{HUB_COLORS[i % 4]};'
+                f'<span style="flex:none;width:14px;height:14px;border-radius:50%;background:{HUB_COLORS[i % len(HUB_COLORS)]};'
                 f'border:2.5px solid #fff;box-shadow:0 0 0 1px {INK}"></span>'
-                f'Station {i + 1} · {size} · {share.get(i, 0):.0%}</div>')
-        folium.Marker([s.lat, s.lon], icon=folium.DivIcon(html=html, icon_size=(190, 20), icon_anchor=(9, 10)),
-                      tooltip=f"Station {i + 1}: {size}").add_to(m)
+                f'Station {i + 1} · {size} · {share.get(i, 0):.0%} of packages</div>')
+        folium.Marker([s.lat, s.lon], icon=folium.DivIcon(html=html, icon_size=(250, 20), icon_anchor=(9, 10)),
+                      tooltip=f"Station {i + 1} is a {size} station. It handles {share.get(i, 0):.0%} of the "
+                              "network's packages on an average day.").add_to(m)
     add_labels(m)
     return m
 
@@ -2378,6 +2379,14 @@ else:
     with right:
         st_folium(network_map(tracts, sites, drive, yours["hubs"], ra), height=460, use_container_width=True,
                   returned_objects=[])
+        n_st = len(hub_list(yours["hubs"]))
+        st.html('<div class="chart-note">Each colored area is served by the station of the same color. The '
+                'percentage next to each station is its share of the network\'s packages on an average day, so the '
+                'percentages add up to 100%.'
+                + (f' Networks of more than {len(HUB_COLORS)} stations reuse colors, so the labels show which '
+                   'station is which.' if n_st > len(HUB_COLORS) else '')
+                + (' Grey areas are ZIP codes the network does not serve.' if ra["coverage"]["households_served"] < 1
+                   else '') + '</div>')
 
     frames = run["frames"]
     PAY_POLICY_ON[0] = bool(ra["drivers"].get("raise_base_to_floor"))
